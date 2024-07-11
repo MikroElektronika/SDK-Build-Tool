@@ -1,5 +1,14 @@
 name: SDK Recursive Build
 
+on:
+  workflow_dispatch:
+    inputs:
+        select_index:
+          type: choice
+          description: SDK Recursive Build
+          options:
+            - RUN hehe
+
 jobs:
   index:
     runs-on: ubuntu-latest
