@@ -1,14 +1,4 @@
-name: Index Latest Release
-
-on:
-  workflow_dispatch:
-    inputs:
-        select_index:
-          type: choice
-          description: Index as test or live
-          options:
-            - Test
-            - Live
+name: SDK Recursive Build
 
 jobs:
   index:
@@ -32,16 +22,11 @@ jobs:
           pip install elasticsearch==7.13.4
           sudo apt-get install p7zip-full
 
-      - name: Run Index Script
+      - name: Run Recursive Build
         env:
           ES_HOST: ${{ secrets.ES_HOST }}
           ES_USER: ${{ secrets.ES_USER }}
           ES_PASSWORD: ${{ secrets.ES_PASSWORD }}
         run: |
-          if [[ ${{ github.event.inputs.select_index }} == "Live" ]]; then
-            echo "Indexing to Live."
-            python -u scripts/index.py ${{ github.repository }} ${{ secrets.GITHUB_TOKEN }} ${{ secrets.ES_INDEX_LIVE }}
-          else
-            echo "Indexing to Test."
-            python -u scripts/index.py ${{ github.repository }} ${{ secrets.GITHUB_TOKEN }} ${{ secrets.ES_INDEX_TEST }}
-          fi
+            echo "Start of yaml."
+            python -u scripts/recursive_build.py ${{ github.repository }} ${{ secrets.GITHUB_TOKEN }} ${{ secrets.ES_INDEX_TEST }}
