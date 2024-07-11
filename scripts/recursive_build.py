@@ -1,3 +1,1 @@
-import subprocess
-
-subprocess.call("echo 'Hello World!'")
+print("Hello World, this is python script!")

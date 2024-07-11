@@ -2,12 +2,6 @@ name: SDK Recursive Build
 
 on:
   workflow_dispatch:
-    inputs:
-        select_index:
-          type: choice
-          description: SDK Recursive Build
-          options:
-            - RUN hehe
 
 jobs:
   index:
@@ -31,6 +25,10 @@ jobs:
           pip install elasticsearch==7.13.4
           sudo apt-get install p7zip-full
 
+      - name: Install NECTO
+        run: |
+          bash scripts/installNecto.sh
+
       - name: Run Recursive Build
         env:
           ES_HOST: ${{ secrets.ES_HOST }}
@@ -38,4 +36,4 @@ jobs:
           ES_PASSWORD: ${{ secrets.ES_PASSWORD }}
         run: |
             echo "Start of yaml."
-            python -u scripts/recursive_build.py ${{ github.repository }} ${{ secrets.GITHUB_TOKEN }} ${{ secrets.ES_INDEX_TEST }}
+            python -u scripts/recursive_build.py
