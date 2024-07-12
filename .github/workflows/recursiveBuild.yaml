@@ -25,6 +25,7 @@ jobs:
           pip install elasticsearch==7.13.4
           sudo apt-get install p7zip-full
           sudo apt-get install freeglut3-dev
+          sudo apt-get install libevent-dev
 
       - name: Install NECTO
         run: |
@@ -43,4 +44,4 @@ jobs:
           cd /home/runner/work/SDK-Build-Tool/MikroElektronika/NECTOStudio/bin
           pwd
           ls -la
-          ./sdk_build_automation --compiler "mikrocavr" --sdk "mikrosdk_v2111" --installPrefix "d:\test" --mcu "ATMEGA2560"
+          ./sdk_build_automation --compiler "mikrocavr" --sdk "mikrosdk_v2111" --installPrefix "/home/runner/work/SDK-Build-Tool/test-result" --mcu "ATMEGA2560"
