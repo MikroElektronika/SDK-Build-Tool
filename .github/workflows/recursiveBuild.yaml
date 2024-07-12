@@ -28,7 +28,8 @@ jobs:
           sudo apt-get install libevent-dev
           sudo apt-get install libopus-dev
           sudo apt-get install libminizip-dev
-          sudo apt-get install libxcb-xinerama0-dev
+          sudo apt-get install libxkbcommon-x11-dev
+          export PATH=$PATH:~/Qt/Tools/QtCreator/bin
 
       - name: Install NECTO
         run: |
