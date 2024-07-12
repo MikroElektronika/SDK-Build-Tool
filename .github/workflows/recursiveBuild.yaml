@@ -40,7 +40,7 @@ jobs:
           echo "Removed files, so it should be empty:"
           ls -la
           cd /home/runner/work/SDK-Build-Tool/SDK-Build-Tool
-          cp -r !(.git|.github|scripts|templates) /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/
+          cp -r !.git|!.github|!scripts|!templates /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/
           cd /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src
           echo "Copied contents of SDK:"
           ls -la
