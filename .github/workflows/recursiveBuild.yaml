@@ -35,7 +35,8 @@ jobs:
           echo "----- GIT LOG and DIFF. --------"
           cd /home/runner/work/SDK-Build-Tool/SDK-Build-Tool
           git log
-          git diff HEAD..remotes/origin/main
+          git branch -r
+          git diff origin/main
           cd /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src
           rm -rf /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/*
           cd /home/runner/work/SDK-Build-Tool/SDK-Build-Tool
