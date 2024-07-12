@@ -29,11 +29,14 @@ jobs:
         run: |
           bash scripts/installNecto.sh
 
-      - name: Clone SDK repo
+      - name: Setup SSH
         env:
-          ES_HOST: ${{ secrets.ES_HOST }}
-          ES_USER: ${{ secrets.ES_USER }}
-          ES_PASSWORD: ${{ secrets.ES_PASSWORD }}
+          DEPLOY_SSH: ${{ secrets.DEPLOY_PRIVATE_SSH }}
+        run: |
+          echo "$DEPLOY_SSH" >> ssh_key
+          ssh-add ssh_key
+
+      - name: Clone SDK repo
         run: |
           git clone git@github.com:MikroElektronika/SDK-Build-Tool.git 2.11.1
           pwd
@@ -41,10 +44,6 @@ jobs:
 
 
       - name: Run Recursive Build
-        env:
-          ES_HOST: ${{ secrets.ES_HOST }}
-          ES_USER: ${{ secrets.ES_USER }}
-          ES_PASSWORD: ${{ secrets.ES_PASSWORD }}
         run: |
             echo "Start of yaml."
             python -u scripts/recursive_build.py
