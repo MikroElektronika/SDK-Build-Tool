@@ -29,6 +29,13 @@ jobs:
         run: |
           bash scripts/installNecto.sh
 
+      - name: Clone SDK repo
+        run: |
+          git clone https://github.com/MikroElektronika/SDK-Build-Tool.git 2.11.1
+          pwd
+          ls -la
+
+
       - name: Run Recursive Build
         env:
           ES_HOST: ${{ secrets.ES_HOST }}
