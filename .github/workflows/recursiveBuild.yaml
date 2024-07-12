@@ -33,10 +33,12 @@ jobs:
         env:
           DEPLOY_SSH: ${{ secrets.DEPLOY_PRIVATE_SSH }}
         run: |
-          echo "$DEPLOY_SSH" >> ssh_key
-          chmod 400 ssh_key
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          echo "$DEPLOY_SSH" >> ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
           eval `ssh-agent`
-          ssh-add ssh_key
+          ssh-add ~/.ssh/id_rsa
 
       - name: Clone SDK repo
         run: |
