@@ -32,15 +32,13 @@ jobs:
 
       - name: Run Recursive Build
         run: |
-          echo "----- GIT LOG and DIFF. --------"
           cd /home/runner/work/SDK-Build-Tool/SDK-Build-Tool
-          git log
           git pull
-          git branch -a
           git diff origin/main > gitDiff.txt
-          cat gitDiff.txt
           cd /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src
           rm -rf /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/*
           cd /home/runner/work/SDK-Build-Tool/SDK-Build-Tool
           shopt -s extglob
           cp -r !(.git|.github|scripts|templates) /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/
+          cd /home/runner/work/SDK-Build-Tool/MikroElektronika/NECTOStudio/bin
+          sdk_build_automation --compiler "mikrocavr" --sdk "mikrosdk_v2111" --installPrefix "d:\test" --mcu "ATMEGA2560"
