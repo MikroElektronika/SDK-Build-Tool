@@ -33,6 +33,7 @@ jobs:
       - name: Run Recursive Build
         run: |
           echo "----- GIT LOG and DIFF. --------"
+          cd /home/runner/work/SDK-Build-Tool/SDK-Build-Tool
           git log
           git diff HEAD..remotes/origin/main
           cd /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src
@@ -40,4 +41,3 @@ jobs:
           cd /home/runner/work/SDK-Build-Tool/SDK-Build-Tool
           shopt -s extglob
           cp -r !(.git|.github|scripts|templates) /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/
-          cd /home/runner/work/SDK-Build-Tool/SDK-Build-Tool
