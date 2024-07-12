@@ -26,16 +26,16 @@ jobs:
           sudo apt-get install p7zip-full
           sudo apt-get install freeglut3-dev
 
-      - name: Install NECTO
-        run: |
-          bash scripts/installNecto.sh
+      # - name: Install NECTO
+      #   run: |
+      #     bash scripts/installNecto.sh
 
       - name: Run Recursive Build
         run: |
           echo "----- GIT LOG and DIFF. --------"
           cd /home/runner/work/SDK-Build-Tool/SDK-Build-Tool
           git log
-          git branch -r
+          git branch -a
           git diff origin/main
           cd /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src
           rm -rf /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/*
