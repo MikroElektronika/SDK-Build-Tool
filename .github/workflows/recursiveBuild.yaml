@@ -27,6 +27,7 @@ jobs:
           sudo apt-get install freeglut3-dev
           sudo apt-get install libevent-dev
           sudo apt-get install libopus-dev
+          sudo apt-get install libminizip-dev
 
       - name: Install NECTO
         run: |
