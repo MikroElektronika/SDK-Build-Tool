@@ -34,6 +34,7 @@ jobs:
           DEPLOY_SSH: ${{ secrets.DEPLOY_PRIVATE_SSH }}
         run: |
           echo "$DEPLOY_SSH" >> ssh_key
+          chmod 400 ssh_key
           eval `ssh-agent`
           ssh-add ssh_key
 
