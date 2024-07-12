@@ -32,8 +32,15 @@ jobs:
 
       - name: Run Recursive Build
         run: |
-          echo "----- Let's see our location. --------"
-          pwd
-          echo "----- Let's see what we have here. -----"
+          echo "----- Let's replace installed SDK contents with current SDK for testing. --------"
+          echo "Original contents of SDK:"
+          cd /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src
           ls -la
-          python -u scripts/recursive_build.py
+          rm -rf /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/*
+          echo "Removed files, so it should be empty:"
+          ls -la
+          cd /home/runner/work/SDK-Build-Tool/SDK-Build-Tool
+          cp !(.git*|scripts|templates) /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/
+          cd /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src
+          echo "Copied contents of SDK:"
+          ls -la
