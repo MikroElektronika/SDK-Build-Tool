@@ -39,7 +39,8 @@ jobs:
           rm -rf /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/*
           echo "Removed files, so it should be empty:"
           ls -la
-          cp /home/runner/work/SDK-Build-Tool/SDK-Build-Tool/* /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/
-          rm -rf .git .github scripts templates
+          cd /home/runner/work/SDK-Build-Tool/SDK-Build-Tool
+          cp -r !(.git|.github|scripts|templates) /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/
+          cd /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src
           echo "Copied contents of SDK:"
           ls -la
