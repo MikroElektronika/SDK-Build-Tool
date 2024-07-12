@@ -37,7 +37,7 @@ jobs:
           git log
           git pull
           git branch -a
-          git diff origin/main >> gitDiff.txt
+          git diff origin/main > gitDiff.txt
           cat gitDiff.txt
           cd /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src
           rm -rf /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/*
