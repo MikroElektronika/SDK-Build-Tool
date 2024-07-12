@@ -15,16 +15,16 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install aiohttp
-          pip install aiofiles
-          pip install requests
-          pip install py7zr
-          pip install elasticsearch==7.13.4
-          sudo apt-get install p7zip-full
-          sudo apt-get install freeglut3-dev
+      # - name: Install Dependencies
+      #   run: |
+      #     python -m pip install --upgrade pip
+      #     pip install aiohttp
+      #     pip install aiofiles
+      #     pip install requests
+      #     pip install py7zr
+      #     pip install elasticsearch==7.13.4
+      #     sudo apt-get install p7zip-full
+      #     sudo apt-get install freeglut3-dev
 
       # - name: Install NECTO
       #   run: |
@@ -35,6 +35,7 @@ jobs:
           echo "----- GIT LOG and DIFF. --------"
           cd /home/runner/work/SDK-Build-Tool/SDK-Build-Tool
           git log
+          git pull
           git branch -a
           git diff origin/main
           cd /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src
