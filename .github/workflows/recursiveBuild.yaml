@@ -30,6 +30,10 @@ jobs:
           bash scripts/installNecto.sh
 
       - name: Clone SDK repo
+        env:
+          ES_HOST: ${{ secrets.ES_HOST }}
+          ES_USER: ${{ secrets.ES_USER }}
+          ES_PASSWORD: ${{ secrets.ES_PASSWORD }}
         run: |
           git clone https://github.com/MikroElektronika/SDK-Build-Tool.git 2.11.1
           pwd
