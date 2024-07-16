@@ -30,7 +30,6 @@ jobs:
           sudo apt-get install libminizip-dev
           sudo apt-get install libxkbcommon-x11-dev
           export PATH=$PATH:~/Qt/Tools/QtCreator/bin
-          export QT_DEBUG_PLUGINS=1
 
       - name: Install NECTO
         run: |
@@ -38,6 +37,7 @@ jobs:
 
       - name: Run Recursive Build
         run: |
+          export QT_DEBUG_PLUGINS=1
           cd /home/runner/work/SDK-Build-Tool/SDK-Build-Tool
           git pull
           git diff origin/main > gitDiff.txt
