@@ -48,4 +48,4 @@ jobs:
           cd /home/runner/work/SDK-Build-Tool/MikroElektronika/NECTOStudio/bin
           pwd
           ls -la
-          ./sdk_build_automation --compiler "mikrocavr" --sdk "mikrosdk_v2111" --installPrefix "/home/runner/work/SDK-Build-Tool/test-result" --mcu "ATMEGA2560"
+          ./sdk_build_automation
