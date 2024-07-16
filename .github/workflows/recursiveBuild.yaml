@@ -24,7 +24,7 @@ jobs:
           pip install py7zr
           pip install elasticsearch==7.13.4
           pip install setuptools
-          pip install opencv-python
+          pip install opencv-python-headless
           pip install PyQt6
           sudo apt-get update
           sudo apt-get install p7zip-full
