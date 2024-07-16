@@ -74,5 +74,6 @@ jobs:
           shopt -s extglob
           cp -r !(.git|.github|scripts|templates) /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/
           cd /home/runner/work/SDK-Build-Tool/MikroElektronika/NECTOStudio/bin
+          chmod ugo+rwx /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/databases
           echo "Running sdk_build_automation"
-          sudo xvfb-run ./sdk_build_automation --compiler "mikrocavr" --sdk "mikrosdk_v2111" --installPrefix "/home/runner/work/SDK-Build-Tool/build_test"
+          xvfb-run ./sdk_build_automation --compiler "mikrocavr" --sdk "mikrosdk_v2111" --installPrefix "/home/runner/work/SDK-Build-Tool/build_test"
