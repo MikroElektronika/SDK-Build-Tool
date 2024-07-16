@@ -28,10 +28,21 @@ jobs:
           sudo apt-get install libevent-dev
           sudo apt-get install libopus-dev
           sudo apt-get install libminizip-dev
-          sudo apt-get install libxkbcommon-x11-dev
+	      sudo apt-get install libxkbcommon-x11-dev
           sudo apt-get install libxcb-cursor0
           sudo apt-get install libxcb-xinerama0
           sudo apt-get install libxcb-icccm4
+          sudo apt-get install libxcb-keysyms1
+          sudo apt-get install libxcb-render
+          sudo apt-get install libxcb-render-util
+          sudo apt-get install libxcb-shape
+          sudo apt-get install libxcb-randr
+          sudo apt-get install libxcb-xfixes
+          sudo apt-get install libxcb-xkb
+          sudo apt-get install libxcb-sync
+          sudo apt-get install libxcb-shm
+          sudo apt-get install libxcb-image
+          sudo apt-get install libxcb-util
           export PATH=$PATH:~/Qt/Tools/QtCreator/bin
 
       - name: Install NECTO
