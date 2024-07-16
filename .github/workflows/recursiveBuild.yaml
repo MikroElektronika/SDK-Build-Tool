@@ -63,4 +63,4 @@ jobs:
           cp -r !(.git|.github|scripts|templates) /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/
           cd /home/runner/work/SDK-Build-Tool/MikroElektronika/NECTOStudio/bin
           echo "Running sdk_build_automation"
-          QT_QPA_PLATFORM=offscreen ./sdk_build_automation --compiler "mikrocavr" --sdk "mikrosdk_v2111" --installPrefix "/home/runner/work/SDK-Build-Tool/build_test"
+          ./sdk_build_automation --compiler "mikrocavr" --sdk "mikrosdk_v2111" --installPrefix "/home/runner/work/SDK-Build-Tool/build_test"
