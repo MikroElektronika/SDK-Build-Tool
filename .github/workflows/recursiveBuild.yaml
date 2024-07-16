@@ -43,8 +43,6 @@ jobs:
           sudo apt-get install libxcb-shm0
           sudo apt-get install libxcb-image0
           sudo apt-get install libxcb-util1
-          export PATH=$PATH:~/Qt/Tools/QtCreator/bin
-          export DISPLAY=:0.0
 
       - name: Install NECTO
         run: |
@@ -52,6 +50,8 @@ jobs:
 
       - name: Run Recursive Build
         run: |
+          export PATH=$PATH:~/Qt/Tools/QtCreator/bin
+          export DISPLAY=:0.0
           export QT_DEBUG_PLUGINS=1
           cd /home/runner/work/SDK-Build-Tool/SDK-Build-Tool
           git pull
