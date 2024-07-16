@@ -52,6 +52,7 @@ jobs:
         run: |
           export PATH=$PATH:~/Qt/Tools/QtCreator/bin
           export QT_DEBUG_PLUGINS=1
+          python scripts/dependencies.py
           cd /home/runner/work/SDK-Build-Tool/SDK-Build-Tool
           git pull
           git diff origin/main > gitDiff.txt
