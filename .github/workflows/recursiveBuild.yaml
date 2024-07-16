@@ -24,10 +24,10 @@ jobs:
           pip install py7zr
           pip install elasticsearch==7.13.4
           sudo apt-get install p7zip-full
-          sudo apt-get install freeglut3
-          sudo apt-get install libevent
-          sudo apt-get install libopus
-          sudo apt-get install libminizip
+          sudo apt-get install freeglut3-dev
+          sudo apt-get install libevent-dev
+          sudo apt-get install libopus-dev
+          sudo apt-get install libminizip-dev
           sudo apt-get install libxkbcommon-x11
           sudo apt-get install libxcb-cursor0
           sudo apt-get install libxcb-xinerama0
