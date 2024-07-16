@@ -24,24 +24,24 @@ jobs:
           pip install py7zr
           pip install elasticsearch==7.13.4
           sudo apt-get install p7zip-full
-          sudo apt-get install freeglut3-dev
-          sudo apt-get install libevent-dev
-          sudo apt-get install libopus-dev
-          sudo apt-get install libminizip-dev
-          sudo apt-get install libxkbcommon-x11-dev
+          sudo apt-get install freeglut3
+          sudo apt-get install libevent
+          sudo apt-get install libopus
+          sudo apt-get install libminizip
+          sudo apt-get install libxkbcommon-x11
           sudo apt-get install libxcb-cursor0
           sudo apt-get install libxcb-xinerama0
           sudo apt-get install libxcb-icccm4
           sudo apt-get install libxcb-keysyms1
           sudo apt-get install libxcb-render-util0
-          sudo apt-get install libxcb-shape
-          sudo apt-get install libxcb-randr
-          sudo apt-get install libxcb-xfixes
+          sudo apt-get install libxcb-shape0
+          sudo apt-get install libxcb-randr0
+          sudo apt-get install libxcb-xfixes0
           sudo apt-get install libxcb-xkb
-          sudo apt-get install libxcb-sync
-          sudo apt-get install libxcb-shm
-          sudo apt-get install libxcb-image
-          sudo apt-get install libxcb-util
+          sudo apt-get install libxcb-sync0
+          sudo apt-get install libxcb-shm0
+          sudo apt-get install libxcb-image0
+          sudo apt-get install libxcb-util1
           export PATH=$PATH:~/Qt/Tools/QtCreator/bin
 
       - name: Install NECTO
