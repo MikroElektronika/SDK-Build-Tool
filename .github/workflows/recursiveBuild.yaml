@@ -37,7 +37,7 @@ jobs:
           sudo apt-get install libxcb-shape0
           sudo apt-get install libxcb-randr0
           sudo apt-get install libxcb-xfixes0
-          sudo apt-get install libxcb-xkb
+          sudo apt-get install libxcb-xkb1
           sudo apt-get install libxcb-sync0
           sudo apt-get install libxcb-shm0
           sudo apt-get install libxcb-image0
