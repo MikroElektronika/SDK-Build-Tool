@@ -44,6 +44,7 @@ jobs:
           sudo apt-get install libxcb-image0
           sudo apt-get install libxcb-util1
           export PATH=$PATH:~/Qt/Tools/QtCreator/bin
+          export DISPLAY=:0.0
 
       - name: Install NECTO
         run: |
