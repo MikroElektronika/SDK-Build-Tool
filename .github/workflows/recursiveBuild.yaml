@@ -66,6 +66,8 @@ jobs:
         run: |
           export PATH=$PATH:~/Qt/Tools/QtCreator/bin
           chmod -R 777 /home/runner/.MIKROE/
+          cd /home/runner/MikroElektronika/NECTOStudio/bin
+          ls -la
           cd /home/runner/.MIKROE/NECTOStudio7
           echo "Running sdk_build_automation"
           xvfb-run /home/runner/MikroElektronika/NECTOStudio/bin/sdk_build_automation --compiler "mikrocavr" --sdk "mikrosdk_v2111" --installPrefix "/home/runner/build_test"
