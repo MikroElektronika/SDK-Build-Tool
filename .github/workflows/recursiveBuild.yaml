@@ -67,7 +67,16 @@ jobs:
           export PATH=$PATH:~/Qt/Tools/QtCreator/bin
           chmod -R 777 /home/runner/.MIKROE/
           chmod -R 777 /home/runner/MikroElektronika/
+          cd /home/runner/MikroElektronika
+          pwd
+          ls -la
           cd /home/runner/MikroElektronika/NECTOStudio/bin
+          pwd
+          ls -la
+          cd /home/runner
+          pwd
+          ls -la
+          cd /home/runner/.config
           pwd
           ls -la
           cd /home/runner/.MIKROE/NECTOStudio7
