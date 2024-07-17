@@ -41,8 +41,8 @@ cp /home/runner/NECTOStudio.conf /home/runner/.config/MikroElektronika
 echo "Step 10: Move installed_packages.json to MIKROE if it's generated in root"
 [ -f "/home/runner/installed_packages.json" ] && mv "/home/runner/installed_packages.json" /home/runner/MikroElektronika/installed_packages.json
 
-echo "Step 11: Remove installer.7z"
-rm /home/runner/installer.7z
+echo "Step 11: Remove NECTOInstaller.zip"
+rm /home/runner/NECTOInstaller.zip
 
 echo "Step 12: Remove NECTOInstaller"
 rm /home/runner/NECTOInstaller
