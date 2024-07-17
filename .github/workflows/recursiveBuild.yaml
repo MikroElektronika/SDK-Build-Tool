@@ -70,19 +70,13 @@ jobs:
           cd /home/runner/MikroElektronika
           pwd
           ls -la
-          cd /home/runner/MikroElektronika/NECTOStudio/bin
-          pwd
-          ls -la
           cd /home/runner
           pwd
           ls -la
+          cd /home/runner/.local
+          pwd
+          ls -la
           cd /home/runner/.config
-          pwd
-          ls -la
-          cd /home/runner/.config/MikroElektronika
-          pwd
-          ls -la
-          cd /home/runner/.MIKROE/NECTOStudio7
           pwd
           ls -la
           echo "Running sdk_build_automation"

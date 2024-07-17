@@ -21,7 +21,7 @@ echo "Step 3: Install NECTO"
 ./NECTOInstaller installer --install-packages necto_installer necto_application /home/runner/MikroElektronika /home/runner/.MIKROE/NECTOStudio7
 
 echo "Step 4: Move installer to MIKROE if it's generated in root"
-[ -f "/home/runner/MikroElektronika/NECTOInstaller" ] && mv "/home/runner/MikroElektronika/NECTOInstaller" /home/runner/MikroElektronika/installer
+[ -f "/home/runner/MikroElektronika/NECTOInstaller" ] && mv "/home/runner/MikroElektronika/installer_tmp" /home/runner/MikroElektronika/installer
 
 echo "Step 5: Move instance_uuid.txt to MIKROE if it's generated in root"
 [ -f "/home/runner/instance_uuid.txt" ] && mv "/home/runner/instance_uuid.txt" /home/runner/MikroElektronika/instance_uuid.txt
