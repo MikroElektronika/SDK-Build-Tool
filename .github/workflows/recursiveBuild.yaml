@@ -69,6 +69,11 @@ jobs:
           git pull
           git diff origin/main > gitDiff.txt
           chmod -R 777 /home/runner/work/SDK-Build-Tool/.MIKROE/
+          cd /home/runner/work/SDK-Build-Tool/.MIKROE/
+          pwd
+          ls -la
+          cd NECTOStudio7
+          ls -la
           rm -rf /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/*
           cd /home/runner/work/SDK-Build-Tool/SDK-Build-Tool
           shopt -s extglob
