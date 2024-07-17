@@ -19,6 +19,7 @@ echo "Step 2: Extract installer"
 
 echo "MicroStep 2: give permissions to write to .config folder"
 chmod 777 /home/runner/.config
+mkdir /home/runner/.config/MikroElektronika
 chmod -R 777 /home/runner/.config
 
 echo "Step 3: Install NECTO"
