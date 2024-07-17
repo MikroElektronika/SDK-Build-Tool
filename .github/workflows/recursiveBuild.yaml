@@ -68,13 +68,11 @@ jobs:
           cd /home/runner/work/SDK-Build-Tool/SDK-Build-Tool
           git pull
           git diff origin/main > gitDiff.txt
+          cd /home/runner/work/SDK-Build-Tool/.MIKROE
+          chmod -R u+rwx NECTOStudio7
           rm -rf /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/*
           cd /home/runner/work/SDK-Build-Tool/SDK-Build-Tool
           shopt -s extglob
           cp -r !(.git|.github|scripts|templates) /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/
-          cd /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7
-          echo "Let's see the contents"
-          pwd
-          ls -la
           echo "Running sdk_build_automation"
           xvfb-run /home/runner/work/SDK-Build-Tool/MikroElektronika/NECTOStudio/bin/sdk_build_automation --compiler "mikrocavr" --sdk "mikrosdk_v2111" --installPrefix "/home/runner/work/SDK-Build-Tool/build_test"
