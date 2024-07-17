@@ -65,19 +65,12 @@ jobs:
       - name: Run Recursive Build
         run: |
           export PATH=$PATH:~/Qt/Tools/QtCreator/bin
-          cd /home/runner/work/SDK-Build-Tool/SDK-Build-Tool
-          git pull
-          git diff origin/main > gitDiff.txt
-          chmod -R 777 /home/runner/work/SDK-Build-Tool/.MIKROE/
-          cd /home/runner/work/SDK-Build-Tool/.MIKROE/
+          chmod -R 777 /home/runner/.MIKROE/
+          cd /home/runner/.MIKROE/
           pwd
           ls -la
           cd NECTOStudio7
           ls -la
-          rm -rf /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/*
-          cd /home/runner/work/SDK-Build-Tool/SDK-Build-Tool
-          shopt -s extglob
-          cp -r !(.git|.github|scripts|templates) /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/
-          cd /home/runner/work/SDK-Build-Tool/.MIKROE/NECTOStudio7
+          cd /home/runner/.MIKROE/NECTOStudio7
           echo "Running sdk_build_automation"
-          xvfb-run /home/runner/work/SDK-Build-Tool/MikroElektronika/NECTOStudio/bin/sdk_build_automation --compiler "mikrocavr" --sdk "mikrosdk_v2111" --installPrefix "/home/runner/work/SDK-Build-Tool/build_test"
+          xvfb-run /home/runner/MikroElektronika/NECTOStudio/bin/sdk_build_automation --compiler "mikrocavr" --sdk "mikrosdk_v2111" --installPrefix "/home/runner/build_test"
