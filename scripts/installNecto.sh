@@ -18,7 +18,7 @@ echo "Step 2: Extract installer"
 7za x installer.7z
 
 echo "Step 3: Install NECTO"
-./installer_tmp installer --install-packages necto_installer necto_application clocks schemas database mikroe_utils_common preinit unit_test_lib /home/runner/MikroElektronika /home/runner/.MIKROE/NECTOStudio7
+./installer_tmp installer --install-packages necto_installer necto_application clocks schemas database mikroe_utils_common preinit unit_test_lib avr_mikroc_avr_lte64k /home/runner/MikroElektronika /home/runner/.MIKROE/NECTOStudio7
 
 echo "Step 4: Move installer to MIKROE if it's generated in root"
 [ -f "/home/runner/MikroElektronika/installer_tmp" ] && mv "/home/runner/MikroElektronika/installer_tmp" /home/runner/MikroElektronika/installer
