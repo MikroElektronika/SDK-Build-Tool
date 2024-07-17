@@ -68,10 +68,10 @@ jobs:
           export PATH=$PATH:~/Qt/Tools/QtCreator/bin
           chmod -R 777 /home/runner/.MIKROE/
           chmod -R 777 /home/runner/MikroElektronika/
-          cd /home/runner/.config/
+          cd /home/runner/
           pwd
           ls -la
-          cd /home/runner/.config/MikroElektronika
+          cd /home/runner/.config
           pwd
           ls -la
           sudo find . -name NECTOStudio.conf
