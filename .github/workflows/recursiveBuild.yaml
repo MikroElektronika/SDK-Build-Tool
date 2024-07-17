@@ -67,20 +67,7 @@ jobs:
           export PATH=$PATH:~/Qt/Tools/QtCreator/bin
           chmod -R 777 /home/runner/.MIKROE/
           chmod -R 777 /home/runner/MikroElektronika/
-          cd /home/runner/MikroElektronika
-          pwd
-          ls -la
-          cd /home/runner
-          pwd
-          ls -la
-          cd /home/runner/.local
-          pwd
-          ls -la
-          cd /home/runner/.local/share
-          pwd
-          ls -la
-          cd /home/runner/.config/GitHub
-          pwd
-          ls -la
+          cd /
+          find . -name NECTOStudio.conf
           echo "Running sdk_build_automation"
           xvfb-run /home/runner/MikroElektronika/NECTOStudio/bin/sdk_build_automation --compiler "mikrocavr" --sdk "mikrosdk_v2111" --installPrefix "/home/runner/build_test"
