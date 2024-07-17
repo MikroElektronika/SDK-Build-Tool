@@ -11,8 +11,8 @@ for file in ${PWD}/*; do
 done
 
 echo "Step 1: Download NECTO"
-echo "https://software-update.mikroe.com/NECTOStudio7/live/necto/linux/NECTOInstaller.zip"
-wget https://software-update.mikroe.com/NECTOStudio7/live/necto/linux/NECTOInstaller.zip
+echo "https://software-update.mikroe.com/NECTOStudio7/development/necto/linux/NECTOInstaller.zip"
+wget https://software-update.mikroe.com/NECTOStudio7/development/necto/linux/NECTOInstaller.zip
 
 echo "Step 2: Extract installer"
 7za x NECTOInstaller.zip
