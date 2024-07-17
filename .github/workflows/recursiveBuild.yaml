@@ -79,6 +79,9 @@ jobs:
           cd /home/runner/.config
           pwd
           ls -la
+          cd /home/runner/.config/MikroElektronika
+          pwd
+          ls -la
           cd /home/runner/.MIKROE/NECTOStudio7
           pwd
           ls -la
