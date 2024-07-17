@@ -15,13 +15,13 @@ echo "https://software-update.mikroe.com/NECTOStudio7/live/necto/linux/NECTOInst
 wget https://software-update.mikroe.com/NECTOStudio7/live/necto/linux/NECTOInstaller.zip
 
 echo "Step 2: Extract installer"
-7za x installer.7z
+7za x NECTOInstaller.zip
 
 echo "Step 3: Install NECTO"
-./installer_tmp installer --install-packages necto_installer necto_application /home/runner/MikroElektronika /home/runner/.MIKROE/NECTOStudio7
+./NECTOInstaller installer --install-packages necto_installer necto_application /home/runner/MikroElektronika /home/runner/.MIKROE/NECTOStudio7
 
 echo "Step 4: Move installer to MIKROE if it's generated in root"
-[ -f "/home/runner/MikroElektronika/installer_tmp" ] && mv "/home/runner/MikroElektronika/installer_tmp" /home/runner/MikroElektronika/installer
+[ -f "/home/runner/MikroElektronika/NECTOInstaller" ] && mv "/home/runner/MikroElektronika/NECTOInstaller" /home/runner/MikroElektronika/installer
 
 echo "Step 5: Move instance_uuid.txt to MIKROE if it's generated in root"
 [ -f "/home/runner/instance_uuid.txt" ] && mv "/home/runner/instance_uuid.txt" /home/runner/MikroElektronika/instance_uuid.txt
@@ -44,8 +44,8 @@ echo "Step 10: Move installed_packages.json to MIKROE if it's generated in root"
 echo "Step 11: Remove installer.7z"
 rm /home/runner/installer.7z
 
-echo "Step 12: Remove installer_tmp"
-rm /home/runner/installer_tmp
+echo "Step 12: Remove NECTOInstaller"
+rm /home/runner/NECTOInstaller
 
 echo "Step 13: Remove NECTOStudio.conf"
 rm /home/runner/NECTOStudio.conf
