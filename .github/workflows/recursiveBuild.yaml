@@ -76,7 +76,10 @@ jobs:
           cd /home/runner/.local
           pwd
           ls -la
-          cd /home/runner/.config
+          cd /home/runner/.local/share
+          pwd
+          ls -la
+          cd /home/runner/.config/GitHub
           pwd
           ls -la
           echo "Running sdk_build_automation"
