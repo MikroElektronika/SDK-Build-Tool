@@ -11,14 +11,14 @@ for file in ${PWD}/*; do
 done
 
 echo "Step 1: Download NECTO"
-echo "https://s3-us-west-2.amazonaws.com/software-update.mikroe.com/NECTOStudio7/development/necto/linux/installer.7z"
-wget https://s3-us-west-2.amazonaws.com/software-update.mikroe.com/NECTOStudio7/development/necto/linux/installer.7z
+echo "https://software-update.mikroe.com/NECTOStudio7/live/necto/linux/NECTOInstaller.zip"
+wget https://software-update.mikroe.com/NECTOStudio7/live/necto/linux/NECTOInstaller.zip
 
 echo "Step 2: Extract installer"
 7za x installer.7z
 
 echo "Step 3: Install NECTO"
-./installer_tmp installer --install-packages necto_installer necto_application clocks schemas database mikroe_utils_common preinit unit_test_lib avr_mikroc_avr_lte64k /home/runner/MikroElektronika /home/runner/.MIKROE/NECTOStudio7
+./installer_tmp installer --install-packages necto_installer necto_application /home/runner/MikroElektronika /home/runner/.MIKROE/NECTOStudio7
 
 echo "Step 4: Move installer to MIKROE if it's generated in root"
 [ -f "/home/runner/MikroElektronika/installer_tmp" ] && mv "/home/runner/MikroElektronika/installer_tmp" /home/runner/MikroElektronika/installer
