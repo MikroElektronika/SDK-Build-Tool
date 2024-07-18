@@ -82,4 +82,4 @@ jobs:
           ls -la
           sudo find . -name NECTOStudio.conf
           echo "Running sdk_build_automation"
-          xvfb-run /home/runner/MikroElektronika/NECTOStudio/bin/sdk_build_automation --compiler "mikrocavr" --sdk "mikrosdk_v2111" --installPrefix "/home/runner/build_test"
+          xvfb-run --auto-servernum --server-num=1 /home/runner/MikroElektronika/NECTOStudio/bin/sdk_build_automation --compiler "mikrocavr" --sdk "mikrosdk_v2111" --installPrefix "/home/runner/build_test"
