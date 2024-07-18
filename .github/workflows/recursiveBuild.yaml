@@ -3,6 +3,9 @@ name: SDK Recursive Build
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   recursiveBuild:
     runs-on: ubuntu-latest
