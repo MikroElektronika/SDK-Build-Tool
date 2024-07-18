@@ -3,12 +3,12 @@ name: SDK Recursive Build
 on:
   workflow_dispatch:
 
-permissions:
-  contents: write
 
 jobs:
   recursiveBuild:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
