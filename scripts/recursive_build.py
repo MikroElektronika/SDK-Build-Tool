@@ -149,6 +149,7 @@ def classify_changes(files):
                 extract_board_name(board_cmake_file)
         
         if any(file.startswith(path) for path in case_3_paths):
+            print("\033[92mWe are in case 3 line\033[0m")
             if file.endswith('CMakeLists.txt') or file.endswith('CMakeLists.cmake'):
                 cmake_files.append(file)
             else:
@@ -162,6 +163,7 @@ def classify_changes(files):
             if other_file.endswith('.h'):
                 handle_header_file(Path(other_file))
             else:
+                print("\033[92mWe are in other_files\033[0m")
                 folder_path = Path(other_file).parent
                 check_and_extract_regex(folder_path)
 
@@ -171,6 +173,7 @@ def check_and_extract_regex(folder_path):
     for iterations in range(2):
         cmake_file = folder_path / 'CMakeLists.txt'
         if cmake_file.exists():
+            print("\033[92mWe found Cmake\033[0m")
             extract_regex(cmake_file)
             return
         cmake_file = folder_path / 'CMakeLists.cmake'
@@ -335,8 +338,6 @@ def main():
     os.makedirs(testPath, exist_ok=True)
     if os.getenv('BUILD_ALL') == '0':
         changed_files = get_changed_files()
-        for line in changed_files:
-            print(line)
         classify_changes(changed_files)
         query_database()
     # run_builds()
