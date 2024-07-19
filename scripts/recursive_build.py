@@ -149,7 +149,6 @@ def classify_changes(files):
                 extract_board_name(board_cmake_file)
         
         if any(file.startswith(path) for path in case_3_paths):
-            print("\033[92mWe are in case 3 line\033[0m")
             if file.endswith('CMakeLists.txt') or file.endswith('CMakeLists.cmake'):
                 cmake_files.append(file)
             else:
@@ -163,17 +162,14 @@ def classify_changes(files):
             if other_file.endswith('.h'):
                 handle_header_file(Path(other_file))
             else:
-                print("\033[92mWe are in other_files\033[0m")
                 folder_path = Path(other_file).parent
                 check_and_extract_regex(folder_path)
 
 def check_and_extract_regex(folder_path):
     """Checks and extracts regex from CMakeLists.txt or CMakeLists.cmake files in the given folder or its parents."""
 
-    for iterations in range(2):
+    for iterations in range(3):
         cmake_file = folder_path / 'CMakeLists.txt'
-        cmd = f'cd {folder_path} && pwd && ls -la'
-        os.system(cmd)
         if cmake_file.exists():
             extract_regex(cmake_file)
             return
