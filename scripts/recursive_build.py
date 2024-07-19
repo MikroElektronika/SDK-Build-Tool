@@ -13,6 +13,7 @@ gitPath = '/home/runner/work/SDK-Build-Tool/SDK-Build-Tool'
 dbPath = '/home/runner/.MIKROE/NECTOStudio7/databases/necto_db.db'
 testPath = '/home/runner/test_results'
 toolPath = '/home/runner/MikroElektronika/NECTOStudio/bin'
+build_failed = False
 
 compiler_list = {
     "ARM": ["gcc_arm_none_eabi", "clang-llvm", "mikrocarm"],
@@ -55,7 +56,9 @@ def run_builds():
     #         cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build"'
     #         os.system(cmd)
     cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mikrocavr" --sdk "mikrosdk_v2111" --mcu "ATMEGA2560" --installPrefix "{testPath}/mcu_card_build"'
-    os.system(cmd)
+    output = subprocess.check_output(cmd, shell=True, text=True)
+    if "Build failed!" in output:
+        build_failed = True
 
 def get_compilers(name, is_mcu=True):
     """Returns the list of compilers based on the given name and type."""
@@ -78,13 +81,28 @@ def get_compilers(name, is_mcu=True):
                 return compiler_list[key] if isinstance(compiler_list[key], list) else [compiler_list[key]]
     return []
 
+def get_latest_releases():
+    """Fetches the two latest releases from the GitHub repository."""
+    try:
+        output = subprocess.check_output(
+            ['git', 'tag', '--sort=-creatordate'],
+            cwd=gitPath, text=True
+        )
+        tags = output.splitlines()
+        return tags[:2]  # Return the two most recent tags
+    except subprocess.CalledProcessError as e:
+        print(f"Error fetching tags: {e}")
+        return None, None
+
 def get_changed_files():
     """Runs the git diff command and returns the list of changed files."""
+    latest, previous = get_latest_releases()
+    if not latest or not previous:
+        return []
+
     try:
-        cmd = 'git pull'
-        os.system(cmd)
         output = subprocess.check_output(
-            ['git', 'diff', '--name-only', 'mikroSDK-2.11.0', 'mikroSDK-2.11.1'],
+            ['git', 'diff', '--name-only', previous, latest],
             cwd=gitPath, text=True
         )
         return output.splitlines()
@@ -318,6 +336,11 @@ def main():
     print(f"Results have been written to {testPath}/mcu_list.txt")
     print(f"Results have been written to {testPath}/board_list.txt")
     print(f"Results have been written to {testPath}/mcu_card_list.txt")
+    if build_failed:
+        print("\n\n\n\n\033[91mBuild Failed!\033[0m")  # Red text
+        exit(1)
+    else:
+        print("\n\n\n\n\033[92mBuild Success!\033[0m")  # Green text
 
 if __name__ == "__main__":
     main()
