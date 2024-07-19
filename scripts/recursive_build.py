@@ -26,9 +26,17 @@ compiler_list = {
 
 def run_cmd(cmd):
     output = subprocess.check_output(cmd, shell=True, text=True)
-    print(output)
-    if "Build failed!" in output:
-        build_failed = True
+    if output.startswith("Building:") or "Build success!" in output or "Build failed" in output:
+        if "Build success!" in output:
+            print("\033[92m{}\033[0m".format(output.strip()))  # Green color for success
+        elif "Build failed" in output:
+            print("\033[91m{}\033[0m".format(output.strip()))  # Red color for failure
+            build_failed = True
+        else:
+            print(output.strip())
+    # print(output)
+    # if "Build failed!" in output:
+        # build_failed = True
 
 def run_builds():
     """Runs the build commands for each member of mcu_list, board_list, and mcu_card_list."""
@@ -265,10 +273,12 @@ def query_database():
     for mcu_card in mcu_card_list:
         mcu_card_upper = mcu_card.upper()
         cursor.execute(f"""
-            SELECT device_uid
+            SELECT SDKToDevice.device_uid
             FROM SDKToDevice
-            WHERE sdk_uid = 'mikrosdk_v2111'
-            AND device_uid REGEXP ?;
+            INNER JOIN Devices ON SDKToDevice.device_uid = Devices.uid
+            WHERE SDKToDevice.sdk_uid = 'mikrosdk_v2111'
+            AND SDKToDevice.device_uid REGEXP ?
+            AND Devices.sdk_support = '1';
         """, (mcu_card_upper,))
         rows = cursor.fetchall()
         if rows:
@@ -281,9 +291,12 @@ def query_database():
     new_board_list = []
     for board in board_list:
         cursor.execute(f"""
-            SELECT uid
-            FROM Boards
-            WHERE sdk_config REGEXP ?;
+            SELECT SDKToDevice.device_uid
+            FROM SDKToDevice
+            INNER JOIN Devices ON SDKToDevice.device_uid = Devices.uid
+            WHERE SDKToDevice.sdk_uid = 'mikrosdk_v2111'
+            AND SDKToDevice.device_uid REGEXP ?
+            AND Devices.sdk_support = '1';
         """, (board,))
         rows = cursor.fetchall()
         if rows:
@@ -297,10 +310,12 @@ def query_database():
     for regex in regex_list:
         if len(regex) > 1:  # Skip regexes with only one letter
             cursor.execute(f"""
-                SELECT device_uid
+                SELECT SDKToDevice.device_uid
                 FROM SDKToDevice
-                WHERE sdk_uid = 'mikrosdk_v2111'
-                AND device_uid REGEXP ?;
+                INNER JOIN Devices ON SDKToDevice.device_uid = Devices.uid
+                WHERE SDKToDevice.sdk_uid = 'mikrosdk_v2111'
+                AND SDKToDevice.device_uid REGEXP ?
+                AND Devices.sdk_support = '1';
             """, (regex,))
             rows = cursor.fetchall()
             if rows:
