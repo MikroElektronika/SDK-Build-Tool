@@ -73,11 +73,13 @@ jobs:
         run: |
           bash scripts/installNecto.sh
 
-      - name: Run Recursive Build
+      - name: Recursive Build for all files
         if: "${{ github.event.inputs.build_type == 'All files'}}"
         run: |
           echo "Building all files."
           python -u scripts/buildSDKAll.py
+
+      - name: Recursive build only for changed files 
         if: "${{ github.event.inputs.build_type == 'Only changed files'}}"
         run: |
           echo "Building only changed files."
