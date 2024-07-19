@@ -335,6 +335,8 @@ def main():
     os.makedirs(testPath, exist_ok=True)
     if os.getenv('BUILD_ALL') == '0':
         changed_files = get_changed_files()
+        for line in changed_files:
+            print(line)
         classify_changes(changed_files)
         query_database()
     # run_builds()
