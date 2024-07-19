@@ -3,12 +3,12 @@ name: SDK Recursive Build
 on:
   workflow_dispatch:
     inputs:
-        select_index:
+        build_type:
           type: choice
           description: Build all or only changed files
           options:
-            - Only changed
-            - All
+            - Only changed files
+            - All files
 
 
 jobs:
@@ -74,14 +74,14 @@ jobs:
           bash scripts/installNecto.sh
 
       - name: Run Recursive Build
+        if: "${{ github.event.inputs.build_type == 'All files'}}"
         run: |
-          if [[ ${{ github.event.inputs.select_index }} == "All" ]]; then
-            echo "Building all files."
-            python -u scripts/buildSDKAll.py
-          else
-            echo "Building only changed files."
-            python -u scripts/recursive_build_changed.py.py
-          fi
+          echo "Building all files."
+          python -u scripts/buildSDKAll.py
+        if: "${{ github.event.inputs.build_type == 'Only changed files'}}"
+        run: |
+          echo "Building only changed files."
+          python -u scripts/recursive_build_changed.py.py
 
       - name: Archive test results
         uses: actions/upload-artifact@v4

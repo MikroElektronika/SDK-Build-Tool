@@ -17,13 +17,8 @@ wget https://software-update.mikroe.com/NECTOStudio7/development/necto/linux/NEC
 echo "Step 2: Extract installer"
 7za x NECTOInstaller.zip
 
-echo "MicroStep 2: give permissions to write to .config folder"
-chmod 777 /home/runner/.config
-mkdir /home/runner/.config/MikroElektronika
-chmod -R 777 /home/runner/.config
-
 echo "Step 3: Install NECTO"
-./NECTOInstaller installer --install-packages necto_installer necto_application /home/runner/MikroElektronika /home/runner/.MIKROE/NECTOStudio7
+./NECTOInstaller installer --install-packages necto_installer necto_application database /home/runner/MikroElektronika /home/runner/.MIKROE/NECTOStudio7
 
 echo "Step 4: Move installer to MIKROE if it's generated in root"
 [ -f "/home/runner/MikroElektronika/installer_tmp" ] && mv "/home/runner/MikroElektronika/installer_tmp" /home/runner/MikroElektronika/installer
