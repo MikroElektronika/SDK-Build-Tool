@@ -26,50 +26,55 @@ compiler_list = {
 
 def run_builds():
     """Runs the build commands for each member of mcu_list, board_list, and mcu_card_list."""
-    # if not mcu_list and not board_list and not mcu_card_list:
-    #     # Run builds for all compilers in compiler_list
-    #     for key, compilers in compiler_list.items():
-    #         if isinstance(compilers, list):
-    #             for compiler in compilers:
-    #                 cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation.exe --compiler "{compiler}" --sdk "mikrosdk_v2111" --installPrefix "{testPath}/generic_build"'
-    #                 output = subprocess.check_output(cmd, shell=True, text=True)
-    #                 if "Build failed!" in output:
-    #                     build_failed = True
-    #         else:
-    #             cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation.exe --isBareMetal "0" --compiler "{compilers}" --sdk "mikrosdk_v2111" --installPrefix "{testPath}/generic_build"'
-    #             output = subprocess.check_output(cmd, shell=True, text=True)
-    #             if "Build failed!" in output:
-    #                 build_failed = True
-    #     return
+    if not mcu_list and not board_list and not mcu_card_list:
+        # Run builds for all compilers in compiler_list
+        for key, compilers in compiler_list.items():
+            if isinstance(compilers, list):
+                for compiler in compilers:
+                    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation.exe --compiler "{compiler}" --sdk "mikrosdk_v2111" --installPrefix "{testPath}/generic_build"'
+                    output = subprocess.check_output(cmd, shell=True, text=True)
+                    print(output)
+                    if "Build failed!" in output:
+                        build_failed = True
+            else:
+                cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation.exe --isBareMetal "0" --compiler "{compilers}" --sdk "mikrosdk_v2111" --installPrefix "{testPath}/generic_build"'
+                output = subprocess.check_output(cmd, shell=True, text=True)
+                print(output)
+                if "Build failed!" in output:
+                    build_failed = True
+        return
 
-    # for mcu in mcu_list:
-    #     compilers, architecture = get_compilers(mcu, is_mcu=True)
-    #     for compiler in compilers:
-    #         cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build"'
-    #         output = subprocess.check_output(cmd, shell=True, text=True)
-    #         if "Build failed!" in output:
-    #             build_failed = True
+    for mcu in mcu_list:
+        compilers, architecture = get_compilers(mcu, is_mcu=True)
+        for compiler in compilers:
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build"'
+            output = subprocess.check_output(cmd, shell=True, text=True)
+            print(output)
+            if "Build failed!" in output:
+                build_failed = True
 
-    # for board in board_list:
-    #     compilers = get_compilers(board, is_mcu=False)
-    #     for compiler in compilers:
-    #         cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --board "{board}" --installPrefix "{testPath}/board_build"'
-    #         output = subprocess.check_output(cmd, shell=True, text=True)
-    #         if "Build failed!" in output:
-    #             build_failed = True
+    for board in board_list:
+        compilers = get_compilers(board, is_mcu=False)
+        for compiler in compilers:
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --board "{board}" --installPrefix "{testPath}/board_build"'
+            output = subprocess.check_output(cmd, shell=True, text=True)
+            print(output)
+            if "Build failed!" in output:
+                build_failed = True
 
-    # for mcu_card in mcu_card_list:
-    #     compilers = get_compilers(mcu_card, is_mcu=True)
-    #     for compiler in compilers:
-    #         cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build"'
-    #         output = subprocess.check_output(cmd, shell=True, text=True)
-    #         if "Build failed!" in output:
-    #             build_failed = True
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mikrocavr" --sdk "mikrosdk_v2111" --mcu "ATMEGA2560" --installPrefix "{testPath}/mcu_card_build"'
-    output = subprocess.check_output(cmd, shell=True, text=True)
-    print(output)
-    if "Build failed!" in output:
-        build_failed = True
+    for mcu_card in mcu_card_list:
+        compilers = get_compilers(mcu_card, is_mcu=True)
+        for compiler in compilers:
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build"'
+            output = subprocess.check_output(cmd, shell=True, text=True)
+            print(output)
+            if "Build failed!" in output:
+                build_failed = True
+    # cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mikrocavr" --sdk "mikrosdk_v2111" --mcu "ATMEGA2560" --installPrefix "{testPath}/mcu_card_build"'
+    # output = subprocess.check_output(cmd, shell=True, text=True)
+    # print(output)
+    # if "Build failed!" in output:
+    #     build_failed = True
 
 def get_compilers(name, is_mcu=True):
     """Returns the list of compilers based on the given name and type."""
@@ -107,13 +112,17 @@ def get_latest_releases():
 
 def get_changed_files():
     """Runs the git diff command and returns the list of changed files."""
-    latest, previous = get_latest_releases()
-    if not latest or not previous:
-        return []
+
+    cmd = 'git pull'
+    os.system(cmd)
+    # latest, previous = get_latest_releases()
+    # if not latest or not previous:
+        # return []
 
     try:
         output = subprocess.check_output(
-            ['git', 'diff', '--name-only', previous, latest],
+            # ['git', 'diff', '--name-only', previous, latest],
+            ['git', 'diff', '--name-only', 'origin/main'],
             cwd=gitPath, text=True
         )
         return output.splitlines()
@@ -339,17 +348,17 @@ def main():
         changed_files = get_changed_files()
         classify_changes(changed_files)
         query_database()
-        write_results_to_file()
-        print(f"Results have been written to {testPath}/regex_list.txt")
-        print(f"Results have been written to {testPath}/mcu_list.txt")
-        print(f"Results have been written to {testPath}/board_list.txt")
-        print(f"Results have been written to {testPath}/mcu_card_list.txt")
     run_builds()
+    write_results_to_file()
+    print(f"Results have been written to {testPath}/regex_list.txt")
+    print(f"Results have been written to {testPath}/mcu_list.txt")
+    print(f"Results have been written to {testPath}/board_list.txt")
+    print(f"Results have been written to {testPath}/mcu_card_list.txt")
     if build_failed:
-        print("\n\n\n\n\033[91mBuild Failed!\033[0m")  # Red text
+        print("\033[91mBuild Failed!\033[0m")  # Red text
         exit(1)
     else:
-        print("\n\n\n\n\033[92mBuild Success!\033[0m")  # Green text
+        print("\033[92mBuild Success!\033[0m")  # Green text
 
 if __name__ == "__main__":
     main()
