@@ -51,6 +51,7 @@ def run_builds():
                 cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build"'
                 run_cmd(cmd)
         else:
+            print("\033[92mCompiler is\033[0m" + compilers)  # Green text
             cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compilers}" --sdk "mikrosdk_v2111" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build"'
             run_cmd(cmd)
 
