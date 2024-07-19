@@ -48,6 +48,7 @@ def run_builds():
         compilers, architecture = get_compilers(mcu, is_mcu=True)
         for compiler in compilers:
             print("\033[92mCompiler is \033[0m" + compiler)
+            print("\033[92mSrchitecture is \033[0m" + architecture)
             cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build"'
             run_cmd(cmd)
 
