@@ -63,10 +63,10 @@ def run_builds():
         for key, compilers in compiler_list.items():
             if isinstance(compilers, list):
                 for compiler in compilers:
-                    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation.exe --compiler "{compiler}" --sdk "{sdk_version}" --installPrefix "{testPath}/generic_build"'
+                    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --compiler "{compiler}" --sdk "{sdk_version}" --installPrefix "{testPath}/generic_build"'
                     run_cmd(cmd)
             else:
-                cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation.exe --isBareMetal "0" --compiler "{compilers}" --sdk "{sdk_version}" --installPrefix "{testPath}/generic_build"'
+                cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compilers}" --sdk "{sdk_version}" --installPrefix "{testPath}/generic_build"'
                 run_cmd(cmd)
         return
 
