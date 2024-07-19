@@ -14,7 +14,7 @@ gitPath = '/home/runner/work/SDK-Build-Tool/SDK-Build-Tool'
 dbPath = '/home/runner/.MIKROE/NECTOStudio7/databases/necto_db.db'
 testPath = '/home/runner/test_results'
 toolPath = '/home/runner/MikroElektronika/NECTOStudio/bin'
-build_failed = 'Success?'
+build_failed = False
 
 compiler_list = {
     'ARM': ['gcc_arm_none_eabi', 'clang-llvm', 'mikrocarm'],
@@ -33,6 +33,7 @@ def get_sdk_version(manifest_path):
         return f"mikrosdk_v{sdk_version}" if sdk_version else None
 
 def run_cmd(cmd):
+    global build_failed
     print(f"\033[94m{cmd}\033[0m") # Blue color for command
     
     try:
@@ -44,8 +45,7 @@ def run_cmd(cmd):
                 print("\033[92m{}\033[0m".format(line))  # Green color for success
             elif "Build failed" in line:
                 print("\033[91m{}\033[0m".format(line))  # Red color for failure
-                build_failed = 'Hooray it fails'
-                print("Build failed cmon, build_failed = " + build_failed)
+                build_failed = True
     except subprocess.CalledProcessError as e:
         for line in e.output.splitlines():
             if line.startswith("Building:"):
@@ -54,8 +54,7 @@ def run_cmd(cmd):
                 print(f"\033[92m{line}\033[0m")  # Green color for success
             elif "Build failed" in line:
                 print(f"\033[91m{line}\033[0m")  # Red color for failure
-                build_failed = 'Hooray it fails'
-                print("Build failed cmon, build_failed = " + build_failed)
+                build_failed = True
 
 def run_builds():
     sdk_version = get_sdk_version('manifest.json')
@@ -367,6 +366,7 @@ def write_results_to_file():
 
 
 def main():
+    global build_failed
     os.makedirs(testPath, exist_ok=True)
     if os.getenv('BUILD_ALL') == '0':
         changed_files = get_changed_files()
@@ -379,10 +379,8 @@ def main():
     print(f"Results have been written to {testPath}/mcu_list.txt")
     print(f"Results have been written to {testPath}/board_list.txt")
     print(f"Results have been written to {testPath}/mcu_card_list.txt")
-    
-    print(build_failed)
 
-    if build_failed == 'Hooray it fails':
+    if build_failed == True:
         print("\033[91mRecursive Build Failed!\033[0m")  # Red text
         exit(1)
     else:
