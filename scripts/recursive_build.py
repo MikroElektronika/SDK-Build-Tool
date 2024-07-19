@@ -378,7 +378,7 @@ def main():
     print(f"Results have been written to {testPath}/board_list.txt")
     print(f"Results have been written to {testPath}/mcu_card_list.txt")
 
-    if build_failed:
+    if build_failed == True:
         print("\033[91mRecursive Build Failed!\033[0m")  # Red text
         exit(1)
     else:
