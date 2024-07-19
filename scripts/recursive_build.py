@@ -34,15 +34,26 @@ def get_sdk_version(manifest_path):
 
 def run_cmd(cmd):
     print(f"\033[94m{cmd}\033[0m")
-    output = subprocess.check_output(cmd, shell=True, text=True)
-    for line in output.splitlines():
-        if line.startswith("Building:"):
-            print(line)
-        elif "Build success!" in line:
-            print("\033[92m{}\033[0m".format(line))  # Green color for success
-        elif "Build failed" in line:
-            print("\033[91m{}\033[0m".format(line))  # Red color for failure
-            build_failed = True
+    
+    try:
+        output = subprocess.check_output(cmd, shell=True, text=True)
+        for line in output.splitlines():
+            if line.startswith("Building:"):
+                print(line)
+            elif "Build success!" in line:
+                print("\033[92m{}\033[0m".format(line))  # Green color for success
+            elif "Build failed" in line:
+                print("\033[91m{}\033[0m".format(line))  # Red color for failure
+                build_failed = True
+    except subprocess.CalledProcessError as e:
+        for line in e.output.splitlines():
+            if line.startswith("Building:"):
+                print(line)
+            elif "Build success!" in line:
+                print(f"\033[92m{line}\033[0m")  # Green color for success
+            elif "Build failed" in line:
+                print(f"\033[91m{line}\033[0m")  # Red color for failure
+                build_failed = True
 
 def run_builds():
     sdk_version = get_sdk_version('manifest.json')
