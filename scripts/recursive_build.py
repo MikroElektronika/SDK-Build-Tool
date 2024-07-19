@@ -48,6 +48,7 @@ def run_builds():
         compilers, architecture = get_compilers(mcu, is_mcu=True)
         if isinstance(compilers, list):
             for compiler in compilers:
+                print("\033[92mCompiler is\033[0m" + compilers)  # Green text
                 cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build"'
                 run_cmd(cmd)
         else:
@@ -74,10 +75,6 @@ def run_builds():
         else:
             cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compilers}" --sdk "mikrosdk_v2111" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build"'
             run_cmd(cmd)
-
-    # cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mikrocavr" --sdk "mikrosdk_v2111" --mcu "ATMEGA2560" --installPrefix "{testPath}/mcu_card_build"'
-    # output = subprocess.check_output(cmd, shell=True, text=True)
-    # run_cmd(cmd)
 
 def get_compilers(name, is_mcu=True):
     """Returns the list of compilers based on the given name and type."""
