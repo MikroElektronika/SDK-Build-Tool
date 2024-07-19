@@ -337,12 +337,14 @@ def main():
         changed_files = get_changed_files()
         classify_changes(changed_files)
         query_database()
-    run_builds()
+    # run_builds()
     write_results_to_file()
+
     print(f"Results have been written to {testPath}/regex_list.txt")
     print(f"Results have been written to {testPath}/mcu_list.txt")
     print(f"Results have been written to {testPath}/board_list.txt")
     print(f"Results have been written to {testPath}/mcu_card_list.txt")
+
     if build_failed:
         print("\033[91mBuild Failed!\033[0m")  # Red text
         # exit(1)
