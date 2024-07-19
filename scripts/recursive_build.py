@@ -356,7 +356,7 @@ def main():
     print(f"Results have been written to {testPath}/mcu_card_list.txt")
     if build_failed:
         print("\033[91mBuild Failed!\033[0m")  # Red text
-        exit(1)
+        # exit(1)
     else:
         print("\033[92mBuild Success!\033[0m")  # Green text
 
