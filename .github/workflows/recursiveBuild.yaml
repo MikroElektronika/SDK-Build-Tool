@@ -79,6 +79,8 @@ jobs:
       - name: Recursive build only for changed files 
         if: "${{ github.event.inputs.build_type == 'Only changed files'}}"
         run: |
+          git pull
+          git diff --name-only origin/main
           export BUILD_ALL=0
           echo "Building only changed files."
           python -u scripts/recursive_build.py
