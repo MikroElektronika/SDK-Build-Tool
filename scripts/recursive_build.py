@@ -336,7 +336,7 @@ def main():
     if os.getenv('BUILD_ALL') == '0':
         changed_files = get_changed_files()
         classify_changes(changed_files)
-        query_database()
+        # query_database()
     # run_builds()
     write_results_to_file()
 
