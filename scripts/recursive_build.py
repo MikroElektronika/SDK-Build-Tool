@@ -172,7 +172,8 @@ def check_and_extract_regex(folder_path):
 
     for iterations in range(2):
         cmake_file = folder_path / 'CMakeLists.txt'
-        print("\033[92mWe found Cmake\033[0m")
+        cmd = 'pwd && ls -la'
+        os.system(cmd)
         if cmake_file.exists():
             extract_regex(cmake_file)
             return
