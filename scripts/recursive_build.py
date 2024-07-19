@@ -33,7 +33,7 @@ def get_sdk_version(manifest_path):
         return f"mikrosdk_v{sdk_version}" if sdk_version else None
 
 def run_cmd(cmd):
-    print(f"\033[94m{cmd}\033[0m")
+    print(f"\033[94m{cmd}\033[0m") # Blue color for command
     
     try:
         output = subprocess.check_output(cmd, shell=True, text=True)
