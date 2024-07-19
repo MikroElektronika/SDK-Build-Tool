@@ -2,6 +2,7 @@ import subprocess
 import re
 import os
 import sqlite3
+import json
 from pathlib import Path
 
 regex_list = []
@@ -24,8 +25,15 @@ compiler_list = {
     'AVR': ['mikrocavr']
 }
 
+def get_sdk_version(manifest_path):
+    """Extracts the SDK version from the manifest.json file."""
+    with open(manifest_path, 'r') as f:
+        manifest = json.load(f)
+        sdk_version = manifest.get("sdk-version", "").replace(".", "")
+        return f"mikrosdk_v{sdk_version}" if sdk_version else None
+
 def run_cmd(cmd):
-    print(f"\033[92m{cmd}\033[0m")
+    print(f"\033[94m{cmd}\033[0m")
     output = subprocess.check_output(cmd, shell=True, text=True)
     for line in output.splitlines():
         if line.startswith("Building:"):
@@ -35,40 +43,38 @@ def run_cmd(cmd):
         elif "Build failed" in line:
             print("\033[91m{}\033[0m".format(line))  # Red color for failure
             build_failed = True
-    # print(output)
-    # if "Build failed!" in output:
-        # build_failed = True
 
 def run_builds():
+    sdk_version = get_sdk_version('manifest.json')
     """Runs the build commands for each member of mcu_list, board_list, and mcu_card_list."""
     if not mcu_list and not board_list and not mcu_card_list:
         # Run builds for all compilers in compiler_list
         for key, compilers in compiler_list.items():
             if isinstance(compilers, list):
                 for compiler in compilers:
-                    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation.exe --compiler "{compiler}" --sdk "mikrosdk_v2111" --installPrefix "{testPath}/generic_build"'
+                    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation.exe --compiler "{compiler}" --sdk "{sdk_version}" --installPrefix "{testPath}/generic_build"'
                     run_cmd(cmd)
             else:
-                cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation.exe --isBareMetal "0" --compiler "{compilers}" --sdk "mikrosdk_v2111" --installPrefix "{testPath}/generic_build"'
+                cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation.exe --isBareMetal "0" --compiler "{compilers}" --sdk "{sdk_version}" --installPrefix "{testPath}/generic_build"'
                 run_cmd(cmd)
         return
 
     for mcu in mcu_list:
         compilers, architecture = get_compilers(mcu, is_mcu=True)
         for compiler in compilers:
-            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build"'
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build"'
             run_cmd(cmd)
 
     for board in board_list:
         compilers = get_compilers(board, is_mcu=False)
         for compiler in compilers:
-            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --board "{board}" --installPrefix "{testPath}/board_build"'
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "{board}" --installPrefix "{testPath}/board_build"'
             run_cmd(cmd)
 
     for mcu_card in mcu_card_list:
         compilers = get_compilers(mcu_card, is_mcu=True)
         for compiler in compilers:
-            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build"'
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build"'
             run_cmd(cmd)
 
 def get_compilers(name, is_mcu=True):
