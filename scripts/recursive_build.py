@@ -336,8 +336,8 @@ def main():
     if os.getenv('BUILD_ALL') == '0':
         changed_files = get_changed_files()
         classify_changes(changed_files)
-        # query_database()
-    # run_builds()
+        query_database()
+    run_builds()
     write_results_to_file()
 
     print(f"Results have been written to {testPath}/regex_list.txt")
@@ -347,7 +347,7 @@ def main():
 
     if build_failed:
         print("\033[91mBuild Failed!\033[0m")  # Red text
-        # exit(1)
+        exit(1)
     else:
         print("\033[92mBuild Success!\033[0m")  # Green text
 
