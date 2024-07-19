@@ -320,7 +320,9 @@ def query_database():
                 INNER JOIN Devices ON SDKToDevice.device_uid = Devices.uid
                 WHERE SDKToDevice.sdk_uid = 'mikrosdk_v2111'
                 AND SDKToDevice.device_uid REGEXP ?
-                AND Devices.sdk_support = '1';
+                AND Devices.sdk_support = '1'
+                AND SDKToDevice.device_uid NOT LIKE '%CARD%'
+                AND SDKToDevice.device_uid NOT LIKE '%SIBRAIN%';
             """, (regex,))
             rows = cursor.fetchall()
             if rows:
