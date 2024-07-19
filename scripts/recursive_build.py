@@ -25,6 +25,18 @@ compiler_list = {
 
 def run_builds():
     """Runs the build commands for each member of mcu_list, board_list, and mcu_card_list."""
+    # if not mcu_list and not board_list and not mcu_card_list:
+    #     # Run builds for all compilers in compiler_list
+    #     for key, compilers in compiler_list.items():
+    #         if isinstance(compilers, list):
+    #             for compiler in compilers:
+    #                 cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation.exe --compiler "{compiler}" --sdk "mikrosdk_v2111" --installPrefix "{testPath}/generic_build"'
+    #                 os.system(cmd)
+    #         else:
+    #             cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation.exe --isBareMetal "0" --compiler "{compilers}" --sdk "mikrosdk_v2111" --installPrefix "{testPath}/generic_build"'
+    #             os.system(cmd)
+    #     return
+
     # for mcu in mcu_list:
     #     compilers, architecture = get_compilers(mcu, is_mcu=True)
     #     for compiler in compilers:
@@ -42,7 +54,7 @@ def run_builds():
     #     for compiler in compilers:
     #         cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build"'
     #         os.system(cmd)
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mikrocavr" --sdk "mikrosdk_v2111" --installPrefix "{testPath}/mcu_card_build"'
+    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mikrocavr" --sdk "mikrosdk_v2111" --mcu "ATMEGA2560" --installPrefix "{testPath}/mcu_card_build"'
     os.system(cmd)
 
 def get_compilers(name, is_mcu=True):
@@ -69,6 +81,8 @@ def get_compilers(name, is_mcu=True):
 def get_changed_files():
     """Runs the git diff command and returns the list of changed files."""
     try:
+        cmd = 'git pull'
+        os.system(cmd)
         output = subprocess.check_output(
             ['git', 'diff', '--name-only', 'mikroSDK-2.11.0', 'mikroSDK-2.11.1'],
             cwd=gitPath, text=True
@@ -90,10 +104,12 @@ def classify_changes(files):
 
     for file in files:
         file = file.replace('\\', '/')  # Ensure we handle paths correctly
-        # if any(file.startswith(prefix) for prefix in ["api", "cmake", "components", "drv", "hal", "middleware", "platform", "thirdparty"]):
-        #     result_list = []
-        #     call_function_that_builds_everything
-        #     exit
+        if any(file.startswith(prefix) for prefix in ["api", "cmake", "components", "drv", "hal", "middleware", "platform", "thirdparty"]):
+            mcu_list = []
+            board_list = []
+            mcu_card_list = []
+            run_builds()
+            exit
         
         if any(file.startswith(path) for path in case_1_paths):
             folder_name = Path(file).parts[4]  # Adjusting for the new path depth
@@ -292,15 +308,16 @@ def write_results_to_file():
 
 
 def main():
-    changed_files = get_changed_files()
-    classify_changes(changed_files)
-    query_database()
-    write_results_to_file()
+    if os.getenv('BUILD_ALL') == '0':
+        changed_files = get_changed_files()
+        classify_changes(changed_files)
+        query_database()
+        write_results_to_file()
     run_builds()
-    print("Results have been written to regex_list.txt")
-    print("Results have been written to mcu_list.txt")
-    print("Results have been written to board_list.txt")
-    print("Results have been written to mcu_card_list.txt")
+    print(f"Results have been written to {testPath}/regex_list.txt")
+    print(f"Results have been written to {testPath}/mcu_list.txt")
+    print(f"Results have been written to {testPath}/board_list.txt")
+    print(f"Results have been written to {testPath}/mcu_card_list.txt")
 
 if __name__ == "__main__":
     main()
