@@ -35,31 +35,45 @@ def run_builds():
     if not mcu_list and not board_list and not mcu_card_list:
         # Run builds for all compilers in compiler_list
         for key, compilers in compiler_list.items():
-            for compiler in compilers:
-                cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation.exe --compiler "{compiler}" --sdk "mikrosdk_v2111" --installPrefix "{testPath}/generic_build"'
+            if isinstance(compilers, list):
+                for compiler in compilers:
+                    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation.exe --compiler "{compiler}" --sdk "mikrosdk_v2111" --installPrefix "{testPath}/generic_build"'
+                    run_cmd(cmd)
+            else:
+                cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation.exe --isBareMetal "0" --compiler "{compilers}" --sdk "mikrosdk_v2111" --installPrefix "{testPath}/generic_build"'
                 run_cmd(cmd)
         return
 
     for mcu in mcu_list:
-        print("\033[92mWe are building it for MCU\033[0m")  # Green text
         compilers, architecture = get_compilers(mcu, is_mcu=True)
-        for compiler in compilers:
-            print("\033[92mCompiler is \033[0m" + compiler)  # Green text
-            print("\033[92mArhitecture is \033[0m" + architecture)  # Green text
-            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build"'
+        if isinstance(compilers, list):
+            for compiler in compilers:
+                cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build"'
+                run_cmd(cmd)
+        else:
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compilers}" --sdk "mikrosdk_v2111" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build"'
             run_cmd(cmd)
 
     for board in board_list:
         compilers = get_compilers(board, is_mcu=False)
-        for compiler in compilers:
-            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --board "{board}" --installPrefix "{testPath}/board_build"'
+        if isinstance(compilers, list):
+            for compiler in compilers:
+                cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --board "{board}" --installPrefix "{testPath}/board_build"'
+                run_cmd(cmd)
+        else:
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compilers}" --sdk "mikrosdk_v2111" --board "{board}" --installPrefix "{testPath}/board_build"'
             run_cmd(cmd)
 
     for mcu_card in mcu_card_list:
         compilers = get_compilers(mcu_card, is_mcu=True)
-        for compiler in compilers:
-            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build"'
+        if isinstance(compilers, list):
+            for compiler in compilers:
+                cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build"'
+                run_cmd(cmd)
+        else:
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compilers}" --sdk "mikrosdk_v2111" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build"'
             run_cmd(cmd)
+
     # cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mikrocavr" --sdk "mikrosdk_v2111" --mcu "ATMEGA2560" --installPrefix "{testPath}/mcu_card_build"'
     # output = subprocess.check_output(cmd, shell=True, text=True)
     # run_cmd(cmd)
