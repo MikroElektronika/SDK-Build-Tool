@@ -51,10 +51,6 @@ jobs:
       - name: Recursive build only for changed files 
         if: "${{ github.event.inputs.build_type == 'Only changed files'}}"
         run: |
-          rm -rf /home/runner/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/*
-          cd /home/runner/work/SDK-Build-Tool/SDK-Build-Tool
-          shopt -s extglob
-          cp -r !(.git|.github|scripts|templates) /home/runner/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/
           export BUILD_ALL=0
           echo "Building only changed files."
           python -u scripts/recursive_build.py
