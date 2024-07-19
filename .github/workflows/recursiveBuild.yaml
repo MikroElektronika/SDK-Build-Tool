@@ -2,6 +2,13 @@ name: SDK Recursive Build
 
 on:
   workflow_dispatch:
+    inputs:
+        select_index:
+          type: choice
+          description: Build all or only changed files
+          options:
+            - Only changed
+            - All
 
 
 jobs:
@@ -68,18 +75,17 @@ jobs:
 
       - name: Run Recursive Build
         run: |
-          export PATH=$PATH:~/Qt/Tools/QtCreator/bin
-          chmod -R 777 /home/runner/.MIKROE/
-          chmod -R 777 /home/runner/MikroElektronika/
-          cd /home/runner/
-          pwd
-          ls -la
-          cd /home/runner/.config
-          pwd
-          ls -la
-          cd /home/runner/.config/MikroElektronika
-          pwd
-          ls -la
-          sudo find . -name NECTOStudio.conf
-          echo "Running sdk_build_automation"
-          xvfb-run --auto-servernum --server-num=1 /home/runner/MikroElektronika/NECTOStudio/bin/sdk_build_automation --compiler "mikrocavr" --sdk "mikrosdk_v2111" --installPrefix "/home/runner/build_test"
+          if [[ ${{ github.event.inputs.select_index }} == "All" ]]; then
+            echo "Building all files."
+            python -u scripts/buildSDKAll.py
+          else
+            echo "Building only changed files."
+            python -u scripts/recursive_build_changed.py.py
+          fi
+
+      - name: Archive test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            /home/runner/test
