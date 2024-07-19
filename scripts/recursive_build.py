@@ -57,6 +57,7 @@ def run_builds():
         for compiler in compilers:
             print("\033[92mCompiler is \033[0m" + compiler)
             print("\033[92mArchitecture is \033[0m" + architecture)
+            print("\033[92mMCU is \033[0m" + mcu)
             cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build"'
             run_cmd(cmd)
 
@@ -285,7 +286,7 @@ def query_database():
             new_mcu_card_list.extend([row[0] for row in rows])
         else:
             unused.append(mcu_card)
-    mcu_card_list[:] = list(set(new_mcu_card_list))
+    mcu_card_list[:] = sorted(list(set(new_mcu_card_list)))
 
     # Update board_list
     new_board_list = []
@@ -303,7 +304,7 @@ def query_database():
             new_board_list.extend([row[0] for row in rows])
         else:
             unused.append(board)
-    board_list[:] = list(set(new_board_list))
+    board_list[:] = sorted(list(set(new_board_list)))
 
     # Update mcu_list based on regex_list
     new_mcu_list = []
@@ -323,6 +324,7 @@ def query_database():
             else:
                 unused.append(regex)
     mcu_list.extend([device for device in set(new_mcu_list) if device not in mcu_list])
+    mcu_list[:] = sorted(mcu_list)
 
     conn.close()
 
