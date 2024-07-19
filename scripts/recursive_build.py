@@ -14,7 +14,7 @@ gitPath = '/home/runner/work/SDK-Build-Tool/SDK-Build-Tool'
 dbPath = '/home/runner/.MIKROE/NECTOStudio7/databases/necto_db.db'
 testPath = '/home/runner/test_results'
 toolPath = '/home/runner/MikroElektronika/NECTOStudio/bin'
-build_failed = False
+build_failed = 0
 
 compiler_list = {
     'ARM': ['gcc_arm_none_eabi', 'clang-llvm', 'mikrocarm'],
@@ -44,7 +44,7 @@ def run_cmd(cmd):
                 print("\033[92m{}\033[0m".format(line))  # Green color for success
             elif "Build failed" in line:
                 print("\033[91m{}\033[0m".format(line))  # Red color for failure
-                build_failed = True
+                build_failed += 1
     except subprocess.CalledProcessError as e:
         for line in e.output.splitlines():
             if line.startswith("Building:"):
@@ -53,7 +53,7 @@ def run_cmd(cmd):
                 print(f"\033[92m{line}\033[0m")  # Green color for success
             elif "Build failed" in line:
                 print(f"\033[91m{line}\033[0m")  # Red color for failure
-                build_failed = True
+                build_failed = 1
 
 def run_builds():
     sdk_version = get_sdk_version('manifest.json')
@@ -378,7 +378,7 @@ def main():
     print(f"Results have been written to {testPath}/board_list.txt")
     print(f"Results have been written to {testPath}/mcu_card_list.txt")
 
-    if build_failed == True:
+    if build_failed != 0:
         print("\033[91mRecursive Build Failed!\033[0m")  # Red text
         exit(1)
     else:
