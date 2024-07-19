@@ -36,6 +36,34 @@ jobs:
           sudo apt-get update
           sudo apt-get install p7zip-full
           sudo apt-get install freeglut3-dev
+          sudo apt-get install libevent-dev
+          sudo apt-get install libopus-dev
+          sudo apt-get install libminizip-dev
+          sudo apt-get install libfontconfig1-dev
+          sudo apt-get install libfreetype-dev
+          sudo apt-get install libx11-dev
+          sudo apt-get install libx11-xcb-dev
+          sudo apt-get install libxext-dev
+          sudo apt-get install libxfixes-dev
+          sudo apt-get install libxi-dev
+          sudo apt-get install libxrender-dev
+          sudo apt-get install libxcb1-dev
+          sudo apt-get install libxcb-cursor-dev
+          sudo apt-get install libxcb-glx0-dev
+          sudo apt-get install libxcb-keysyms1-dev
+          sudo apt-get install libxcb-image0-dev
+          sudo apt-get install libxcb-shm0-dev
+          sudo apt-get install libxcb-icccm4-dev
+          sudo apt-get install libxcb-sync-dev
+          sudo apt-get install libxcb-xfixes0-dev
+          sudo apt-get install libxcb-shape0-dev
+          sudo apt-get install libxcb-randr0-dev
+          sudo apt-get install libxcb-render-util0-dev
+          sudo apt-get install libxcb-util-dev
+          sudo apt-get install libxcb-xinerama0-dev
+          sudo apt-get install libxcb-xkb-dev
+          sudo apt-get install libxkbcommon-dev
+          sudo apt-get install libxkbcommon-x11-dev
 
       - name: Install NECTO
         run: |
@@ -51,6 +79,10 @@ jobs:
       - name: Recursive build only for changed files 
         if: "${{ github.event.inputs.build_type == 'Only changed files'}}"
         run: |
+          rm -rf /home/runner/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/*
+          cd /home/runner/work/SDK-Build-Tool/SDK-Build-Tool
+          shopt -s extglob
+          cp -r !(.git|.github|scripts|templates) /home/runner/.MIKROE/NECTOStudio7/packages/sdk/2.11.1/src/
           export BUILD_ALL=0
           echo "Building only changed files."
           python -u scripts/recursive_build.py
