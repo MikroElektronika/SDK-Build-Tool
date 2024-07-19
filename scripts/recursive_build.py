@@ -25,6 +25,7 @@ compiler_list = {
 }
 
 def run_cmd(cmd):
+    print(f"\033[92m{cmd}\033[0m")
     output = subprocess.check_output(cmd, shell=True, text=True)
     for line in output.splitlines():
         if line.startswith("Building:"):
@@ -55,9 +56,6 @@ def run_builds():
     for mcu in mcu_list:
         compilers, architecture = get_compilers(mcu, is_mcu=True)
         for compiler in compilers:
-            print("\033[92mCompiler is \033[0m" + compiler)
-            print("\033[92mArchitecture is \033[0m" + architecture)
-            print("\033[92mMCU is \033[0m" + mcu)
             cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build"'
             run_cmd(cmd)
 
