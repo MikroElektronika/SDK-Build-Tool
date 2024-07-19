@@ -26,14 +26,14 @@ compiler_list = {
 
 def run_cmd(cmd):
     output = subprocess.check_output(cmd, shell=True, text=True)
-    if output.startswith("Building:") or "Build success!" in output or "Build failed" in output:
-        if "Build success!" in output:
-            print("\033[92m{}\033[0m".format(output.strip()))  # Green color for success
-        elif "Build failed" in output:
-            print("\033[91m{}\033[0m".format(output.strip()))  # Red color for failure
+    for line in output.splitlines():
+        if line.startswith("Building:"):
+            print(line)
+        elif "Build success!" in line:
+            print("\033[92m{}\033[0m".format(line))  # Green color for success
+        elif "Build failed" in line:
+            print("\033[91m{}\033[0m".format(line))  # Red color for failure
             build_failed = True
-        else:
-            print(output.strip())
     # print(output)
     # if "Build failed!" in output:
         # build_failed = True
@@ -56,7 +56,7 @@ def run_builds():
         compilers, architecture = get_compilers(mcu, is_mcu=True)
         for compiler in compilers:
             print("\033[92mCompiler is \033[0m" + compiler)
-            print("\033[92mSrchitecture is \033[0m" + architecture)
+            print("\033[92mArchitecture is \033[0m" + architecture)
             cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v2111" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build"'
             run_cmd(cmd)
 
