@@ -59,30 +59,21 @@ def run_cmd(cmd):
 def run_builds():
     sdk_version = get_sdk_version('manifest.json')
     """Runs the build commands for each member of mcu_list, board_list, and mcu_card_list."""
-    if not mcu_list and not board_list and not mcu_card_list:
-        # Run builds for all compilers in compiler_list
-        for key, compilers in compiler_list.items():
-            if isinstance(compilers, list):
-                for compiler in compilers:
-                    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --compiler "{compiler}" --sdk "{sdk_version}" --installPrefix "{testPath}/generic_build"'
-                    run_cmd(cmd)
-            else:
-                cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compilers}" --sdk "{sdk_version}" --installPrefix "{testPath}/generic_build"'
-                run_cmd(cmd)
-        return
-
+    print(f"\033[93mRunning build for {len(mcu_list)} MCUs\033[0m")
     for mcu in mcu_list:
         compilers, architecture = get_compilers(mcu, is_mcu=True)
         for compiler in compilers:
             cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build"'
             run_cmd(cmd)
 
+    print(f"\033[93mRunning build for {len(board_list)} boards\033[0m")
     for board in board_list:
         compilers = get_compilers(board, is_mcu=False)
         for compiler in compilers:
             cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "{board}" --installPrefix "{testPath}/board_build"'
             run_cmd(cmd)
 
+    print(f"\033[93mRunning build for {len(mcu_card_list)} MCU cards\033[0m")
     for mcu_card in mcu_card_list:
         compilers = get_compilers(mcu_card, is_mcu=True)
         for compiler in compilers:
@@ -138,7 +129,14 @@ def get_changed_files():
             ['git', 'diff', '--name-only', 'origin/main'],
             cwd=gitPath, text=True
         )
-        return output.splitlines()
+        changed_files = output.splitlines()
+        
+        # Write changed files to changed_files.txt
+        with open(f'{testPath}/changed_files.txt', 'w') as f:
+            for line in changed_files:
+                f.write(line + '\n')
+        
+        return changed_files
     except subprocess.CalledProcessError as e:
         print(f"Error running git diff: {e}")
         return []
@@ -280,6 +278,7 @@ def regexp(expr, item):
     return reg.search(item) is not None
 
 def query_database():
+    sdk_version = get_sdk_version('manifest.json')
     """Queries the database to update mcu_card_list, board_list, and mcu_list."""
     conn = sqlite3.connect(dbPath)
     conn.create_function("REGEXP", 2, regexp)
@@ -293,7 +292,7 @@ def query_database():
             SELECT SDKToDevice.device_uid
             FROM SDKToDevice
             INNER JOIN Devices ON SDKToDevice.device_uid = Devices.uid
-            WHERE SDKToDevice.sdk_uid = 'mikrosdk_v2111'
+            WHERE SDKToDevice.sdk_uid = '{sdk_version}'
             AND SDKToDevice.device_uid REGEXP ?
             AND Devices.sdk_support = '1';
         """, (mcu_card_upper,))
@@ -311,7 +310,7 @@ def query_database():
             SELECT SDKToDevice.device_uid
             FROM SDKToDevice
             INNER JOIN Devices ON SDKToDevice.device_uid = Devices.uid
-            WHERE SDKToDevice.sdk_uid = 'mikrosdk_v2111'
+            WHERE SDKToDevice.sdk_uid = '{sdk_version}'
             AND SDKToDevice.device_uid REGEXP ?
             AND Devices.sdk_support = '1';
         """, (board,))
@@ -330,7 +329,7 @@ def query_database():
                 SELECT SDKToDevice.device_uid
                 FROM SDKToDevice
                 INNER JOIN Devices ON SDKToDevice.device_uid = Devices.uid
-                WHERE SDKToDevice.sdk_uid = 'mikrosdk_v2111'
+                WHERE SDKToDevice.sdk_uid = '{sdk_version}'
                 AND SDKToDevice.device_uid REGEXP ?
                 AND Devices.sdk_support = '1'
                 AND SDKToDevice.device_uid NOT LIKE '%CARD%'
@@ -341,6 +340,22 @@ def query_database():
                 new_mcu_list.extend([row[0] for row in rows])
             else:
                 unused.append(regex)
+    mcu_list.extend([device for device in set(new_mcu_list) if device not in mcu_list])
+    mcu_list[:] = sorted(mcu_list)
+
+    if not mcu_list and not board_list and not mcu_card_list:
+        cursor.execute(f"""
+            SELECT SDKToDevice.device_uid
+            FROM SDKToDevice
+            INNER JOIN Devices ON SDKToDevice.device_uid = Devices.uid
+            WHERE SDKToDevice.sdk_uid = '{sdk_version}'
+            AND Devices.sdk_support = '1';
+        """)
+        rows = cursor.fetchall()
+        if rows:
+            new_mcu_list.extend([row[0] for row in rows])
+        else:
+            unused.append(regex)
     mcu_list.extend([device for device in set(new_mcu_list) if device not in mcu_list])
     mcu_list[:] = sorted(mcu_list)
 
@@ -364,21 +379,21 @@ def write_results_to_file():
         for item in unused:
             unused_file.write(f"{item}\n")
 
-
 def main():
     global build_failed
     os.makedirs(testPath, exist_ok=True)
     if os.getenv('BUILD_ALL') == '0':
         changed_files = get_changed_files()
         classify_changes(changed_files)
-        query_database()
+    query_database()
     run_builds()
     write_results_to_file()
 
-    print(f"Results have been written to {testPath}/regex_list.txt")
-    print(f"Results have been written to {testPath}/mcu_list.txt")
-    print(f"Results have been written to {testPath}/board_list.txt")
-    print(f"Results have been written to {testPath}/mcu_card_list.txt")
+    print(f"Detected changed files have been written to {testPath}/changed_files.txt")
+    print(f"Detected regexes have been written to {testPath}/regex_list.txt")
+    print(f"Built MCUs list has been written to {testPath}/mcu_list.txt")
+    print(f"Built boards list has been written to {testPath}/board_list.txt")
+    print(f"Built MCU cards list has been written to {testPath}/mcu_card_list.txt")
 
     if build_failed == True:
         print("\033[91mRecursive Build Failed!\033[0m")  # Red text
