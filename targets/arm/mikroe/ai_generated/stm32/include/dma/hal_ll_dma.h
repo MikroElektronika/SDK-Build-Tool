@@ -96,7 +96,7 @@ typedef enum
  */
 typedef enum
 {
-    HAL_LL_DMA_DATA_ALIGN_BYTES_1 = 0, /*!< Align data to byte (uint8_t). */
+    HAL_LL_DMA_DATA_ALIGN_BYTES_1 = 1, /*!< Align data to byte (uint8_t). */
     HAL_LL_DMA_DATA_ALIGN_BYTES_2,    /*!< Align data to half word (uint16_t). */
     HAL_LL_DMA_DATA_ALIGN_BYTES_3,    /*!< Align data to 3 bytes (uint24_t). */
     HAL_LL_DMA_DATA_ALIGN_BYTES_4,    /*!< Align data to word (uint32_t). */

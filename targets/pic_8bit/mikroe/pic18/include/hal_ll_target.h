@@ -55,7 +55,7 @@ extern "C"{
 #define HAL_LL_MODULE_ERROR (hal_ll_base_addr_t)(0xFFFFFFFF)
 #define HAL_LL_CHANNEL_ERROR (hal_ll_base_addr_t)(0xFFFFFFFF)
 #define HAL_LL_PIN_NC (hal_ll_pin_name_t)(0xFFFFFFFF)
-#define HAL_LL_PORT_NC (hal_ll_port_name_t)(0xFFFFFFFF)
+#define HAL_LL_PORT_NC (hal_ll_port_name_t)(0xFFFFFFF0)
 
 #ifdef __cplusplus
 }

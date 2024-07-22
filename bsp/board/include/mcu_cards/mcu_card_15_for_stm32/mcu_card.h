@@ -64,7 +64,7 @@ extern "C"{
 #define LEFT_CN_PIN_005 PA4
 #define LEFT_CN_PIN_006 PA5
 #define LEFT_CN_PIN_007 PA6
-#define LEFT_CN_PIN_008 PA7
+#define LEFT_CN_PIN_008 PA6
 #define LEFT_CN_PIN_009     // Pin not routed.
 #define LEFT_CN_PIN_010     // Pin not routed.
 #define LEFT_CN_PIN_011     // Pin not routed.

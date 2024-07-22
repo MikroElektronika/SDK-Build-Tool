@@ -89,7 +89,7 @@ static const hal_ll_can_pin_map_t hal_ll_can_rx_map[] =
     #ifdef CAN1_RX_RC7_RP55
     {hal_ll_can_module_num(CAN_MODULE_1), PC7, HAL_LL_CAN1_BASE_ADDRESS},
     #endif
-    #ifdef CAN2_RX_RC7_RP55
+    #ifdef CAN2_RX_RC7_RP53
     {hal_ll_can_module_num(CAN_MODULE_2), PC7, HAL_LL_CAN2_BASE_ADDRESS},
     #endif
     #ifdef CAN1_RX_RC8_RP56

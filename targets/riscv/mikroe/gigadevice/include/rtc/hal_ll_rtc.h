@@ -65,7 +65,7 @@ typedef struct
 {
     uint8_t hour;   // 2-digit format - supports values from 00 to 23
     uint8_t minute; // 2-digit format - supports values from 00 to 59
-    uint8_t second; // 2-digit format - supports values from 00 to 59
+    uint8_t seconda; // 2-digit format - supports values from 00 to 59
 } hal_ll_rtc_time_t;
 
 /**
