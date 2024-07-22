@@ -125,7 +125,7 @@ def get_compilers(name, is_mcu=True):
         elif "PIC32" in name:
             return compiler_list["PIC32"], "PIC32"
         elif any(substring in name for substring in ["DSPIC", "PIC24"]):
-            return compiler_list["dsPIC"], "DSPIC"
+            return compiler_list["DSPIC"], "DSPIC"
         elif any(substring in name for substring in ["PIC18", "PIC16", "PIC12", "PIC10"]):
             return compiler_list["PIC"], "PIC"
         elif "AT" in name and "ATSAM" not in name:
