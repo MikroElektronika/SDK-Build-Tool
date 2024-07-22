@@ -71,7 +71,7 @@ jobs:
 
       - name: Run Recursive Build
         run: |
-          if [[ ${{ github.event.inputs.build_type }} == 'All files' ]]; then
+          if [[ "${{ github.event.inputs.build_type }}" == 'All files' ]]; then
             export BUILD_ALL=1
             echo "Building all files."
           else
