@@ -229,6 +229,9 @@ def get_changed_files():
 
 # Classifies changes into 4 different Cases.
 def classify_changes(files):
+    global mcu_card_list
+    global mcu_list
+    global board_list
     # Case 1 - MCU card files were changed. 
     case_1_paths = ["bsp/board/include/mcu_cards"]
     # Case 2 - Board files were changed.
