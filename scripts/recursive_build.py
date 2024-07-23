@@ -120,6 +120,8 @@ def run_builds():
     print(f"\033[93mRunning build for {len(mcu_card_list)} MCU cards\033[0m")
     cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mchp_xc16" --sdk "mikrosdk_v2111" --board "GENERIC_DSPIC_BOARD" --mcu "DSPIC33EP128GP504" --installPrefix "{testPath}/mcu_build"'
     run_cmd(cmd)
+    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mikrocdspic" --sdk "mikrosdk_v2111" --board "GENERIC_DSPIC_BOARD" --mcu "DSPIC33EP128GP504" --installPrefix "{testPath}/mcu_build"'
+    run_cmd(cmd)
 
 # Returns the list of compilers based on the given name and type.
 def get_compilers(name, is_mcu=True):
@@ -515,6 +517,7 @@ def query_database():
                 AND Devices.sdk_support = '1'
                 AND SDKToDevice.device_uid NOT LIKE '%PIM%'
                 AND SDKToDevice.device_uid NOT LIKE '%CARD%'
+                AND SDKToDevice.device_uid NOT LIKE '%SPARKFUN%'
                 AND SDKToDevice.device_uid NOT LIKE '%SIBRAIN%';
             """, (regex,))
             rows = cursor.fetchall()
@@ -537,6 +540,7 @@ def query_database():
             AND Devices.sdk_support = '1';
             AND SDKToDevice.device_uid NOT LIKE '%PIM%'
             AND SDKToDevice.device_uid NOT LIKE '%CARD%'
+            AND SDKToDevice.device_uid NOT LIKE '%SPARKFUN%'
             AND SDKToDevice.device_uid NOT LIKE '%SIBRAIN%';
         """)
         rows = cursor.fetchall()
@@ -551,7 +555,7 @@ def query_database():
             SELECT device_uid
             FROM SDKToDevice
             WHERE sdk_uid = '{sdk_version}'
-            AND device_uid REGEXP 'CARD|SIBRAIN|PIM';
+            AND device_uid REGEXP 'CARD|SIBRAIN|PIM|SPARKFUN';
         """)
         rows = cursor.fetchall()
         if rows:
