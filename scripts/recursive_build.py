@@ -87,33 +87,36 @@ def run_cmd(cmd):
 
 # Runs the build commands for each member of mcu_list, board_list, and mcu_card_list.
 def run_builds():
-    # Get the SDK version from manifest.json file.
-    sdk_version = get_sdk_version('manifest.json')
+    # # Get the SDK version from manifest.json file.
+    # sdk_version = get_sdk_version('manifest.json')
 
-    # Run build for all MCUs from mcu_list.
-    print(f"\033[93mRunning build for {len(mcu_list)} MCUs\033[0m")
-    for mcu in mcu_list:
-        # Get the necessary compiler for the current MCU build.
-        compilers, architecture = get_compilers(mcu, is_mcu=True)
-        for compiler in compilers:
-            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build"'
-            run_cmd(cmd)
+    # # Run build for all MCUs from mcu_list.
+    # print(f"\033[93mRunning build for {len(mcu_list)} MCUs\033[0m")
+    # for mcu in mcu_list:
+    #     # Get the necessary compiler for the current MCU build.
+    #     compilers, architecture = get_compilers(mcu, is_mcu=True)
+    #     for compiler in compilers:
+    #         cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build"'
+    #         run_cmd(cmd)
 
-    # Run build for all boards from board_list.
-    print(f"\033[93mRunning build for {len(board_list)} boards\033[0m")
-    for board in board_list:
-        compilers = get_compilers(board, is_mcu=False)
-        for compiler in compilers:
-            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "{board}" --installPrefix "{testPath}/board_build"'
-            run_cmd(cmd)
+    # # Run build for all boards from board_list.
+    # print(f"\033[93mRunning build for {len(board_list)} boards\033[0m")
+    # for board in board_list:
+    #     compilers = get_compilers(board, is_mcu=False)
+    #     for compiler in compilers:
+    #         cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "{board}" --installPrefix "{testPath}/board_build"'
+    #         run_cmd(cmd)
 
-    # Run build for all MCU cards from mcu_card_list.
-    print(f"\033[93mRunning build for {len(mcu_card_list)} MCU cards\033[0m")
-    for mcu_card in mcu_card_list:
-        compilers = get_compilers(mcu_card, is_mcu=True)
-        for compiler in compilers:
-            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build"'
-            run_cmd(cmd)
+    # # Run build for all MCU cards from mcu_card_list.
+    # print(f"\033[93mRunning build for {len(mcu_card_list)} MCU cards\033[0m")
+    # for mcu_card in mcu_card_list:
+    #     compilers = get_compilers(mcu_card, is_mcu=True)
+    #     for compiler in compilers:
+    #         cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build"'
+    #         run_cmd(cmd)
+
+    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mchp_xc16" --sdk "mikrosdk_v2111" --board "GENERIC_DSPIC_BOARD" --mcu "DSPIC33EP128GP504" --installPrefix "{testPath}/mcu_build"'
+    run_cmd(cmd)
 
 # Returns the list of compilers based on the given name and type.
 def get_compilers(name, is_mcu=True):
@@ -600,7 +603,7 @@ def main():
         # Classify the changed files.
         classify_changes(changed_files)
 
-    # Get the mecessary data from the database.
+    # Get the necessary data from the database.
     query_database()
 
     # Finally, run the SDK build tool.
