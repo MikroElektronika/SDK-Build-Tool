@@ -118,37 +118,13 @@ def run_builds():
     print(f"\033[93mRunning build for {len(mcu_list)} MCUs\033[0m")
     print(f"\033[93mRunning build for {len(board_list)} boards\033[0m")
     print(f"\033[93mRunning build for {len(mcu_card_list)} MCU cards\033[0m")
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mchp_xc16" --sdk "mikrosdk_v2111" --board "GENERIC_DSPIC_BOARD" --mcu "DSPIC33EP128GP504" --installPrefix "{testPath}/mcu_build/mchp_xc16"'
+    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mchp_xc16" --sdk "mikrosdk_v2111" --board "GENERIC_DSPIC_BOARD" --mcu "dsPIC33EP128GP504" --installPrefix "{testPath}/mcu_build/mchp_xc16"'
     run_cmd(cmd)
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mikrocdspic" --sdk "mikrosdk_v2111" --board "GENERIC_DSPIC_BOARD" --mcu "DSPIC33EP128GP504" --installPrefix "{testPath}/mcu_build/mikrocdspic"'
+    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mikrocdspic" --sdk "mikrosdk_v2111" --board "GENERIC_DSPIC_BOARD" --mcu "dsPIC33EP128GP504" --installPrefix "{testPath}/mcu_build/mikrocdspic"'
     run_cmd(cmd)
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "gcc_arm_none_eabi" --sdk "mikrosdk_v2111" --board "GENERIC_ARM_BOARD" --mcu "STM32F407ZG" --installPrefix "{testPath}/mcu_build/gcc_arm_none_eabi"'
+    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mchp_xc16" --sdk "mikrosdk_v2111" --board "GENERIC_DSPIC_BOARD" --mcu "PIC24EP512GU814" --installPrefix "{testPath}/mcu_build/mchp_xc16"'
     run_cmd(cmd)
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "clang-llvm" --sdk "mikrosdk_v2111" --board "GENERIC_ARM_BOARD" --mcu "STM32F407ZG" --installPrefix "{testPath}/mcu_build/clang-llvm"'
-    run_cmd(cmd)
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mikrocarm" --sdk "mikrosdk_v2111" --board "GENERIC_ARM_BOARD" --mcu "STM32F407ZG" --installPrefix "{testPath}/mcu_build/mikrocarm"'
-    run_cmd(cmd)
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "gcc_arm_none_eabi" --sdk "mikrosdk_v2111" --board "GENERIC_ARM_BOARD" --mcu "TM4C129XNCZAD" --installPrefix "{testPath}/mcu_build/gcc_arm_none_eabi"'
-    run_cmd(cmd)
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "clang-llvm" --sdk "mikrosdk_v2111" --board "GENERIC_ARM_BOARD" --mcu "TM4C129XNCZAD" --installPrefix "{testPath}/mcu_build/clang-llvm"'
-    run_cmd(cmd)
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mikrocarm" --sdk "mikrosdk_v2111" --board "GENERIC_ARM_BOARD" --mcu "TM4C129XNCZAD" --installPrefix "{testPath}/mcu_build/mikrocarm"'
-    run_cmd(cmd)
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "gcc_arm_none_eabi" --sdk "mikrosdk_v2111" --board "GENERIC_ARM_BOARD" --mcu "MK66FX1M0VLQ18" --installPrefix "{testPath}/mcu_build/gcc_arm_none_eabi"'
-    run_cmd(cmd)
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "clang-llvm" --sdk "mikrosdk_v2111" --board "GENERIC_ARM_BOARD" --mcu "MK66FX1M0VLQ18" --installPrefix "{testPath}/mcu_build/clang-llvm"'
-    run_cmd(cmd)
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mikrocarm" --sdk "mikrosdk_v2111" --board "GENERIC_ARM_BOARD" --mcu "MK66FX1M0VLQ18" --installPrefix "{testPath}/mcu_build/mikrocarm"'
-    run_cmd(cmd)
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "xpack-riscv-none-embed-gcc" --sdk "mikrosdk_v2111" --board "GENERIC_RISCV_BOARD" --mcu "GD32VF103VBT6" --installPrefix "{testPath}/mcu_build/xpack-riscv-none-embed-gcc"'
-    run_cmd(cmd)
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "clang-llvm-riscv" --sdk "mikrosdk_v2111" --board "GENERIC_RISCV_BOARD" --mcu "GD32VF103VBT6" --installPrefix "{testPath}/mcu_build/clang-llvm-riscv"'
-    run_cmd(cmd)
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mikrocpic" --sdk "mikrosdk_v2111" --board "GENERIC_PIC_BOARD" --mcu "PIC18F57Q43" --installPrefix "{testPath}/mcu_build/mikrocpic"'
-    run_cmd(cmd)
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mchp_xc8" --sdk "mikrosdk_v2111" --board "GENERIC_PIC_BOARD" --mcu "PIC18F57Q43" --installPrefix "{testPath}/mcu_build/mchp_xc8"'
-    run_cmd(cmd)
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mikrocpic32" --sdk "mikrosdk_v2111" --board "GENERIC_PIC32_BOARD" --mcu "PIC32MZ2048EFH144" --installPrefix "{testPath}/mcu_build/mikrocpic32"'
+    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mikrocdspic" --sdk "mikrosdk_v2111" --board "GENERIC_DSPIC_BOARD" --mcu "PIC24EP512GU814" --installPrefix "{testPath}/mcu_build/mikrocdspic"'
     run_cmd(cmd)
     cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mchp_xc32" --sdk "mikrosdk_v2111" --board "GENERIC_PIC32_BOARD" --mcu "PIC32MZ2048EFH144" --installPrefix "{testPath}/mcu_build/mchp_xc32"'
     run_cmd(cmd)
