@@ -30,7 +30,7 @@ def main():
     run_command("7za x NECTOInstaller.zip")
 
     print("Step 3: Install NECTO")
-    run_command("./NECTOInstaller installer --install-packages necto_installer necto_application database /home/runner/MikroElektronika /home/runner/.MIKROE/NECTOStudio7")
+    run_command("./NECTOInstaller installer --install-packages necto_installer necto_application arm_gcc_clang_stm32g431x6_x8_xb database /home/runner/MikroElektronika /home/runner/.MIKROE/NECTOStudio7")
 
     print("Step 4: Move installer to MIKROE if it's generated in root")
     if os.path.isfile("/home/runner/MikroElektronika/installer_tmp"):

@@ -122,12 +122,6 @@ def run_builds():
     run_cmd(cmd)
     cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mikrocdspic" --sdk "mikrosdk_v2111" --board "GENERIC_DSPIC_BOARD" --mcu "dsPIC33EP128GP504" --installPrefix "{testPath}/mcu_build/mikrocdspic"'
     run_cmd(cmd)
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mchp_xc16" --sdk "mikrosdk_v2111" --board "GENERIC_DSPIC_BOARD" --mcu "PIC24EP512GU814" --installPrefix "{testPath}/mcu_build/mchp_xc16"'
-    run_cmd(cmd)
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mikrocdspic" --sdk "mikrosdk_v2111" --board "GENERIC_DSPIC_BOARD" --mcu "PIC24EP512GU814" --installPrefix "{testPath}/mcu_build/mikrocdspic"'
-    run_cmd(cmd)
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mchp_xc32" --sdk "mikrosdk_v2111" --board "GENERIC_PIC32_BOARD" --mcu "PIC32MZ2048EFH144" --installPrefix "{testPath}/mcu_build/mchp_xc32"'
-    run_cmd(cmd)
 
 # Returns the list of compilers based on the given name and type.
 def get_compilers(name, is_mcu=True):
