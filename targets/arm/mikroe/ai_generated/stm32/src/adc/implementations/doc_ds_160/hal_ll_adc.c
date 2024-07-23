@@ -77,7 +77,7 @@
 #define HAL_LL_ADC_RESOLUTION_BIT0             3
 #define HAL_LL_ADC_RESOLUTION_BIT1             4
 #define HAL_LL_ADC_VREF_VRR                    3
-#define HAL_LL_ADC_ALIGN_BIT                   6
+#define HAL_LL_ADC_ALIGN_BIT                   5
 
 #define HAL_LL_ADC1_ENABLE_CLOCK               13
 #define HAL_LL_ADC2_ENABLE_CLOCK               13

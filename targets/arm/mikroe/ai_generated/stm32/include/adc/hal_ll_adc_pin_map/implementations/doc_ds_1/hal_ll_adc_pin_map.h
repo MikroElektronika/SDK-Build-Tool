@@ -58,7 +58,7 @@ extern "C"{
  */
 typedef enum
 {
-    HAL_LL_ADC_CHANNEL_0 = 1,
+    HAL_LL_ADC_CHANNEL_0 = 0,
     HAL_LL_ADC_CHANNEL_1,
     HAL_LL_ADC_CHANNEL_2,
     HAL_LL_ADC_CHANNEL_3,

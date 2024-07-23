@@ -56,7 +56,7 @@ extern "C"{
 typedef enum
 {
     HAL_LL_DMA_SUCCESS = 0, /*!< Success. */
-    HAL_LL_DMA_ERROR = (-2) /*!< Error. */
+    HAL_LL_DMA_ERROR = (-1) /*!< Error. */
 } hal_ll_dma_err_t;
 
 /**

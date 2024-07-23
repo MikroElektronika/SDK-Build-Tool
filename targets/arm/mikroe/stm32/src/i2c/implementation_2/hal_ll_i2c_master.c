@@ -74,7 +74,7 @@ static volatile hal_ll_i2c_master_handle_register_t hal_ll_module_state[I2C_MODU
 
 /*!< @brief Macros defining register bit location */
 #define HAL_LL_I2C1EN_BIT 21
-#define HAL_LL_I2C2EN_BIT 23
+#define HAL_LL_I2C2EN_BIT 22
 #if defined(STM32F7xx)
     #define HAL_LL_I2C3EN_BIT 23
     #define HAL_LL_I2C4EN_BIT 24
