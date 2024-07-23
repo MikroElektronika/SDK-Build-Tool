@@ -68,6 +68,9 @@ jobs:
       - name: Install NECTO
         run: |
           python -u scripts/install_necto.py
+          mkdir /home/runner/test_results
+          cp /home/runner/MikroElektronika/installed_packages.json /home/runner/test_results
+          cat /home/runner/MikroElektronika/installed_packages.json
 
       - name: Run Recursive Build
         run: |
