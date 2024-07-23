@@ -115,6 +115,9 @@ def run_builds():
     #         cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build"'
     #         run_cmd(cmd)
 
+    print(f"\033[93mRunning build for {len(mcu_list)} MCUs\033[0m")
+    print(f"\033[93mRunning build for {len(board_list)} boards\033[0m")
+    print(f"\033[93mRunning build for {len(mcu_card_list)} MCU cards\033[0m")
     cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mchp_xc16" --sdk "mikrosdk_v2111" --board "GENERIC_DSPIC_BOARD" --mcu "DSPIC33EP128GP504" --installPrefix "{testPath}/mcu_build"'
     run_cmd(cmd)
 
