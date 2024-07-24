@@ -96,7 +96,7 @@ def run_builds():
     #     # Get the necessary compiler for the current MCU build.
     #     compilers, architecture = get_compilers(mcu, is_mcu=True)
     #     for compiler in compilers:
-    #         cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build"/{compiler}'
+    #         cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
     #         run_cmd(cmd)
 
     # # Run build for all boards from board_list.

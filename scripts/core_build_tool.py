@@ -29,11 +29,50 @@ compiler_list = {
     'AVR': ['mikrocavr']
 }
 
-# Replace these with your repository details
+# Repo information.
 REPO_OWNER = 'MikroElektronika'
 REPO_NAME = 'core_packages'
 
-# Function to extract numeric value after '_v'
+# Returns the list of compilers based on the given name and type.
+def get_compilers(name):
+    if any(substring in name for substring in ["ATSAM", "STM", "TM4C", "MK"]):
+        return compiler_list["ARM"], "ARM"
+    elif "GD32" in name:
+        return compiler_list["RISCV"], "RISCV"
+    elif "PIC32" in name:
+        return compiler_list["PIC32"], "PIC32"
+    elif any(substring in name for substring in ["DSPIC", "PIC24", "dsPIC"]):
+        return compiler_list["DSPIC"], "DSPIC"
+    elif any(substring in name for substring in ["PIC18", "PIC16", "PIC12", "PIC10"]):
+        return compiler_list["PIC"], "PIC"
+    elif "AT" in name and "ATSAM" not in name:
+        return compiler_list["AVR"], "AVR"
+    
+def get_all_mcus(sdk_version):
+    mcu_list = []
+    conn = sqlite3.connect(dbPath)
+    cursor = conn.cursor()
+
+    cursor.execute(f"""
+        SELECT SDKToDevice.device_uid
+        FROM SDKToDevice
+        INNER JOIN Devices ON SDKToDevice.device_uid = Devices.uid
+        WHERE SDKToDevice.sdk_uid = '{sdk_version}'
+        AND SDKToDevice.device_uid NOT LIKE '%PIM%'
+        AND SDKToDevice.device_uid NOT LIKE '%CARD%'
+        AND SDKToDevice.device_uid NOT LIKE '%SPARKFUN%'
+        AND SDKToDevice.device_uid NOT LIKE '%SIBRAIN%';
+    """)
+    rows = cursor.fetchall()
+    if rows:
+        mcu_list.extend([row[0] for row in rows])
+    mcu_list[:] = sorted(mcu_list)
+
+    conn.close()
+
+    return mcu_list
+
+# Function to extract numeric value after 'mikrosdk_v'.
 def extract_version_number(uid):
     match = re.search(r'_v(\d+)', uid)
     return int(match.group(1)) if match else 0
@@ -53,6 +92,8 @@ def get_sdk_version():
 
     # Sort the SDK versions based on the extracted numeric value and get the highest one
     latest_sdk = max(sdk_versions, key=lambda x: extract_version_number(x[0]))[0]
+
+    conn.close()
 
     return latest_sdk
 
@@ -90,42 +131,62 @@ def run_cmd(cmd):
             elif "Build success!" in line:
 
                 # Green color for success.
-                print(f"\033[92m{line}\033[0m")  # Green color for success
+                print(f"\033[92m{line}\033[0m")
             elif "Build failed" in line:
 
                 # Red color for failure.
-                print(f"\033[91m{line}\033[0m")  # Red color for failure
+                print(f"\033[91m{line}\033[0m")
                 build_failed = True
 
+# Runs recursive builds.
 def run_builds(compiler_mcu_map):
     sdk = get_sdk_version()
-    # Run build for all MCUs from mcu_list.
-    print(f"\033[93mRunning build for {len(compiler_mcu_map)} architectures\033[0m")
-    for architecture, compilers in compiler_mcu_map.items():
-        print(f"\033[93mRunning build for {len(compilers)} compilers with {architecture} architecture\033[0m")
-        for compiler, mcus in compilers.items():
-            print(f"\033[93mRunning build for {len(mcus)} MCUs with {compiler}\033[0m")
-            for mcu in mcus:
+    if compiler_mcu_map != {}:
+        # Run build for all MCUs from compiler_mcu_map.
+        print(f"\033[93mRunning build for {len(compiler_mcu_map)} architectures\033[0m")
+        for architecture, compilers in compiler_mcu_map.items():
+            print(f"\033[93mRunning build for {len(compilers)} compilers with {architecture} architecture\033[0m")
+            for compiler, mcus in compilers.items():
+                print(f"\033[93mRunning build for {len(mcus)} MCUs with {compiler}\033[0m")
+                for mcu in mcus:
+                    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk}" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
+                    run_cmd(cmd)
+    else:
+        mcu_list = get_all_mcus(sdk)
+
+        # Run build for all MCUs from mcu_list.
+        print(f"\033[93mRunning build for {len(mcu_list)} MCUs\033[0m")
+        for mcu in mcu_list:
+            # Get the necessary compiler for the current MCU build.
+            compilers, architecture = get_compilers(mcu, is_mcu=True)
+            for compiler in compilers:
                 cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk}" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
                 run_cmd(cmd)
+        
 
+# Fetches metadata.json from release.
 def fetch_json(url):
     response = requests.get(url)
     response.raise_for_status()
     return response.json()
 
+# Gets 2 latest releases.
 def get_latest_releases(owner, repo):
     releases_url = f'https://api.github.com/repos/{owner}/{repo}/releases'
     response = requests.get(releases_url)
     response.raise_for_status()
     releases = response.json()
-    return releases[:2]  # Get the latest two releases
 
+    # Get the latest two releases.
+    return releases[:2]
+
+# Downloads the file.
 def download_file(url):
     response = requests.get(url)
     response.raise_for_status()
     return response.content
 
+# Compares hashes in metadata.json
 def compare_hashes(metadata_1, metadata_2):
     hash_diff_names = []
     dict_1 = {item['name']: item['hash'] for item in metadata_1}
@@ -137,20 +198,27 @@ def compare_hashes(metadata_1, metadata_2):
     
     return hash_diff_names
 
+# Extracts the files from archive.
 def extract_docs_archive(content, extract_to='docs'):
     with py7zr.SevenZipFile(io.BytesIO(content), mode='r') as z:
         z.extractall(path=extract_to)
 
+# Maps architecture with compilers and MCUs.
 def find_mcus_and_toolchains(extract_path, names):
     toolchain_mcu_map = {}
 
     for name in names:
-        # Split the name to get architecture and toolchain
+        # Split the name to get architecture and toolchain.
         parts = name.split('_')
-        architecture = parts[0].upper()  # The first part is the architecture
+
+        # The first part is the architecture.
+        architecture = parts[0].upper()
         if architecture == 'DSPIC':
-            architecture = 'dsPIC'  # Make 'ds' lower case
-        toolchain = parts[1]  # The second part is the toolchain
+            # Make 'ds' lower case.
+            architecture = 'dsPIC'
+
+        # The second part is the toolchain.
+        toolchain = parts[1]
         if toolchain == 'gcc':
             toolchain = 'gcc_clang'
         elif toolchain == 'mikroc':
@@ -158,11 +226,11 @@ def find_mcus_and_toolchains(extract_path, names):
         elif toolchain.startswith('xc'):
             toolchain = toolchain.upper()
 
-        # Construct the path to the JSON file
+        # Construct the path to the JSON file.
         json_folder_path = os.path.join(extract_path, architecture)
         json_file_path = None
 
-        # Search for the JSON file inside the architecture folder
+        # Search for the JSON file inside the architecture folder.
         for root, dirs, files in os.walk(json_folder_path):
             for file in files:
                 if toolchain in file:
@@ -171,7 +239,7 @@ def find_mcus_and_toolchains(extract_path, names):
             if json_file_path:
                 break
 
-        # If the JSON file is found, extract the required data
+        # If the JSON file is found, extract the required data.
         if json_file_path and os.path.exists(json_file_path):
             with open(json_file_path, 'r') as f:
                 data = json.load(f)
@@ -198,7 +266,7 @@ def find_mcus_and_toolchains(extract_path, names):
                                     else:
                                         toolchain_mcu_map[architecture][compiler] = mcus
 
-    # Remove duplicates from each list in the map
+    # Remove duplicates from each list in the map.
     for architecture in toolchain_mcu_map:
         for toolchain in toolchain_mcu_map[architecture]:
             toolchain_mcu_map[architecture][toolchain] = list(set(toolchain_mcu_map[architecture][toolchain]))
@@ -208,51 +276,56 @@ def find_mcus_and_toolchains(extract_path, names):
 def main():
     global build_failed
 
-    # Create testPath if it does not exist
+    # Dictionary for architecture-compiler-mcu dependencies
+    compiler_mcu_map = {}
+
+    # Create testPath if it does not exist.
     os.makedirs(testPath, exist_ok=True)
 
-    # Get the latest two releases
-    latest_releases = get_latest_releases(REPO_OWNER, REPO_NAME)
-    
-    # Get the URLs for metadata.json files
-    metadata_url_release_1 = None
-    metadata_url_release_2 = None
-    docs_url_latest_release = None
+    # Check if it's a job for global build or not.
+    if os.getenv('BUILD_ALL') == '0':
+        # Get the latest two releases.
+        latest_releases = get_latest_releases(REPO_OWNER, REPO_NAME)
+        
+        # Get the URLs for metadata.json files.
+        metadata_url_release_1 = None
+        metadata_url_release_2 = None
+        docs_url_latest_release = None
 
-    if len(latest_releases) >= 2:
-        for asset in latest_releases[1]['assets']:
-            if asset['name'] == 'metadata.json':
-                metadata_url_release_1 = asset['browser_download_url']
-            if asset['name'] == 'docs.7z':
-                docs_url_release_1 = asset['browser_download_url']
+        if len(latest_releases) >= 2:
+            for asset in latest_releases[1]['assets']:
+                if asset['name'] == 'metadata.json':
+                    metadata_url_release_1 = asset['browser_download_url']
 
-        for asset in latest_releases[0]['assets']:
-            if asset['name'] == 'metadata.json':
-                metadata_url_release_2 = asset['browser_download_url']
-            if asset['name'] == 'docs.7z':
-                docs_url_latest_release = asset['browser_download_url']
-    
-    if not metadata_url_release_1 or not metadata_url_release_2 or not docs_url_latest_release:
-        print("Required files not found in the releases.")
-        return
+            for asset in latest_releases[0]['assets']:
+                if asset['name'] == 'metadata.json':
+                    metadata_url_release_2 = asset['browser_download_url']
+                if asset['name'] == 'docs.7z':
+                    docs_url_latest_release = asset['browser_download_url']
+        
+        if not metadata_url_release_1 or not metadata_url_release_2 or not docs_url_latest_release:
+            
+            # Error handling if we couldn't find 2 latest releases.
+            print("Required files not found in the releases.")
+            return
 
-    # Fetch the metadata.json files
-    metadata_1 = fetch_json(metadata_url_release_1)
-    metadata_2 = fetch_json(metadata_url_release_2)
-    
-    # Compare hashes and find differing names
-    differing_names = compare_hashes(metadata_1, metadata_2)
-    
-    # Download and extract docs.7z archive from the latest release
-    docs_content = download_file(docs_url_latest_release)
-    extract_docs_archive(docs_content)
-    
-    # Find mcus and toolchains from the extracted docs
-    compiler_mcu_map = find_mcus_and_toolchains('docs', differing_names)
+        # Fetch the metadata.json files.
+        metadata_1 = fetch_json(metadata_url_release_1)
+        metadata_2 = fetch_json(metadata_url_release_2)
+        
+        # Compare hashes and find differing names.
+        differing_names = compare_hashes(metadata_1, metadata_2)
+        
+        # Download and extract docs.7z archive from the latest release.
+        docs_content = download_file(docs_url_latest_release)
+        extract_docs_archive(docs_content)
+        
+        # Find architectures, mcus and toolchains from the extracted docs.
+        compiler_mcu_map = find_mcus_and_toolchains('docs', differing_names)
 
     run_builds(compiler_mcu_map)
     
-    # Save the results to a JSON file
+    # Save the results to a JSON file.
     with open(f"{testPath}/built_changed.json", "w") as outfile:
         json.dump(compiler_mcu_map, outfile, indent=4)
 
