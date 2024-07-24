@@ -158,7 +158,7 @@ def run_builds(compiler_mcu_map):
         print(f"\033[93mRunning build for {len(mcu_list)} MCUs\033[0m")
         for mcu in mcu_list:
             # Get the necessary compiler for the current MCU build.
-            compilers, architecture = get_compilers(mcu, is_mcu=True)
+            compilers, architecture = get_compilers(mcu)
             for compiler in compilers:
                 cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk}" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
                 run_cmd(cmd)
