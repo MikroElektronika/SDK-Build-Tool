@@ -3,6 +3,7 @@ import requests
 import py7zr
 import io
 import os
+import re
 import sqlite3
 import subprocess
 
@@ -14,6 +15,9 @@ testPath = '/home/runner/test_results'
 
 # Path to sdk_build_automation tool.
 toolPath = '/home/runner/MikroElektronika/NECTOStudio/bin'
+
+# Global variable to trace failed tests.
+build_failed = False
 
 # Supported compilers list for each architecture.
 compiler_list = {
@@ -29,6 +33,11 @@ compiler_list = {
 REPO_OWNER = 'MikroElektronika'
 REPO_NAME = 'core_packages'
 
+# Function to extract numeric value after '_v'
+def extract_version_number(uid):
+    match = re.search(r'_v(\d+)', uid)
+    return int(match.group(1)) if match else 0
+
 # Extracts the SDK version from the manifest.json file.
 def get_sdk_version():
     # Connect to the database.
@@ -40,9 +49,12 @@ def get_sdk_version():
         FROM SDKs
         WHERE installed = '1';
     """)
-    sdk = cursor.fetchall()[0][0]
+    sdk_versions = cursor.fetchall()
 
-    return sdk
+    # Sort the SDK versions based on the extracted numeric value and get the highest one
+    latest_sdk = max(sdk_versions, key=lambda x: extract_version_number(x[0]))[0]
+
+    return latest_sdk
 
 # Runs the bash command.
 def run_cmd(cmd):
@@ -194,6 +206,8 @@ def find_mcus_and_toolchains(extract_path, names):
     return toolchain_mcu_map
 
 def main():
+    global build_failed
+
     # Create testPath if it does not exist
     os.makedirs(testPath, exist_ok=True)
 
@@ -241,6 +255,15 @@ def main():
     # Save the results to a JSON file
     with open(f"{testPath}/built_changed.json", "w") as outfile:
         json.dump(compiler_mcu_map, outfile, indent=4)
+
+    if build_failed == True:
+        # Red text for failure.
+        print("\033[91mRecursive Build Failed!\033[0m")
+        # Fail the job as well.
+        exit(1)
+    else:
+        # Green text for success.
+        print("\033[92mRecursive Build Success!\033[0m")
 
 if __name__ == "__main__":
     main()
