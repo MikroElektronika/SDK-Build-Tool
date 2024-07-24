@@ -3,7 +3,11 @@ import requests
 import py7zr
 import io
 import os
+import sqlite3
 import subprocess
+
+# Path to the necto_db.db file.
+dbPath = '/home/runner/.MIKROE/NECTOStudio7/databases/necto_db.db'
 
 # Path for storing artifacts.
 testPath = '/home/runner/test_results'
@@ -24,6 +28,21 @@ compiler_list = {
 # Replace these with your repository details
 REPO_OWNER = 'MikroElektronika'
 REPO_NAME = 'core_packages'
+
+# Extracts the SDK version from the manifest.json file.
+def get_sdk_version():
+    # Connect to the database.
+    conn = sqlite3.connect(dbPath)
+    cursor = conn.cursor()
+
+    cursor.execute(f"""
+        SELECT uid
+        FROM SDKs
+        WHERE installed = '1';
+    """)
+    sdk = cursor.fetchall()[0][0]
+
+    return sdk
 
 # Runs the bash command.
 def run_cmd(cmd):
@@ -67,6 +86,7 @@ def run_cmd(cmd):
                 build_failed = True
 
 def run_builds(compiler_mcu_map):
+    sdk = get_sdk_version()
     # Run build for all MCUs from mcu_list.
     print(f"\033[93mRunning build for {len(compiler_mcu_map)} architectures\033[0m")
     for architecture, compilers in compiler_mcu_map.items():
@@ -74,7 +94,7 @@ def run_builds(compiler_mcu_map):
         for compiler, mcus in compilers.items():
             print(f"\033[93mRunning build for {len(mcus)} MCUs with {compiler}\033[0m")
             for mcu in mcus:
-                cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "1" --compiler "{compiler}" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
+                cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk}" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
                 run_cmd(cmd)
 
 def fetch_json(url):
@@ -174,6 +194,9 @@ def find_mcus_and_toolchains(extract_path, names):
     return toolchain_mcu_map
 
 def main():
+    # Create testPath if it does not exist
+    os.makedirs(testPath, exist_ok=True)
+
     # Get the latest two releases
     latest_releases = get_latest_releases(REPO_OWNER, REPO_NAME)
     
@@ -216,7 +239,7 @@ def main():
     run_builds(compiler_mcu_map)
     
     # Save the results to a JSON file
-    with open(f"{testPath}/built_changes.json", "w") as outfile:
+    with open(f"{testPath}/built_changed.json", "w") as outfile:
         json.dump(compiler_mcu_map, outfile, indent=4)
 
 if __name__ == "__main__":
