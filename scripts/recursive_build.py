@@ -1,9 +1,14 @@
 import subprocess
+import requests
 import re
 import os
 import sqlite3
 import json
 from pathlib import Path
+
+# Define the repository owner and name
+repo_owner = "MikroElektronika"
+repo_name = "mikrosdk_v2"
 
 # Path to the necto_db.db file.
 dbPath = '/home/runner/.MIKROE/NECTOStudio7/databases/necto_db.db'
@@ -173,49 +178,45 @@ def get_compilers(name, is_mcu=True):
 # Fetches the two latest releases from the GitHub repository.
 def get_latest_releases():
     try:
-        # Get all the GIT release tags.
-        output = subprocess.check_output(
-            ['git', 'tag', '--sort=-creatordate'],
-            cwd='.', text=True
-        )
-        tags = output.splitlines()
+        # GitHub API URL to fetch tags
+        tags_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/tags"
 
-        # Return the two most recent tags.
-        return tags[:2]
-    except subprocess.CalledProcessError as e:
+        # Send request to GitHub API
+        response = requests.get(tags_url)
+        response.raise_for_status()
+        tags = response.json()
 
-        # Return error if coudn't find any GIT release tags.
+        # Return the two most recent tags
+        return [tag['name'] for tag in tags[:2]]
+    except requests.RequestException as e:
         print(f"Error fetching tags: {e}")
         return None, None
 
-# Runs the git diff command and returns the list of changed files.
+# Fetches the changed files between two releases using the GitHub API.
 def get_changed_files():
-    # Make sure to pull all the latest GIT info.
-    cmd = 'git pull'
-    os.system(cmd)
-
-    # Get the latest and previous GIT release tags.
     latest, previous = get_latest_releases()
     if not latest or not previous:
         return []
 
     try:
-        # See the differences in the files between current and latest releases.
-        output = subprocess.check_output(
-            ['git', 'diff', '--name-only', previous, latest],
-            cwd='.', text=True
-        )
-        changed_files = output.splitlines()
+        # GitHub API URL to compare commits between two tags
+        compare_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/compare/{previous}...{latest}"
+
+        # Send request to GitHub API
+        response = requests.get(compare_url)
+        response.raise_for_status()
+        compare_data = response.json()
+
+        # Extract the list of changed files
+        changed_files = [file['filename'] for file in compare_data['files']]
         
-        # Write all detected changed files to changed_files.txt.
-        with open(f'{testPath}/changed_files.txt', 'w') as f:
+        # Write all detected changed files to changed_files.txt
+        with open('changed_files.txt', 'w') as f:
             for line in changed_files:
                 f.write(line + '\n')
-        
+
         return changed_files
-    except subprocess.CalledProcessError as e:
-        
-        # Return error if failed to run git diff.
+    except requests.RequestException as e:
         print(f"Error running git diff: {e}")
         return []
 
