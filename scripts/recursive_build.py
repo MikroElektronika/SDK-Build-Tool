@@ -5,13 +5,6 @@ import sqlite3
 import json
 from pathlib import Path
 
-# Lists for storing all the info for building.
-regex_list = []
-mcu_list = []
-board_list = []
-mcu_card_list = []
-unused = []
-
 # Path for git root directory.
 gitPath = '/home/runner/work/SDK-Build-Tool/SDK-Build-Tool'
 
@@ -86,42 +79,34 @@ def run_cmd(cmd):
                 build_failed = True
 
 # Runs the build commands for each member of mcu_list, board_list, and mcu_card_list.
-def run_builds():
-    # # Get the SDK version from manifest.json file.
-    # sdk_version = get_sdk_version('manifest.json')
+def run_builds(changes_dict):
+    # Get the SDK version from manifest.json file.
+    sdk_version = get_sdk_version('manifest.json')
 
-    # # Run build for all MCUs from mcu_list.
-    # print(f"\033[93mRunning build for {len(mcu_list)} MCUs\033[0m")
-    # for mcu in mcu_list:
-    #     # Get the necessary compiler for the current MCU build.
-    #     compilers, architecture = get_compilers(mcu, is_mcu=True)
-    #     for compiler in compilers:
-    #         cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
-    #         run_cmd(cmd)
+    # Run build for all MCUs from mcu_list.
+    print(f"\033[93mRunning build for {len(changes_dict['mcu_list'])} MCUs\033[0m")
+    for mcu in changes_dict['mcu_list']:
+        # Get the necessary compiler for the current MCU build.
+        compilers, architecture = get_compilers(mcu, is_mcu=True)
+        for compiler in compilers:
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
+            run_cmd(cmd)
 
-    # # Run build for all boards from board_list.
-    # print(f"\033[93mRunning build for {len(board_list)} boards\033[0m")
-    # for board in board_list:
-    #     compilers = get_compilers(board, is_mcu=False)
-    #     for compiler in compilers:
-    #         cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "{board}" --installPrefix "{testPath}/board_build/{compiler}"'
-    #         run_cmd(cmd)
+    # Run build for all boards from board_list.
+    print(f"\033[93mRunning build for {len(changes_dict['board_list'])} boards\033[0m")
+    for board in changes_dict['board_list']:
+        compilers = get_compilers(board, is_mcu=False)
+        for compiler in compilers:
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "{board}" --installPrefix "{testPath}/board_build/{compiler}"'
+            run_cmd(cmd)
 
-    # # Run build for all MCU cards from mcu_card_list.
-    # print(f"\033[93mRunning build for {len(mcu_card_list)} MCU cards\033[0m")
-    # for mcu_card in mcu_card_list:
-    #     compilers = get_compilers(mcu_card, is_mcu=True)
-    #     for compiler in compilers:
-    #         cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build/{compiler}"'
-    #         run_cmd(cmd)
-
-    print(f"\033[93mRunning build for {len(mcu_list)} MCUs\033[0m")
-    print(f"\033[93mRunning build for {len(board_list)} boards\033[0m")
-    print(f"\033[93mRunning build for {len(mcu_card_list)} MCU cards\033[0m")
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mchp_xc16" --sdk "mikrosdk_v2111" --board "GENERIC_DSPIC_BOARD" --mcu "dsPIC33EP128GP504" --installPrefix "{testPath}/mcu_build/mchp_xc16"'
-    run_cmd(cmd)
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "mikrocdspic" --sdk "mikrosdk_v2111" --board "GENERIC_DSPIC_BOARD" --mcu "dsPIC33EP128GP504" --installPrefix "{testPath}/mcu_build/mikrocdspic"'
-    run_cmd(cmd)
+    # Run build for all MCU cards from mcu_card_list.
+    print(f"\033[93mRunning build for {len(changes_dict['mcu_card_list'])} MCU cards\033[0m")
+    for mcu_card in changes_dict['mcu_card_list']:
+        compilers = get_compilers(mcu_card, is_mcu=True)
+        for compiler in compilers:
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build/{compiler}"'
+            run_cmd(cmd)
 
 # Returns the list of compilers based on the given name and type.
 def get_compilers(name, is_mcu=True):
@@ -210,15 +195,15 @@ def get_changed_files():
     os.system(cmd)
 
     # Get the latest and previous GIT release tags.
-    # latest, previous = get_latest_releases()
-    # if not latest or not previous:
-        # return []
+    latest, previous = get_latest_releases()
+    if not latest or not previous:
+        return []
 
     try:
         # See the differences in the files between current and latest releases.
         output = subprocess.check_output(
-            # ['git', 'diff', '--name-only', previous, latest],
-            ['git', 'diff', '--name-only', 'origin/main'],
+            ['git', 'diff', '--name-only', previous, latest],
+            # ['git', 'diff', '--name-only', 'origin/main'],
             cwd=gitPath, text=True
         )
         changed_files = output.splitlines()
@@ -236,10 +221,7 @@ def get_changed_files():
         return []
 
 # Classifies changes into 4 different Cases.
-def classify_changes(files):
-    global mcu_card_list
-    global mcu_list
-    global board_list
+def classify_changes(changes_dict):
     # Case 1 - MCU card files were changed. 
     case_1_paths = ["bsp/board/include/mcu_cards"]
     # Case 2 - Board files were changed.
@@ -253,14 +235,14 @@ def classify_changes(files):
     # List for storing source and header files affected by the changes.
     other_files = []
 
-    for file in files:
+    for file in changes_dict['changed_files']:
         # Ensure we handle paths correctly.
         file = file.replace('\\', '/')
         # Case 4 - return empty data lists which means that we need to run build for everything.
         if any(file.startswith(prefix) for prefix in ["api", "cmake", "components", "drv", "hal", "middleware", "platform", "thirdparty"]):
-            mcu_list = []
-            board_list = []
-            mcu_card_list = []
+            changes_dict['mcu_list'] = []
+            changes_dict['board_list'] = []
+            changes_dict['mcu_card_list'] = []
             return
         
         # Case 1 - find MCU card name that was affected by the changes.
@@ -268,8 +250,8 @@ def classify_changes(files):
             # MCU card name is always present as a folder name.
             folder_name = Path(file).parts[4]
             # Add it to the list for building if it is not present there already.
-            if folder_name not in mcu_card_list:
-                mcu_card_list.append(folder_name)
+            if folder_name not in changes_dict['mcu_card_list']:
+                changes_dict['mcu_card_list'].append(folder_name)
         
         # Case 2 - obtain the _MSDK_BOARD_NAME_ variable from board.cmake file.
         if any(file.startswith(path) for path in case_2_paths):
@@ -278,7 +260,7 @@ def classify_changes(files):
             board_cmake_file = Path(gitPath) / 'bsp/board/include/boards' / folder_name / 'board.cmake'
             # If board.cmake file was found add it to the list for building in sdk_config format.
             if board_cmake_file.exists():
-                extract_board_name(board_cmake_file)
+                extract_board_name(board_cmake_file, changes_dict)
         
         # Case 3 - store all the changed files from targets folder.
         if any(file.startswith(path) for path in case_3_paths):
@@ -292,50 +274,50 @@ def classify_changes(files):
     if cmake_files or other_files:
         # If it is CMake file simply extract the regex from it. 
         for cmake_file in cmake_files:
-            extract_regex(Path(cmake_file))
+            extract_regex(Path(cmake_file), changes_dict)
 
         # If it is source or header file find the CMake that handles this file.
         for other_file in other_files:
             if other_file.endswith('.h'):
                 # If it is header file do additional checkings.
-                handle_header_file(Path(other_file))
+                handle_header_file(Path(other_file), changes_dict)
             else:
                 # If it is a source file find appropriat CMake file in current or 2 parent folders.
                 folder_path = Path(other_file).parent
-                check_and_extract_regex(folder_path)
+                check_and_extract_regex(folder_path, changes_dict)
 
 # Checks and extracts regex from CMakeLists.txt or CMakeLists.cmake files in the given folder or its parents.
-def check_and_extract_regex(folder_path):
+def check_and_extract_regex(folder_path, changes_dict):
     # Check for CMake in the same folder with the source file and in 2 parent folders.
     for iterations in range(3):
         cmake_file = folder_path / 'CMakeLists.txt'
         if cmake_file.exists():
             # Extract regex for MCUs from found CMake file.
-            extract_regex(cmake_file)
+            extract_regex(cmake_file, changes_dict)
             return
         cmake_file = folder_path / 'CMakeLists.cmake'
         if cmake_file.exists():
             # Extract regex for MCUs from found CMake file.
-            extract_regex(cmake_file)
+            extract_regex(cmake_file, changes_dict)
             return
         folder_path = folder_path.parent
 
 # Extracts and stores regex from the given cmake file.
-def extract_regex(cmake_file):
+def extract_regex(cmake_file, changes_dict):
     try:
         with open(str(gitPath) + '/' + str(cmake_file), 'r') as file:
             content = file.read()
             # Find all matches for MCU_* MATCHES or MCU_* STREQUAL.
             regexes = re.findall(r'\${[^}]*MCU[^}]*}\s+(?:MATCHES|STREQUAL)\s+"([^"]+)"', content)
             # Store all the found regexes.
-            regex_list.extend(regexes)
+            changes_dict['regex_list'].extend(regexes)
     except Exception as e:
 
         # Return error if couldn't read the CMake file.
         print(f"Error reading {cmake_file}: {e}")
 
 # Extracts the _MSDK_BOARD_NAME_ from the board.cmake file.
-def extract_board_name(board_cmake_file):
+def extract_board_name(board_cmake_file, changes_dict):
     try:
         with open(board_cmake_file, 'r') as file:
             content = file.read()
@@ -343,24 +325,24 @@ def extract_board_name(board_cmake_file):
             board_names = re.findall(r'\${_MSDK_BOARD_NAME_}\s+STREQUAL\s+"([^"]+)"', content)
             # Store all found _MSDK_BOARD_NAME_ values in sdk_config format.
             for board_name in board_names:
-                board_list.append(f'"_MSDK_BOARD_NAME_":"{board_name}"')
+                changes_dict['board_list'].append(f'"_MSDK_BOARD_NAME_":"{board_name}"')
     except Exception as e:
         
         # Return error if couldn't read the board.cmake file.
         print(f"Error reading {board_cmake_file}: {e}")
 
 # Handles header files to find MCU names or check corresponding CMake files.
-def handle_header_file(header_file):
+def handle_header_file(header_file, changes_dict):
     # If changes were done to the common folder simply get the MCU name from folder name.
     if "common" in header_file.parts:
-        obtain_mcu_name_from_path(header_file)
+        obtain_mcu_name_from_path(header_file, changes_dict)
 
     # If changes were done to the include folder find a corresponding src folder with CMake file.
     elif "include" in header_file.parts:
-        find_corresponding_src_folder(header_file)
+        find_corresponding_src_folder(header_file, changes_dict)
 
 # Obtains MCU name from the header file path.
-def obtain_mcu_name_from_path(header_file):
+def obtain_mcu_name_from_path(header_file, changes_dict):
     try:
         path_parts = header_file.parts
         # For ARM and RISCV MCUs we have different folder structure with extra folder after mcu_definitions and mcu_reg_addresses.
@@ -389,15 +371,15 @@ def obtain_mcu_name_from_path(header_file):
             mcu_name = path_parts[idx + 1]
 
         # Add the obtained MCU name to the list for building if it hasn't been added there already.
-        if mcu_name not in mcu_list:
-            mcu_list.append(mcu_name)
+        if mcu_name not in changes_dict['mcu_list']:
+            changes_dict['mcu_list'].append(mcu_name)
     except ValueError as e:
 
         # Print an error message if something went wrong.
         print(f"Error obtaining MCU name from path: {e}")
 
 # Finds the corresponding src folder for a given header file in include folder.
-def find_corresponding_src_folder(header_file):
+def find_corresponding_src_folder(header_file, changes_dict):
     try:
         # Get the include folder index in the path.
         parts = list(header_file.parts)
@@ -427,7 +409,7 @@ def find_corresponding_src_folder(header_file):
                         cmake_file_path = Path(root) / file
                         # If we found CMake with the changed header file extract regexes for MCUs.
                         if check_cmake_file_for_include_path(cmake_file_path, include_path):
-                            extract_regex(cmake_file_path)
+                            extract_regex(cmake_file_path, changes_dict)
     except ValueError as e:
 
         # Return error if no src folder has been found.
@@ -453,7 +435,7 @@ def regexp(expr, item):
     return reg.search(item) is not None
 
 # Queries the database to update mcu_card_list, board_list, and mcu_list.
-def query_database():
+def query_database(changes_dict):
     # Get the SDK version from the manifest.json file.
     sdk_version = get_sdk_version('manifest.json')
 
@@ -467,7 +449,7 @@ def query_database():
     # Update mcu_card_list.
     # Find all MCU cards according to the stored MCU card names that has SDK support.
     new_mcu_card_list = []
-    for mcu_card in mcu_card_list:
+    for mcu_card in changes_dict['mcu_card_list']:
         mcu_card_upper = mcu_card.upper()
         cursor.execute(f"""
             SELECT SDKToDevice.device_uid
@@ -481,13 +463,13 @@ def query_database():
         if rows:
             new_mcu_card_list.extend([row[0] for row in rows])
         else:
-            unused.append(mcu_card)
-    mcu_card_list[:] = sorted(list(set(new_mcu_card_list)))
+            changes_dict['unused'].append(mcu_card)
+    changes_dict['mcu_card_list'][:] = sorted(list(set(new_mcu_card_list)))
 
     # Update board_list.
     # Find all boards according to the stored _MSDK_BOARD_NAME_ values that has SDK support.
     new_board_list = []
-    for board in board_list:
+    for board in changes_dict['board_list']:
         cursor.execute(f"""
             SELECT SDKToBoard.board_uid
             FROM SDKToBoard
@@ -499,13 +481,13 @@ def query_database():
         if rows:
             new_board_list.extend([row[0] for row in rows])
         else:
-            unused.append(board)
-    board_list[:] = sorted(list(set(new_board_list)))
+            changes_dict['unused'].append(board)
+    changes_dict['board_list'][:] = sorted(list(set(new_board_list)))
 
     # Update mcu_list based on regex_list.
     # Find all MCUs that are not on any cards and that have SDK support.
     new_mcu_list = []
-    for regex in regex_list:
+    for regex in changes_dict['regex_list']:
         # Skip regexes with only one letter.
         if len(regex) > 1:
             cursor.execute(f"""
@@ -524,14 +506,14 @@ def query_database():
             if rows:
                 new_mcu_list.extend([row[0] for row in rows])
             else:
-                unused.append(regex)
-    mcu_list.extend([device for device in set(new_mcu_list) if device not in mcu_list])
-    mcu_list[:] = sorted(mcu_list)
+                changes_dict['unused'].append(regex)
+    changes_dict['mcu_list'].extend([device for device in set(new_mcu_list) if device not in changes_dict['mcu_list']])
+    changes_dict['mcu_list'][:] = sorted(changes_dict['mcu_list'])
 
     # If all lists for building are empty this means that either changes were made to Case 4 folders
     #   or we are running build for everything. 
     # In this case get all the SDK supported boards, MCU cards and MCUs from the database.
-    if not mcu_list and not board_list and not mcu_card_list:
+    if not changes_dict['mcu_list'] and not changes_dict['board_list'] and not changes_dict['mcu_card_list']:
         cursor.execute(f"""
             SELECT SDKToDevice.device_uid
             FROM SDKToDevice
@@ -547,9 +529,9 @@ def query_database():
         if rows:
             new_mcu_list.extend([row[0] for row in rows])
         else:
-            unused.append(regex)
-        mcu_list.extend([device for device in set(new_mcu_list) if device not in mcu_list])
-        mcu_list[:] = sorted(mcu_list)
+            changes_dict['unused'].append(regex)
+        changes_dict['mcu_list'].extend([device for device in set(new_mcu_list) if device not in changes_dict['mcu_list']])
+        changes_dict['mcu_list'][:] = sorted(changes_dict['mcu_list'])
 
         cursor.execute(f"""
             SELECT device_uid
@@ -561,8 +543,8 @@ def query_database():
         if rows:
             new_mcu_card_list.extend([row[0] for row in rows])
         else:
-            unused.append(mcu_card)
-        mcu_card_list[:] = sorted(list(set(new_mcu_card_list)))
+            changes_dict['unused'].append(mcu_card)
+        changes_dict['mcu_card_list'][:] = sorted(list(set(new_mcu_card_list)))
 
         cursor.execute(f"""
             SELECT board_uid
@@ -573,31 +555,33 @@ def query_database():
         if rows:
             new_board_list.extend([row[0] for row in rows])
         else:
-            unused.append(board)
-        board_list[:] = sorted(list(set(new_board_list)))
+            changes_dict['unused'].append(board)
+        changes_dict['board_list'][:] = sorted(list(set(new_board_list)))
 
     conn.close()
 
-def write_results_to_file():
-    """Writes the result list to a file, removing duplicates, and ensures testPath exists."""    
-    with open(f'{testPath}/regex_list.txt', 'w+') as regex_list_file:
-        for item in regex_list:
-            regex_list_file.write(f"{item}\n")
-    with open(f'{testPath}/board_list.txt', 'w+') as board_list_file:
-        for item in board_list:
-            board_list_file.write(f"{item}\n")
-    with open(f'{testPath}/mcu_card_list.txt', 'w+') as mcu_card_list_file:
-        for item in mcu_card_list:
-            mcu_card_list_file.write(f"{item}\n")
-    with open(f'{testPath}/mcu_list.txt', 'w+') as mcu_list_file:
-        for item in mcu_list:
-            mcu_list_file.write(f"{item}\n")
+# Writes the result dictionary to a JSON file and ensures testPath exists.
+def write_results_to_file(changes_dict):
+    with open(f'{testPath}/built_changes.json', 'w+') as json_file:
+        json.dump(changes_dict, json_file, indent=4)
 
-    for item in unused:
+    print(f"All the data for build has been written to {testPath}/Built_Changes.json")
+
+    for item in changes_dict['unused']:
         print(f"Couldn't find {item} in the database")
 
 def main():
     global build_failed
+
+    # Initialize the changes dictionary.
+    changes_dict = {
+        'regex_list': [],
+        'mcu_list': [],
+        'board_list': [],
+        'mcu_card_list': [],
+        'unused': [],
+        'changed_files': []
+    }
 
     # Create a folder for job artifacts. 
     os.makedirs(testPath, exist_ok=True)
@@ -605,26 +589,19 @@ def main():
     # Check if it's a job for global build or not.
     if os.getenv('BUILD_ALL') == '0':
         # If it's not - get the changed files.
-        changed_files = get_changed_files()
+        changes_dict['changed_files'] = get_changed_files()
 
         # Classify the changed files.
-        classify_changes(changed_files)
+        classify_changes(changes_dict)
 
     # Get the necessary data from the database.
-    query_database()
+    query_database(changes_dict)
 
     # Finally, run the SDK build tool.
-    run_builds()
+    run_builds(changes_dict)
 
     # Write all the used info for building to artifact folder.
-    write_results_to_file()
-
-    # Let the user know that files were written and can be seen.
-    print(f"Detected changed files have been written to {testPath}/changed_files.txt")
-    print(f"Detected regexes have been written to {testPath}/regex_list.txt")
-    print(f"Built MCUs list has been written to {testPath}/mcu_list.txt")
-    print(f"Built boards list has been written to {testPath}/board_list.txt")
-    print(f"Built MCU cards list has been written to {testPath}/mcu_card_list.txt")
+    write_results_to_file(changes_dict)
 
     if build_failed == True:
         # Red text for failure.
