@@ -12,7 +12,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Upload release assets
+      - name: Create release
         run: |
           echo "Creating release for tag ${{ github.event.release.tag_name }}"
           curl -s \
