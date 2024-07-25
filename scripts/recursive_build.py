@@ -416,8 +416,8 @@ def find_corresponding_src_folder(header_file, changes_dict):
         print(f"Error finding corresponding src folder: {e}")
     return None
 
+# Checks if the CMake file contains the include path or parts of it.
 def check_cmake_file_for_include_path(cmake_file_path, include_path):
-    """Checks if the CMake file contains the include path or parts of it."""
     try:
         with open(cmake_file_path, 'r') as cmake_file:
             content = cmake_file.read()
