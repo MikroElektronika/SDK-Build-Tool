@@ -5,11 +5,11 @@ import sqlite3
 import json
 from pathlib import Path
 
-# Path for git root directory.
-gitPath = '/home/runner/work/SDK-Build-Tool/SDK-Build-Tool'
-
 # Path to the necto_db.db file.
 dbPath = '/home/runner/.MIKROE/NECTOStudio7/databases/necto_db.db'
+
+# Path to the released SDK folder.
+sdkPath = '/home/runner/.MIKROE/NECTOStudio7/packages/sdk'
 
 # Path for storing artifacts.
 testPath = '/home/runner/test_results'
@@ -34,8 +34,8 @@ compiler_list = {
 def get_sdk_version(manifest_path):
     with open(manifest_path, 'r') as f:
         manifest = json.load(f)
-        sdk_version = manifest.get("sdk-version", "").replace(".", "")
-        return f"mikrosdk_v{sdk_version}" if sdk_version else None
+
+        return manifest.get("sdk-version", "")
 
 # Runs the bash command.
 def run_cmd(cmd):
@@ -81,7 +81,7 @@ def run_cmd(cmd):
 # Runs the build commands for each member of mcu_list, board_list, and mcu_card_list.
 def run_builds(changes_dict):
     # Get the SDK version from manifest.json file.
-    sdk_version = get_sdk_version('manifest.json')
+    sdk_version = get_sdk_version('manifest.json').replace(".", "")
 
     # Run build for all MCUs from mcu_list.
     print(f"\033[93mRunning build for {len(changes_dict['mcu_list'])} MCUs\033[0m")
@@ -89,7 +89,7 @@ def run_builds(changes_dict):
         # Get the necessary compiler for the current MCU build.
         compilers, architecture = get_compilers(mcu, is_mcu=True)
         for compiler in compilers:
-            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v{sdk_version}" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
             run_cmd(cmd)
 
     # Run build for all boards from board_list.
@@ -176,7 +176,7 @@ def get_latest_releases():
         # Get all the GIT release tags.
         output = subprocess.check_output(
             ['git', 'tag', '--sort=-creatordate'],
-            cwd=gitPath, text=True
+            cwd='.', text=True
         )
         tags = output.splitlines()
 
@@ -203,8 +203,7 @@ def get_changed_files():
         # See the differences in the files between current and latest releases.
         output = subprocess.check_output(
             ['git', 'diff', '--name-only', previous, latest],
-            # ['git', 'diff', '--name-only', 'origin/main'],
-            cwd=gitPath, text=True
+            cwd='.', text=True
         )
         changed_files = output.splitlines()
         
@@ -235,6 +234,8 @@ def classify_changes(changes_dict):
     # List for storing source and header files affected by the changes.
     other_files = []
 
+    sdk_version = get_sdk_version('manifest.json')
+
     for file in changes_dict['changed_files']:
         # Ensure we handle paths correctly.
         file = file.replace('\\', '/')
@@ -257,7 +258,7 @@ def classify_changes(changes_dict):
         if any(file.startswith(path) for path in case_2_paths):
             # Board name can differ from folder name but always has the same path.
             folder_name = Path(file).parts[4]
-            board_cmake_file = Path(gitPath) / 'bsp/board/include/boards' / folder_name / 'board.cmake'
+            board_cmake_file = Path(sdkPath) / f'{sdk_version}/src/bsp/board/include/boards' / folder_name / 'board.cmake'
             # If board.cmake file was found add it to the list for building in sdk_config format.
             if board_cmake_file.exists():
                 extract_board_name(board_cmake_file, changes_dict)
@@ -304,8 +305,10 @@ def check_and_extract_regex(folder_path, changes_dict):
 
 # Extracts and stores regex from the given cmake file.
 def extract_regex(cmake_file, changes_dict):
+    sdk_version = sdk_version = get_sdk_version('manifest.json')
+
     try:
-        with open(str(gitPath) + '/' + str(cmake_file), 'r') as file:
+        with open(str(sdkPath) + f'/{sdk_version}/src/' + str(cmake_file), 'r') as file:
             content = file.read()
             # Find all matches for MCU_* MATCHES or MCU_* STREQUAL.
             regexes = re.findall(r'\${[^}]*MCU[^}]*}\s+(?:MATCHES|STREQUAL)\s+"([^"]+)"', content)
@@ -437,7 +440,7 @@ def regexp(expr, item):
 # Queries the database to update mcu_card_list, board_list, and mcu_list.
 def query_database(changes_dict):
     # Get the SDK version from the manifest.json file.
-    sdk_version = get_sdk_version('manifest.json')
+    sdk_version = get_sdk_version('manifest.json').replace(".", "")
 
     # Connect to the database.
     conn = sqlite3.connect(dbPath)
@@ -455,7 +458,7 @@ def query_database(changes_dict):
             SELECT SDKToDevice.device_uid
             FROM SDKToDevice
             INNER JOIN Devices ON SDKToDevice.device_uid = Devices.uid
-            WHERE SDKToDevice.sdk_uid = '{sdk_version}'
+            WHERE SDKToDevice.sdk_uid = 'mikrosdk_v{sdk_version}'
             AND SDKToDevice.device_uid REGEXP ?
             AND Devices.sdk_support = '1';
         """, (mcu_card_upper,))
@@ -474,7 +477,7 @@ def query_database(changes_dict):
             SELECT SDKToBoard.board_uid
             FROM SDKToBoard
             INNER JOIN Boards ON SDKToBoard.board_uid = Boards.uid
-            WHERE SDKToBoard.sdk_uid = '{sdk_version}'
+            WHERE SDKToBoard.sdk_uid = 'mikrosdk_v{sdk_version}'
             AND Boards.sdk_config REGEXP ?;
         """, (board,))
         rows = cursor.fetchall()
@@ -494,7 +497,7 @@ def query_database(changes_dict):
                 SELECT SDKToDevice.device_uid
                 FROM SDKToDevice
                 INNER JOIN Devices ON SDKToDevice.device_uid = Devices.uid
-                WHERE SDKToDevice.sdk_uid = '{sdk_version}'
+                WHERE SDKToDevice.sdk_uid = 'mikrosdk_v{sdk_version}'
                 AND SDKToDevice.device_uid REGEXP ?
                 AND Devices.sdk_support = '1'
                 AND SDKToDevice.device_uid NOT LIKE '%PIM%'
@@ -518,7 +521,7 @@ def query_database(changes_dict):
             SELECT SDKToDevice.device_uid
             FROM SDKToDevice
             INNER JOIN Devices ON SDKToDevice.device_uid = Devices.uid
-            WHERE SDKToDevice.sdk_uid = '{sdk_version}'
+            WHERE SDKToDevice.sdk_uid = 'mikrosdk_v{sdk_version}'
             AND Devices.sdk_support = '1';
             AND SDKToDevice.device_uid NOT LIKE '%PIM%'
             AND SDKToDevice.device_uid NOT LIKE '%CARD%'
@@ -536,7 +539,7 @@ def query_database(changes_dict):
         cursor.execute(f"""
             SELECT device_uid
             FROM SDKToDevice
-            WHERE sdk_uid = '{sdk_version}'
+            WHERE sdk_uid = 'mikrosdk_v{sdk_version}'
             AND device_uid REGEXP 'CARD|SIBRAIN|PIM|SPARKFUN';
         """)
         rows = cursor.fetchall()
@@ -549,7 +552,7 @@ def query_database(changes_dict):
         cursor.execute(f"""
             SELECT board_uid
             FROM SDKToBoard
-            WHERE sdk_uid = '{sdk_version}';
+            WHERE sdk_uid = 'mikrosdk_v{sdk_version}';
         """)
         rows = cursor.fetchall()
         if rows:
@@ -565,7 +568,7 @@ def write_results_to_file(changes_dict):
     with open(f'{testPath}/built_changes.json', 'w+') as json_file:
         json.dump(changes_dict, json_file, indent=4)
 
-    print(f"All the data for build has been written to {testPath}/Built_Changes.json")
+    print(f"All the data for build has been written to {testPath}/built_changes.json")
 
     for item in changes_dict['unused']:
         print(f"Couldn't find {item} in the database")
