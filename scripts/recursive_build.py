@@ -241,11 +241,11 @@ def classify_changes(changes_dict):
         # Ensure we handle paths correctly.
         file = file.replace('\\', '/')
         # Case 4 - return empty data lists which means that we need to run build for everything.
-        # if any(file.startswith(prefix) for prefix in ["api", "cmake", "components", "drv", "hal", "middleware", "platform", "thirdparty"]):
-        #     changes_dict['mcu_list'] = []
-        #     changes_dict['board_list'] = []
-        #     changes_dict['mcu_card_list'] = []
-        #     return
+        if any(file.startswith(prefix) for prefix in ["api", "cmake", "components", "drv", "hal", "middleware", "platform", "thirdparty"]):
+            changes_dict['mcu_list'] = []
+            changes_dict['board_list'] = []
+            changes_dict['mcu_card_list'] = []
+            return
         
         # Case 1 - find MCU card name that was affected by the changes.
         if any(file.startswith(path) for path in case_1_paths):
@@ -602,7 +602,7 @@ def main():
     query_database(changes_dict)
 
     # Finally, run the SDK build tool.
-    # run_builds(changes_dict)
+    run_builds(changes_dict)
 
     # Write all the used info for building to artifact folder.
     write_results_to_file(changes_dict)
