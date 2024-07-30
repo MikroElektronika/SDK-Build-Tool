@@ -242,7 +242,12 @@ def find_mcus_and_toolchains(extract_path, names):
         # If the JSON file is found, extract the required data.
         if json_file_path and os.path.exists(json_file_path):
             with open(json_file_path, 'rb') as f:
-                data = json.load(f)
+                # Read the binary content
+                bytes_content = f.read()
+                # Decode the bytes content to string
+                json_content = bytes_content.decode('utf-8', errors='ignore')
+                # Load the JSON data from the string content
+                data = json.load(io.StringIO(json_content))
                 for obj in data:
                     if name in obj:
                         mcus = obj[name].get('mcus', [])
