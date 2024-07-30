@@ -6,7 +6,6 @@ import os
 import re
 import sqlite3
 import subprocess
-import chardet
 
 # Path to the necto_db.db file.
 dbPath = '/home/runner/.MIKROE/NECTOStudio7/databases/necto_db.db'
@@ -242,12 +241,7 @@ def find_mcus_and_toolchains(extract_path, names):
 
         # If the JSON file is found, extract the required data.
         if json_file_path and os.path.exists(json_file_path):
-            with open(json_file_path, 'rb') as f:
-                raw_data = f.read()
-                result = chardet.detect(raw_data)
-                encoding = result['encoding']
-                print(f"Detected encoding: {encoding}")
-            with open(json_file_path, 'r', encoding=encoding) as f:
+            with open(json_file_path, 'r') as f:
                 data = json.load(f)
                 for obj in data:
                     if name in obj:
