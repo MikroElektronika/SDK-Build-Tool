@@ -233,7 +233,7 @@ def find_mcus_and_toolchains(extract_path, names):
         # Search for the JSON file inside the architecture folder.
         for root, dirs, files in os.walk(json_folder_path):
             for file in files:
-                if toolchain in file:
+                if toolchain in file and file.endswith('.json'):
                     json_file_path = os.path.join(root, file)
                     break
             if json_file_path:
@@ -241,43 +241,30 @@ def find_mcus_and_toolchains(extract_path, names):
 
         # If the JSON file is found, extract the required data.
         if json_file_path and os.path.exists(json_file_path):
-            with open(json_file_path, 'rb') as f:
-                # Read the binary content
-                bytes_content = f.read()
-                # Decode the bytes content to string
-                json_content = bytes_content.decode('utf-8', errors='ignore')
-                
-                # Ensure the content is not empty and valid JSON
-                if json_content.strip():  # Check if the content is not empty or just whitespace
-                    try:
-                        # Load the JSON data from the string content
-                        data = json.load(io.StringIO(json_content))
-                        for obj in data:
-                            if name in obj:
-                                mcus = obj[name].get('mcus', [])
-                                toolchain = obj[name].get('toolchain', '')
+            with open(json_file_path, 'r') as f:
+                data = json.load(f)
+                for obj in data:
+                    if name in obj:
+                        mcus = obj[name].get('mcus', [])
+                        toolchain = obj[name].get('toolchain', '')
 
-                                if architecture not in toolchain_mcu_map:
-                                    toolchain_mcu_map[architecture] = {}
+                        if architecture not in toolchain_mcu_map:
+                            toolchain_mcu_map[architecture] = {}
 
-                                compilers = compiler_list.get(architecture.upper(), [])
-                                for compiler in compilers:
-                                    if toolchain == 'gcc_clang':
-                                        if 'gcc' in compiler or 'clang' in compiler:
-                                            if compiler in toolchain_mcu_map[architecture]:
-                                                toolchain_mcu_map[architecture][compiler].extend(mcus)
-                                            else:
-                                                toolchain_mcu_map[architecture][compiler] = mcus
+                        compilers = compiler_list.get(architecture.upper(), [])
+                        for compiler in compilers:
+                            if toolchain == 'gcc_clang':
+                                if 'gcc' in compiler or 'clang' in compiler:
+                                    if compiler in toolchain_mcu_map[architecture]:
+                                        toolchain_mcu_map[architecture][compiler].extend(mcus)
                                     else:
-                                        if toolchain in compiler:
-                                            if compiler in toolchain_mcu_map[architecture]:
-                                                toolchain_mcu_map[architecture][compiler].extend(mcus)
-                                            else:
-                                                toolchain_mcu_map[architecture][compiler] = mcus
-                    except json.JSONDecodeError:
-                        print(f"Error decoding JSON from file: {json_file_path}")
-                else:
-                    print(f"File {json_file_path} is empty or not valid JSON.")
+                                        toolchain_mcu_map[architecture][compiler] = mcus
+                            else:
+                                if toolchain in compiler:
+                                    if compiler in toolchain_mcu_map[architecture]:
+                                        toolchain_mcu_map[architecture][compiler].extend(mcus)
+                                    else:
+                                        toolchain_mcu_map[architecture][compiler] = mcus
 
     # Remove duplicates from each list in the map.
     for architecture in toolchain_mcu_map:
