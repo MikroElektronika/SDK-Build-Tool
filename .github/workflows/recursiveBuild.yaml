@@ -9,6 +9,9 @@ on:
           options:
             - Only changed files
             - All files
+  pull_request:
+    branches:
+      - main
 
 
 jobs:
@@ -49,23 +52,16 @@ jobs:
         run: |
           python -u scripts/install_necto.py
 
-      - name: Run Recursive Build
+      - name: Run Core Recursive Build
         run: |
-          export QT_DEBUG_PLUGINS=1
-          echo "Running sdk_build_automation"
-          cd /home/runner/MikroElektronika/NECTOStudio/bin
-          xvfb-run --auto-servernum --server-num=1 /home/runner/MikroElektronika/NECTOStudio/bin/sdk_build_automation --compiler "mikrocavr" --sdk "mikrosdk_v2111" --mcu "ATMEGA1280" --installPrefix "/home/runner/test"
-
-      # - name: Run Core Recursive Build
-      #   run: |
-      #     if [[ "${{ github.event.inputs.build_type }}" == 'All files' ]]; then
-      #       export BUILD_ALL=1
-      #       echo "Building all files."
-      #     else
-      #       export BUILD_ALL=0
-      #       echo "Building only changed files."
-      #     fi
-      #     python -u scripts/core_build_tool.py
+          if [[ "${{ github.event.inputs.build_type }}" == 'All files' ]]; then
+            export BUILD_ALL=1
+            echo "Building all files."
+          else
+            export BUILD_ALL=0
+            echo "Building only changed files."
+          fi
+          python -u scripts/core_build_tool.py
 
       - name: Archive test results
         uses: actions/upload-artifact@v4
