@@ -523,7 +523,7 @@ def query_database(changes_dict):
             FROM SDKToDevice
             INNER JOIN Devices ON SDKToDevice.device_uid = Devices.uid
             WHERE SDKToDevice.sdk_uid = 'mikrosdk_v{sdk_version}'
-            AND Devices.sdk_support = '1';
+            AND Devices.sdk_support = '1'
             AND SDKToDevice.device_uid NOT LIKE '%PIM%'
             AND SDKToDevice.device_uid NOT LIKE '%CARD%'
             AND SDKToDevice.device_uid NOT LIKE '%SPARKFUN%'
@@ -601,11 +601,12 @@ def main():
     # Get the necessary data from the database.
     query_database(changes_dict)
 
+    # Write all the used info for building to artifact folder.
+    write_results_to_file(changes_dict)
+    
     # Finally, run the SDK build tool.
     run_builds(changes_dict)
 
-    # Write all the used info for building to artifact folder.
-    write_results_to_file(changes_dict)
 
     if build_failed == True:
         # Red text for failure.

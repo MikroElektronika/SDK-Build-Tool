@@ -60,7 +60,7 @@ jobs:
             export BUILD_ALL=0
             echo "Building only changed files."
           fi
-          python -u scripts/core_build_tool.py
+          python -u scripts/recursive_build.py
 
       - name: Archive test results
         uses: actions/upload-artifact@v4
