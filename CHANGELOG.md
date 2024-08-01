@@ -1,7 +1,7 @@
 # CHANGELOG
 
 *All notable changes to this project shall be documented in this file.*
-blabla
+
 **VERSIONS:**
 
 + **[v2.11.1](#v2111)**
