@@ -1,4 +1,4 @@
-name: SDK Recursive Build
+name: Core Packages Recursive Build
 
 on:
   workflow_dispatch:
@@ -9,6 +9,12 @@ on:
           options:
             - Only changed files
             - All files
+        necto_type:
+          type: choice
+          description: Live or Development NECTO build
+          options:
+            - Development
+            - Live
   pull_request:
     branches:
       - main
@@ -48,10 +54,18 @@ jobs:
           sudo apt-get install libxkbcommon-x11-dev
 
       - name: Install NECTO
+        env:
+          if [[ "${{ github.event.inputs.necto_type }}" == 'Live' ]]; then
+            NECTO_DOWNLOAD_URL: ${{ secrets.NECTO_LIVE_DOWNLOAD_URL }}
+            echo "Step 1: Downloading Live NECTOStudio version"
+          else
+            NECTO_DOWNLOAD_URL: ${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
+            echo "Step 1: Downloading Live NECTOStudio version"
+          fi
         run: |
           python -u scripts/install_necto.py
 
-      - name: Run Core Recursive Build
+      - name: Run Recursive Build
         run: |
           if [[ "${{ github.event.inputs.build_type }}" == 'All files' ]]; then
             export BUILD_ALL=1
