@@ -3,18 +3,18 @@ name: Core Packages Recursive Build
 on:
   workflow_dispatch:
     inputs:
-        build_type:
-          type: choice
-          description: Build all or only changed files
-          options:
-            - Only changed files
-            - All files
-        necto_type:
-          type: choice
-          description: Live or Development NECTO build
-          options:
-            - Development
-            - Live
+      build_type:
+        type: choice
+        description: Build all or only changed files
+        options:
+          - Only changed files
+          - All files
+      necto_type:
+        type: choice
+        description: Live or Development NECTO build
+        options:
+          - Development
+          - Live
   pull_request:
     branches:
       - main
@@ -60,7 +60,7 @@ jobs:
             echo "Step 1: Downloading Live NECTOStudio version"
           else
             NECTO_DOWNLOAD_URL: ${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
-            echo "Step 1: Downloading Live NECTOStudio version"
+            echo "Step 1: Downloading Development NECTOStudio version"
           fi
         run: |
           python -u scripts/install_necto.py
