@@ -54,13 +54,12 @@ jobs:
           sudo apt-get install libxkbcommon-x11-dev
 
       - name: Install NECTO
-        env:
+        run: |
           if [[ "${{ github.event.inputs.necto_type }}" == 'Live' ]]; then
             export NECTO_DOWNLOAD_URL=${{ secrets.NECTO_LIVE_DOWNLOAD_URL }}
           else
             export NECTO_DOWNLOAD_URL=${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
           fi
-        run: |
           python -u scripts/install_necto.py
 
       - name: Run Recursive Build
