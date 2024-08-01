@@ -58,7 +58,7 @@ def get_all_mcus(sdk_version):
         FROM SDKToDevice
         INNER JOIN Devices ON SDKToDevice.device_uid = Devices.uid
         WHERE SDKToDevice.sdk_uid = '{sdk_version}'
-        AND SDKToDevice.device_uid NOT LIKE '%\_%' ESCAPE '\';
+        AND SDKToDevice.device_uid NOT LIKE '%\\_%' ESCAPE '\\';
     """)
     rows = cursor.fetchall()
     if rows:
