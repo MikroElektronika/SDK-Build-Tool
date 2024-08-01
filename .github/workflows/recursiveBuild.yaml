@@ -9,12 +9,14 @@ on:
         options:
           - Only changed files
           - All files
+          required: true
       necto_type:
         type: choice
         description: Live or Development NECTO build
         options:
           - Development
           - Live
+          required: true
   pull_request:
     branches:
       - main
