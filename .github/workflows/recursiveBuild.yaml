@@ -9,14 +9,12 @@ on:
         options:
           - Only changed files
           - All files
-          required: true
       necto_type:
         type: choice
         description: Live or Development NECTO build
         options:
           - Development
           - Live
-          required: true
   pull_request:
     branches:
       - main
@@ -58,10 +56,10 @@ jobs:
       - name: Install NECTO
         env:
           if [[ "${{ github.event.inputs.necto_type }}" == 'Live' ]]; then
-            NECTO_DOWNLOAD_URL: ${{ secrets.NECTO_LIVE_DOWNLOAD_URL }}
+            export NECTO_DOWNLOAD_URL=${{ secrets.NECTO_LIVE_DOWNLOAD_URL }}
             echo "Step 1: Downloading Live NECTOStudio version"
           else
-            NECTO_DOWNLOAD_URL: ${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
+            export NECTO_DOWNLOAD_URL=${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
             echo "Step 1: Downloading Development NECTOStudio version"
           fi
         run: |
