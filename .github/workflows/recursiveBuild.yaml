@@ -57,10 +57,8 @@ jobs:
         env:
           if [[ "${{ github.event.inputs.necto_type }}" == 'Live' ]]; then
             export NECTO_DOWNLOAD_URL=${{ secrets.NECTO_LIVE_DOWNLOAD_URL }}
-            echo "Step 1: Downloading Live NECTOStudio version"
           else
             export NECTO_DOWNLOAD_URL=${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
-            echo "Step 1: Downloading Development NECTOStudio version"
           fi
         run: |
           python -u scripts/install_necto.py
