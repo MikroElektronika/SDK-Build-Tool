@@ -93,7 +93,7 @@ def run_builds(changes_dict):
     for board in changes_dict['board_list']:
         compilers, mcu = get_compilers(board, is_mcu=False)
         for compiler in compilers:
-            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "{board}" --mcu "{mcu} --installPrefix "{testPath}/board_build/{compiler}"'
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "{board}" --mcu "{mcu}" --installPrefix "{testPath}/board_build/{compiler}"'
             run_cmd(cmd)
 
 # Returns the list of compilers based on the given name and type.
@@ -117,9 +117,11 @@ def get_compilers(name, is_mcu=True):
 
         # Get all device_uids associated with the board name.
         cursor.execute(f"""
-            SELECT device_uid
-            FROM BoardToDevice
-            WHERE board_uid = '{name}';
+            SELECT bd.device_uid
+            FROM BoardToDevice bd
+            JOIN Devices d ON bd.device_uid = d.uid
+            WHERE bd.board_uid = '{name}'
+            AND d.sdk_support = 1;
         """)
         device_uids = cursor.fetchall()
         
