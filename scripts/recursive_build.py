@@ -93,7 +93,7 @@ def run_builds(changes_dict):
     for board in changes_dict['board_list']:
         compilers, mcu = get_compilers(board, is_mcu=False)
         for compiler in compilers:
-            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "{board}" --mcu "{mcu}" --installPrefix "{testPath}/board_build/{compiler}"'
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v{sdk_version}" --board "{board}" --mcu "{mcu}" --installPrefix "{testPath}/board_build/{compiler}"'
             run_cmd(cmd)
 
 # Returns the list of compilers based on the given name and type.
