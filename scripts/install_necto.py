@@ -77,7 +77,7 @@ def main():
 
     print("Step 14: Check for the existence of the bsp folder")
     bsp_path = "/home/runner/.MIKROE/NECTOStudio7/packages/sdk/mikroSDK_v2/src/bsp"
-    os.chdir("/home/runner/.MIKROE/NECTOStudio7/packages/sdk")
+    os.chdir("/home/runner/.MIKROE/NECTOStudio7/packages/sdk/mikroSDK_v2/src")
     for file in os.listdir(os.getcwd()):
         print(file)
 
