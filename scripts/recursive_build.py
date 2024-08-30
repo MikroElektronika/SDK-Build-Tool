@@ -129,31 +129,39 @@ def get_compilers(name, is_mcu=True):
         unique_compilers = set()
         result_compilers = []
 
-        device_uid = device_uid[0]
-        if any(substring in device_uid for substring in ["ATSAM", "STM", "TM4C", "MK"]):
-            if "ARM" not in unique_compilers:
-                unique_compilers.add("ARM")
-                result_compilers.extend(compiler_list["ARM"])
-        elif "GD32" in device_uid:
-            if "RISCV" not in unique_compilers:
-                unique_compilers.add("RISCV")
-                result_compilers.extend(compiler_list["RISCV"])
-        elif "PIC32" in device_uid:
-            if "PIC32" not in unique_compilers:
-                unique_compilers.add("PIC32")
-                result_compilers.extend(compiler_list["PIC32"])
-        elif any(substring in device_uid for substring in ["dsPIC", "PIC24"]):
-            if "DSPIC" not in unique_compilers:
-                unique_compilers.add("DSPIC")
-                result_compilers.extend(compiler_list["DSPIC"])
-        elif any(substring in device_uid for substring in ["PIC18", "PIC16", "PIC12", "PIC10"]):
-            if "PIC" not in unique_compilers:
-                unique_compilers.add("PIC")
-                result_compilers.extend(compiler_list["PIC"])
-        elif "AT" in device_uid and "ATSAM" not in device_uid:
-            if "AVR" not in unique_compilers:
-                unique_compilers.add("AVR")
-                result_compilers.extend(compiler_list["AVR"])
+        # Get necessary compilers for all supported MCU cards for this board.
+        for device_uid in device_uids:
+            device_uid = device_uid[0]
+            if any(substring in device_uid for substring in ["ATSAM", "STM", "TM4C", "MK"]):
+                if "ARM" not in unique_compilers:
+                    unique_compilers.add("ARM")
+                    result_compilers.extend(compiler_list["ARM"])
+                    return result_compilers, device_uid
+            elif "GD32" in device_uid:
+                if "RISCV" not in unique_compilers:
+                    unique_compilers.add("RISCV")
+                    result_compilers.extend(compiler_list["RISCV"])
+                    return result_compilers, device_uid
+            elif "PIC32" in device_uid:
+                if "PIC32" not in unique_compilers:
+                    unique_compilers.add("PIC32")
+                    result_compilers.extend(compiler_list["PIC32"])
+                    return result_compilers, device_uid
+            elif any(substring in device_uid for substring in ["dsPIC", "PIC24"]):
+                if "DSPIC" not in unique_compilers:
+                    unique_compilers.add("DSPIC")
+                    result_compilers.extend(compiler_list["DSPIC"])
+                    return result_compilers, device_uid
+            elif any(substring in device_uid for substring in ["PIC18", "PIC16", "PIC12", "PIC10"]):
+                if "PIC" not in unique_compilers:
+                    unique_compilers.add("PIC")
+                    result_compilers.extend(compiler_list["PIC"])
+                    return result_compilers, device_uid
+            elif "AT" in device_uid and "ATSAM" not in device_uid:
+                if "AVR" not in unique_compilers:
+                    unique_compilers.add("AVR")
+                    result_compilers.extend(compiler_list["AVR"])
+                    return result_compilers, device_uid
 
         conn.close()
         return result_compilers, device_uid
