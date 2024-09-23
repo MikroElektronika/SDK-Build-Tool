@@ -1,5 +1,0 @@
-if(${_MSDK_BOARD_NAME_} STREQUAL "BOARD_EASYPIC_V8_FOR_DSPIC30")
-    set(BOARD_PATH   "include/boards/board_easypic_v8_for_dspic30")
-    set(MCU_CARD  FALSE)
-    set(DIP_SOCKET  TRUE)
-endif()

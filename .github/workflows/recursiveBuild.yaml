@@ -3,18 +3,6 @@ name: Recursive Build
 on:
   workflow_dispatch:
     inputs:
-      build_type:
-        type: choice
-        description: Build all or only changed files
-        options:
-          - Only changed files
-          - All files
-      necto_type:
-        type: choice
-        description: Live or Development NECTO build
-        options:
-          - Development
-          - Live
   pull_request:
     branches:
       - main
@@ -51,22 +39,11 @@ jobs:
 
       - name: Install NECTO
         run: |
-          if [[ "${{ github.event.inputs.necto_type }}" == 'Live' ]]; then
-            export NECTO_DOWNLOAD_URL=${{ secrets.NECTO_LIVE_DOWNLOAD_URL }}
-          else
-            export NECTO_DOWNLOAD_URL=${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
-          fi
+          export NECTO_DOWNLOAD_URL=${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
           python -u scripts/install_necto.py
 
       - name: Run Recursive Build
         run: |
-          if [[ "${{ github.event.inputs.build_type }}" == 'All files' ]]; then
-            export BUILD_ALL=1
-            echo "Building all files."
-          else
-            export BUILD_ALL=0
-            echo "Building only changed files."
-          fi
           python -u scripts/recursive_build.py
 
       - name: Archive test results

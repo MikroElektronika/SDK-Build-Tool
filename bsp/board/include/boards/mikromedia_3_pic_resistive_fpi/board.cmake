@@ -1,5 +1,0 @@
-if(${_MSDK_BOARD_NAME_} STREQUAL "MIKROMEDIA3FORPICRESISTIVEFPI")
-    set(BOARD_PATH   "include/boards/mikromedia_3_pic_resistive_fpi")
-    set(MCU_CARD  FALSE)
-    set(SHIELD FALSE)
-endif()

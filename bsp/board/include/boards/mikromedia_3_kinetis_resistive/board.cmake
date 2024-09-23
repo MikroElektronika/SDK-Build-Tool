@@ -1,5 +1,0 @@
-if(${_MSDK_BOARD_NAME_} STREQUAL "MIKROMEDIA3FORKINETISRESISTIVE")
-    set(BOARD_PATH   "include/boards/mikromedia_3_kinetis_resistive")
-    set(MCU_CARD  FALSE)
-    set(SHIELD TRUE)
-endif()

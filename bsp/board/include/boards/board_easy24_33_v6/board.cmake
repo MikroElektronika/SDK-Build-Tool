@@ -1,5 +1,0 @@
-if(${_MSDK_BOARD_NAME_} STREQUAL "EASY24_33_V6")
-    set(BOARD_PATH   "include/boards/board_easy24_33_v6")
-    set(MCU_CARD  FALSE)
-    set(DIP_SOCKET  FALSE)
-endif()

@@ -1,5 +1,0 @@
-if(${_MSDK_BOARD_NAME_} STREQUAL "BOARD_CURIOSITY_HPC")
-    set(BOARD_PATH   "include/boards/board_curiosity_hpc")
-    set(MCU_CARD  FALSE)
-    set(DIP_SOCKET  TRUE)
-endif()

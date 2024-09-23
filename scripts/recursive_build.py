@@ -1,244 +1,890 @@
-import subprocess
-import requests
-import re
 import os
-import sqlite3
 import json
-from pathlib import Path
+import sys
+import re
+import sqlite3
+from colorama import init, Fore, Style
 
-# Define the repository owner and name
-repo_owner = "MikroElektronika"
-repo_name = "mikrosdk_v2"
+# Initialize colorama
+init(autoreset=True)
 
-# Path to the necto_db.db file.
-dbPath = '/home/runner/.MIKROE/NECTOStudio7/databases/necto_db.db'
+# Global variable for local_app_data_path
+local_app_data_path = 'c:/Users/stefan.djordjevic/AppData/Local/MIKROE/NECTOStudio7'
 
-# Path to the released SDK folder.
-sdkPath = '/home/runner/.MIKROE/NECTOStudio7/packages/sdk'
+def load_build_json():
+    """
+    Navigates one directory up from the current script's location and loads the build.json file.
 
-# Path for storing artifacts.
-testPath = '/home/runner/test_results'
-
-# Path to sdk_build_automation tool.
-toolPath = '/home/runner/MikroElektronika/NECTOStudio/bin'
-
-# Global variable to trace failed tests.
-build_failed = False
-
-# Supported compilers list for each architecture.
-compiler_list = {
-    'ARM': ['gcc_arm_none_eabi'],
-    'RISCV': ['xpack-riscv-none-embed-gcc'],
-    'PIC': ['mikrocpic'],
-    'DSPIC': ['mikrocdspic'],
-    'PIC32': ['mikrocpic32'],
-    'AVR': ['mikrocavr']
-}
-
-# Extracts the SDK version from the manifest.json file.
-def get_sdk_version(manifest_path):
-    with open(manifest_path, 'r') as f:
-        manifest = json.load(f)
-
-        return manifest.get("sdk-version", "")
-
-# Runs the bash command.
-def run_cmd(cmd):
-    global build_failed
-    # Blue color for build tool command command.
-    print(f"\033[94m{cmd}\033[0m")
-    
+    Returns:
+        dict: A dictionary containing package names as keys and doc_ds numbers as values.
+    """
     try:
-        # Store all the output lines to print only important ones.
-        output = subprocess.check_output(cmd, shell=True, text=True)
-        for line in output.splitlines():
-            if line.startswith("Building:"):
+        # Get the absolute path of the current script
+        current_script_path = os.path.abspath(__file__)
+        current_dir = os.path.dirname(current_script_path)
 
-                # White color for the current setup build.
-                print(line)
-            elif "Build success!" in line:
+        # Navigate one directory up
+        parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
 
-                # Green color for success.
-                print("\033[92m{}\033[0m".format(line))
-            elif "Build failed" in line:
+        # Path to build.json
+        build_json_path = os.path.join(parent_dir, 'build.json')
 
-                # Red color for failure.
-                print("\033[91m{}\033[0m".format(line))
-                build_failed = True
+        # Check if build.json exists
+        if not os.path.isfile(build_json_path):
+            print(Fore.RED + f"Error: build.json not found in {parent_dir}")
+            sys.exit(1)
 
-    # Error handling for failed builds not to fail the job.
-    except subprocess.CalledProcessError as e:
-        for line in e.output.splitlines():
-            if line.startswith("Building:"):
+        # Open and load the JSON file
+        with open(build_json_path, 'r', encoding='utf-8') as file:
+            try:
+                data = json.load(file)
+            except json.JSONDecodeError as jde:
+                print(Fore.RED + f"Error decoding JSON: {jde}")
+                sys.exit(1)
 
-                # White color for the current setup build.
-                print(line)
-            elif "Build success!" in line:
+        # Validate that the JSON is a dictionary
+        if not isinstance(data, dict):
+            print(Fore.RED + "Error: build.json does not contain a JSON object (expected key-value pairs).")
+            sys.exit(1)
 
-                # Green color for success.
-                print(f"\033[92m{line}\033[0m")  # Green color for success
-            elif "Build failed" in line:
+        return data
 
-                # Red color for failure.
-                print(f"\033[91m{line}\033[0m")  # Red color for failure
-                build_failed = True
+    except Exception as e:
+        print(Fore.RED + f"An unexpected error occurred: {e}")
+        sys.exit(1)
 
-# Runs the build commands for each member of mcu_list, board_list, and mcu_card_list.
-def run_builds(changes_dict):
-    # Get the SDK version from manifest.json file.
-    sdk_version = get_sdk_version('/home/runner/.MIKROE/NECTOStudio7/packages/sdk/mikroSDK_v2/src/manifest.json').replace(".", "")
+def find_doc_ds_folder(doc_ds, implementations_dir):
+    """
+    Searches for a folder named after the doc_ds variable within the implementations directory.
 
-    # Run build for all boards from board_list.
-    print(f"\033[93mRunning build for {len(changes_dict['board_list'])} boards\033[0m")
-    for board in changes_dict['board_list']:
-        compilers, mcu = get_compilers(board, is_mcu=False)
-        for compiler in compilers:
-            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v{sdk_version}" --board "{board}" --mcu "{mcu}" --installPrefix "{testPath}/board_build/{compiler}"'
-            run_cmd(cmd)
+    Args:
+        doc_ds (str): The doc_ds number to search for.
+        implementations_dir (str): The path to the implementations directory.
 
-# Returns the list of compilers based on the given name and type.
-def get_compilers(name, is_mcu=True):
-    if is_mcu:
-        if any(substring in name for substring in ["ATSAM", "STM", "TM4C", "MK"]):
-            return compiler_list["ARM"], "ARM"
-        elif "GD32" in name:
-            return compiler_list["RISCV"], "RISCV"
-        elif "PIC32" in name:
-            return compiler_list["PIC32"], "PIC32"
-        elif any(substring in name for substring in ["DSPIC", "PIC24", "dsPIC"]):
-            return compiler_list["DSPIC"], "DSPIC"
-        elif any(substring in name for substring in ["PIC18", "PIC16", "PIC12", "PIC10"]):
-            return compiler_list["PIC"], "PIC"
-        elif "AT" in name and "ATSAM" not in name:
-            return compiler_list["AVR"], "AVR"
+    Returns:
+        str or None: The path to the doc_ds folder if found, else None.
+    """
+    target_folder = os.path.join(implementations_dir, doc_ds)
+    if os.path.isdir(target_folder):
+        return target_folder
     else:
-        conn = sqlite3.connect(dbPath)
+        return None
+
+def extract_mcu_list(cmake_file_path):
+    """
+    Extracts MCU names from the specified CMakeLists.cmake file.
+
+    Args:
+        cmake_file_path (str): Path to the CMakeLists.cmake file.
+
+    Returns:
+        list: A list of MCU names without ^ and $.
+    """
+    mcu_list = []
+    pattern = r'if\s*\(\s*\$\{MCU_NAME\}\s+MATCHES\s+"([^"]+)"\s*\)'
+
+    try:
+        with open(cmake_file_path, 'r', encoding='utf-8') as cmake_file:
+            for line in cmake_file:
+                match = re.search(pattern, line)
+                if match:
+                    mcu_pattern = match.group(1)
+                    # Extract all MCUs enclosed between ^ and $
+                    mcu_matches = re.findall(r'\^([^$|]+)\$', mcu_pattern)
+                    mcu_list.extend(mcu_matches)
+                    # Assuming only one relevant line; remove break if multiple lines are possible
+                    break
+    except FileNotFoundError:
+        print(Fore.RED + f"Error: {cmake_file_path} not found.")
+    except Exception as e:
+        print(Fore.RED + f"An error occurred while reading {cmake_file_path}: {e}")
+
+    return mcu_list
+
+def validate_and_rearrange_pkg(pkg):
+    """
+    Validates the mcu_package string and rearranges it if valid.
+
+    Args:
+        pkg (str): The mcu_package string to validate and rearrange.
+
+    Returns:
+        tuple: (rearranged_pkg, error_message)
+               rearranged_pkg (str or None): The rearranged package string if valid, else None.
+               error_message (str or None): The error message if invalid, else None.
+    """
+    # Check if pkg ends with a number
+    match = re.match(r'^(\w+?)(\d+)$', pkg)
+    if match:
+        name_part = match.group(1)
+        number_part = match.group(2)
+        # Check if there is only one word (no spaces or special characters)
+        if re.match(r'^\w+$', pkg):
+            rearranged_pkg = f"{number_part}/{name_part}"
+            return rearranged_pkg, None
+        else:
+            return None, "Package name contains multiple words or invalid characters."
+    else:
+        return None, "Package name does not end with a number."
+
+def find_mcu_packages(mcu_name, mcu_definitions_dir, error_log, package, doc_ds):
+    """
+    Searches for the MCU folder and retrieves its package folders. Validates and rearranges package names.
+
+    Args:
+        mcu_name (str): The name of the MCU to search for.
+        mcu_definitions_dir (str): The path to the STM32 MCU definitions directory.
+        error_log (file object): The file object for logging errors.
+        package (str): The package name being processed.
+        doc_ds (str): The doc_ds number being processed.
+
+    Returns:
+        list: A list of validated and rearranged mcu_packages if found, else None.
+    """
+    target_mcu_dir = os.path.join(mcu_definitions_dir, mcu_name)
+    if not os.path.isdir(target_mcu_dir):
+        error_message = f"{package}, {doc_ds}: {mcu_name}, N/A - MCU folder '{mcu_name}' not found."
+        print(Fore.RED + f"Error: MCU folder '{mcu_name}' not found in {mcu_definitions_dir}")
+        error_log.write(error_message + "\n")
+        return None
+
+    try:
+        # List all subdirectories (mcu_packages) within the MCU folder
+        raw_mcu_packages = [item for item in os.listdir(target_mcu_dir)
+                            if os.path.isdir(os.path.join(target_mcu_dir, item))]
+        validated_mcu_packages = []
+        for pkg in raw_mcu_packages:
+            # Validate and rearrange pkg
+            rearranged_pkg, error = validate_and_rearrange_pkg(pkg)
+            if rearranged_pkg:
+                validated_mcu_packages.append(rearranged_pkg)
+            else:
+                # Log error and append "ERROR"
+                error_message = f"{package}, {doc_ds}: {mcu_name}, {pkg} - {error}"
+                print(Fore.RED + f"Error: {error}")
+                error_log.write(error_message + "\n")
+                validated_mcu_packages.append("ERROR")
+        return validated_mcu_packages
+    except Exception as e:
+        error_message = f"{package}, {doc_ds}: {mcu_name}, N/A - Error accessing '{target_mcu_dir}': {e}"
+        print(Fore.RED + f"An error occurred while accessing '{target_mcu_dir}': {e}")
+        error_log.write(error_message + "\n")
+        return None
+
+def connect_database(db_path):
+    """
+    Connects to the SQLite database.
+
+    Args:
+        db_path (str): Path to the SQLite database file.
+
+    Returns:
+        sqlite3.Connection: SQLite connection object.
+    """
+    try:
+        conn = sqlite3.connect(db_path)
+        return conn
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Error connecting to database: {e}")
+        sys.exit(1)
+
+def check_mcu_exists(conn, mcu_name):
+    """
+    Checks if the MCU already exists in the Devices table.
+
+    Args:
+        conn (sqlite3.Connection): SQLite connection object.
+        mcu_name (str): The MCU name to check.
+
+    Returns:
+        bool: True if exists, False otherwise.
+    """
+    try:
         cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM Devices WHERE name = ?", (mcu_name,))
+        count = cursor.fetchone()[0]
+        return count > 0
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Database error while checking MCU existence: {e}")
+        return False
 
-        # Get all device_uids associated with the board name.
-        cursor.execute(f"""
-            SELECT bd.device_uid
-            FROM BoardToDevice bd
-            JOIN Devices d ON bd.device_uid = d.uid
-            WHERE bd.board_uid = '{name}'
-            AND d.sdk_support = 1;
-        """)
-        device_uids = cursor.fetchall()
-        
-        # Initialize an empty set to store unique compiler keys.
-        unique_compilers = set()
-        result_compilers = []
+def insert_device(conn, mcu_name, installer_packages):
+    """
+    Inserts a new MCU into the Devices table.
 
-        # Get necessary compilers for all supported MCU cards for this board.
-        for device_uid in device_uids:
-            device_uid = device_uid[0]
-            if any(substring in device_uid for substring in ["ATSAM", "STM", "TM4C", "MK"]):
-                if "ARM" not in unique_compilers:
-                    unique_compilers.add("ARM")
-                    result_compilers.extend(compiler_list["ARM"])
-                    return result_compilers, device_uid
-            elif "GD32" in device_uid:
-                if "RISCV" not in unique_compilers:
-                    unique_compilers.add("RISCV")
-                    result_compilers.extend(compiler_list["RISCV"])
-                    return result_compilers, device_uid
-            elif "PIC32" in device_uid:
-                if "PIC32" not in unique_compilers:
-                    unique_compilers.add("PIC32")
-                    result_compilers.extend(compiler_list["PIC32"])
-                    return result_compilers, device_uid
-            elif any(substring in device_uid for substring in ["dsPIC", "PIC24"]):
-                if "DSPIC" not in unique_compilers:
-                    unique_compilers.add("DSPIC")
-                    result_compilers.extend(compiler_list["DSPIC"])
-                    return result_compilers, device_uid
-            elif any(substring in device_uid for substring in ["PIC18", "PIC16", "PIC12", "PIC10"]):
-                if "PIC" not in unique_compilers:
-                    unique_compilers.add("PIC")
-                    result_compilers.extend(compiler_list["PIC"])
-                    return result_compilers, device_uid
-            elif "AT" in device_uid and "ATSAM" not in device_uid:
-                if "AVR" not in unique_compilers:
-                    unique_compilers.add("AVR")
-                    result_compilers.extend(compiler_list["AVR"])
-                    return result_compilers, device_uid
+    Args:
+        conn (sqlite3.Connection): SQLite connection object.
+        mcu_name (str): The MCU name.
+        installer_packages (dict): Dictionary mapping compilers to packages.
 
-        conn.close()
-        return result_compilers, device_uid
+    Returns:
+        bool: True if inserted successfully, False otherwise.
+    """
+    try:
+        cursor = conn.cursor()
+        sdk_config = {
+            "MCU_NAME": mcu_name,
+            "CORE_NAME": "M0",
+            "_MSDK_HAL_LOW_LEVEL_TARGET_": "mikroe",
+            "_MSDK_ETH_PHY_CHIP_": "NULL",
+            "AI_GENERATED_SDK": "True"
+        }
+        sdk_config_json = json.dumps(sdk_config)
 
-# Define a REGEXP function for SQLite.
-def regexp(expr, item):
-    reg = re.compile(expr)
-    return reg.search(item) is not None
+        installer_package_json = json.dumps(installer_packages)
 
-# Queries the database to update mcu_card_list, board_list, and mcu_list.
-def query_database(changes_dict):
-    # Get the SDK version from the manifest.json file.
-    sdk_version = get_sdk_version('/home/runner/.MIKROE/NECTOStudio7/packages/sdk/mikroSDK_v2/src/manifest.json').replace(".", "")
+        cursor.execute("""
+            INSERT INTO Devices (
+                def_file,
+                family_uid,
+                flash,
+                icon,
+                max_speed,
+                name,
+                ram,
+                sdk_config,
+                necto_config,
+                uid,
+                vendor,
+                tft_socket,
+                sdk_support,
+                installer_package
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            f"{mcu_name}.json",        # def_file
+            "STM32",                   # family_uid
+            1024,                      # flash
+            "images/mcu/stm32.png",    # icon
+            64.000,                    # max_speed
+            mcu_name,                  # name
+            327680,                    # ram
+            sdk_config_json,           # sdk_config
+            None,                      # necto_config
+            mcu_name,                  # uid
+            "STMicroelectronics",      # vendor
+            1,                         # tft_socket
+            1,                         # sdk_support
+            installer_package_json     # installer_package
+        ))
+        conn.commit()
+        return True
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Database error while inserting device '{mcu_name}': {e}")
+        return False
 
-    # Connect to the database.
-    conn = sqlite3.connect(dbPath)
+def insert_board_to_device(conn, mcu_name):
+    """
+    Inserts a record into the BoardToDevice table.
 
-    # Create REGEXP function for python script.
-    conn.create_function("REGEXP", 2, regexp)
-    cursor = conn.cursor()
+    Args:
+        conn (sqlite3.Connection): SQLite connection object.
+        mcu_name (str): The MCU name.
 
-    new_board_list = []
+    Returns:
+        bool: True if inserted successfully, False otherwise.
+    """
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO BoardToDevice (board_uid, device_uid) VALUES (?, ?)
+        """, ("GENERIC_ARM_BOARD", mcu_name))
+        conn.commit()
+        return True
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Database error while inserting into BoardToDevice for '{mcu_name}': {e}")
+        return False
 
-    cursor.execute(f"""
-        SELECT board_uid
-        FROM SDKToBoard
-        WHERE sdk_uid = 'mikrosdk_v{sdk_version}';
-    """)
-    rows = cursor.fetchall()
-    new_board_list.extend([row[0] for row in rows])
-    changes_dict['board_list'][:] = sorted(list(set(new_board_list)))
+def insert_sdk_to_device(conn, mcu_name):
+    """
+    Inserts a record into the SDKToDevice table.
 
-    conn.close()
+    Args:
+        conn (sqlite3.Connection): SQLite connection object.
+        mcu_name (str): The MCU name.
 
-# Writes the result dictionary to a JSON file and ensures testPath exists.
-def write_results_to_file(changes_dict):
-    with open(f'{testPath}/built_changes.json', 'w+') as json_file:
-        json.dump(changes_dict, json_file, indent=4)
+    Returns:
+        bool: True if inserted successfully, False otherwise.
+    """
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO SDKToDevice (sdk_uid, device_uid) VALUES (?, ?)
+        """, ("mikrosdk_v2112", mcu_name))
+        conn.commit()
+        return True
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Database error while inserting into SDKToDevice for '{mcu_name}': {e}")
+        return False
 
-    print(f"All the data for build has been written to {testPath}/built_changes.json")
+def insert_compiler_to_device(conn, mcu_name):
+    """
+    Inserts records into the CompilerToDevice table.
 
-    for item in changes_dict['unused']:
-        print(f"Couldn't find {item} in the database")
+    Args:
+        conn (sqlite3.Connection): SQLite connection object.
+        mcu_name (str): The MCU name.
+
+    Returns:
+        bool: True if both inserts are successful, False otherwise.
+    """
+    try:
+        cursor = conn.cursor()
+        compilers = ["gcc_arm_none_eabi", "clang-llvm"]
+        for compiler in compilers:
+            cursor.execute("""
+                INSERT INTO CompilerToDevice (device_uid, compiler_uid) VALUES (?, ?)
+            """, (mcu_name, compiler))
+        conn.commit()
+        return True
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Database error while inserting into CompilerToDevice for '{mcu_name}': {e}")
+        return False
+
+def insert_programmer_to_device(conn, mcu_name):
+    """
+    Inserts a record into the ProgrammerToDevice table.
+
+    Args:
+        conn (sqlite3.Connection): SQLite connection object.
+        mcu_name (str): The MCU name.
+
+    Returns:
+        bool: True if inserted successfully, False otherwise.
+    """
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO ProgrammerToDevice (programer_uid, device_uid) VALUES (?, ?)
+        """, ("codegrip", mcu_name))
+        conn.commit()
+        return True
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Database error while inserting into ProgrammerToDevice for '{mcu_name}': {e}")
+        return False
+
+def insert_device_to_package(conn, mcu_name, pkg):
+    """
+    Inserts a record into the DeviceToPackage table.
+
+    Args:
+        conn (sqlite3.Connection): SQLite connection object.
+        mcu_name (str): The MCU name.
+        pkg (str): The package UID.
+
+    Returns:
+        bool: True if inserted successfully, False otherwise.
+    """
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO DeviceToPackage (device_uid, package_uid) VALUES (?, ?)
+        """, (mcu_name, pkg))
+        conn.commit()
+        return True
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Database error while inserting into DeviceToPackage for '{mcu_name}' and package '{pkg}': {e}")
+        return False
+
+def process_database_operations(conn, mcu_dependencies, error_log):
+    """
+    Processes the database operations based on mcu_dependencies.
+
+    Args:
+        conn (sqlite3.Connection): SQLite connection object.
+        mcu_dependencies (dict): The MCU dependencies dictionary.
+        error_log (file object): The file object for logging errors.
+    """
+    for doc_ds, mcus in mcu_dependencies.items():
+        for mcu_name, packages in mcus.items():
+            # Skip if mcu_name is already in Devices
+            if check_mcu_exists(conn, mcu_name):
+                error_message = f"{doc_ds}: {mcu_name} - MCU already exists in Devices."
+                print(Fore.RED + f"Error: MCU '{mcu_name}' already exists in Devices.")
+                error_log.write(error_message + "\n")
+                continue
+
+            # Prepare installer_package dictionary
+            # Map each compiler to list of packages (excluding "ERROR")
+            valid_packages = [pkg.split('/', 1)[1] for pkg in packages if pkg != "ERROR"]
+            if not valid_packages:
+                installer_packages = {"clang-llvm": [], "gcc_arm_none_eabi": []}
+            else:
+                installer_packages = {
+                    "clang-llvm": valid_packages,
+                    "gcc_arm_none_eabi": valid_packages
+                }
+
+            # Insert into Devices
+            if not insert_device(conn, mcu_name, installer_packages):
+                error_message = f"{doc_ds}: {mcu_name} - Failed to insert into Devices."
+                error_log.write(error_message + "\n")
+                continue
+
+            # Insert into BoardToDevice
+            if not insert_board_to_device(conn, mcu_name):
+                error_message = f"{doc_ds}: {mcu_name} - Failed to insert into BoardToDevice."
+                error_log.write(error_message + "\n")
+
+            # Insert into SDKToDevice
+            if not insert_sdk_to_device(conn, mcu_name):
+                error_message = f"{doc_ds}: {mcu_name} - Failed to insert into SDKToDevice."
+                error_log.write(error_message + "\n")
+
+            # Insert into CompilerToDevice
+            if not insert_compiler_to_device(conn, mcu_name):
+                error_message = f"{doc_ds}: {mcu_name} - Failed to insert into CompilerToDevice."
+                error_log.write(error_message + "\n")
+
+            # Insert into ProgrammerToDevice
+            if not insert_programmer_to_device(conn, mcu_name):
+                error_message = f"{doc_ds}: {mcu_name} - Failed to insert into ProgrammerToDevice."
+                error_log.write(error_message + "\n")
+
+            # Insert into DeviceToPackage for each valid package
+            for pkg in packages:
+                if pkg == "ERROR":
+                    continue  # Skip invalid packages
+                if not insert_device_to_package(conn, mcu_name, pkg):
+                    error_message = f"{doc_ds}: {mcu_name}, {pkg} - Failed to insert into DeviceToPackage."
+                    error_log.write(error_message + "\n")
 
 def main():
-    global build_failed
+    # Load dependencies from build.json
+    dependencies = load_build_json()
 
-    # Initialize the changes dictionary.
-    changes_dict = {
-        'regex_list': [],
-        'mcu_list': [],
-        'board_list': [],
-        'mcu_card_list': [],
-        'unused': [],
-        'changed_files': []
-    }
+    # Define the implementations directory relative to the parent directory
+    current_script_path = os.path.abspath(__file__)
+    current_dir = os.path.dirname(current_script_path)
+    parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+    implementations_dir = os.path.join(parent_dir, 'sdk', 'targets', 'arm', 'mikroe', 'ai_generated', 'stm32', 'src', 'gpio', 'implementations')
 
-    # Create a folder for job artifacts. 
-    os.makedirs(testPath, exist_ok=True)
+    # Define the MCU definitions directory
+    mcu_definitions_dir = os.path.join(parent_dir, 'sdk', 'targets', 'arm', 'mikroe', 'common', 'include', 'mcu_definitions', 'ai_generated', 'STM32')
 
-    # Get the necessary data from the database.
-    query_database(changes_dict)
+    # Check if implementations directory exists
+    if not os.path.isdir(implementations_dir):
+        print(Fore.RED + f"Error: Implementations directory not found at {implementations_dir}")
+        sys.exit(1)
 
-    # Finally, run the SDK build tool.
-    run_builds(changes_dict)
+    # Check if MCU definitions directory exists
+    if not os.path.isdir(mcu_definitions_dir):
+        print(Fore.RED + f"Error: MCU definitions directory not found at {mcu_definitions_dir}")
+        sys.exit(1)
 
-    # Write all the used info for building to artifact folder.
-    write_results_to_file(changes_dict)
+    # Dictionary to store MCU dependencies with mcu_packages
+    # Structure: { package: { doc_ds: { mcu_name: [mcu_packages] } } }
+    mcu_dependencies = {}
 
-    if build_failed == True:
-        # Red text for failure.
-        print("\033[91mRecursive Build Failed!\033[0m")
-        # Fail the job as well.
-        exit(1)
-    else:
-        # Green text for success.
-        print("\033[92mRecursive Build Success!\033[0m")
+    # Path to error.txt
+    error_txt_path = os.path.join(parent_dir, 'error.txt')
+
+    # Backup existing error.txt if exists
+    if os.path.exists(error_txt_path):
+        backup_path = os.path.join(parent_dir, 'error_backup.txt')
+        try:
+            os.rename(error_txt_path, backup_path)
+            print(Fore.YELLOW + f"Existing error.txt backed up to {backup_path}")
+        except Exception as e:
+            print(Fore.RED + f"Error backing up existing error.txt: {e}")
+            # Proceed without backup
+
+    # Open error.txt in append mode
+    with open(error_txt_path, 'a', encoding='utf-8') as error_log:
+        print("Processing dependencies...\n")
+        for package, doc_ds in dependencies.items():
+            print(f"Processing Package: {package}, doc_ds: {doc_ds}")
+
+            # Initialize the nested dictionary for this package
+            mcu_dependencies[package] = {}
+            mcu_dependencies[package][doc_ds] = {}
+
+            # Step 1: Search for the doc_ds folder
+            doc_ds_folder = find_doc_ds_folder(doc_ds, implementations_dir)
+            if not doc_ds_folder:
+                error_message = f"{package}, {doc_ds}: N/A, N/A - Folder for doc_ds '{doc_ds}' not found."
+                print(Fore.RED + f"Error: Folder for doc_ds '{doc_ds}' not found in {implementations_dir}\n")
+                error_log.write(error_message + "\n")
+                continue  # Skip to the next dependency
+
+            print(f"Found folder for doc_ds '{doc_ds}': {doc_ds_folder}")
+
+            # Step 2: Locate and parse CMakeLists.cmake
+            cmake_file_path = os.path.join(doc_ds_folder, 'CMakeLists.cmake')
+            if not os.path.isfile(cmake_file_path):
+                error_message = f"{package}, {doc_ds}: N/A, N/A - CMakeLists.cmake not found in {doc_ds_folder}."
+                print(Fore.RED + f"Error: CMakeLists.cmake not found in {doc_ds_folder}\n")
+                error_log.write(error_message + "\n")
+                continue
+
+            # Extract MCU list
+            mcu_list = extract_mcu_list(cmake_file_path)
+            if not mcu_list:
+                error_message = f"{package}, {doc_ds}: N/A, N/A - No MCU names found in {cmake_file_path}."
+                print(Fore.RED + f"Error: No MCU names found in {cmake_file_path}\n")
+                error_log.write(error_message + "\n")
+                continue
+
+            # Process each MCU
+            for mcu_name in mcu_list:
+                print(f"  Processing MCU: {mcu_name}")
+
+                # Step 3: Find mcu_packages for the MCU
+                mcu_packages = find_mcu_packages(mcu_name, mcu_definitions_dir, error_log, package, doc_ds)
+                if mcu_packages is None:
+                    print()  # Blank line for readability
+                    continue  # Skip to the next MCU
+
+                # Store the mcu_packages in the dictionary
+                mcu_dependencies[package][doc_ds][mcu_name] = mcu_packages
+
+                # Print the mcu_packages
+                print("    MCU Packages:")
+                for pkg in mcu_packages:
+                    print(f"     - {pkg}")
+                print()  # Blank line for readability
+
+    # After processing dependencies, connect to the database and perform operations
+    db_path = os.path.join(local_app_data_path, 'databases', 'necto_db.db')
+    if not os.path.isfile(db_path):
+        print(Fore.RED + f"Error: Database file not found at {db_path}")
+        sys.exit(1)
+
+    # Connect to the SQLite database
+    conn = connect_database(db_path)
+
+    # Process database operations
+    with open(error_txt_path, 'a', encoding='utf-8') as error_log:
+        process_database_operations(conn, mcu_dependencies, error_log)
+
+    # Close the database connection
+    conn.close()
+
+    # Write the mcu_dependencies to a JSON file
+    output_file = os.path.join(parent_dir, 'mcu_dependencies.json')
+    try:
+        with open(output_file, 'w', encoding='utf-8') as outfile:
+            json.dump(mcu_dependencies, outfile, indent=4)
+        print(f"MCU dependencies have been written to {output_file}")
+    except Exception as e:
+        print(Fore.RED + f"Error writing to {output_file}: {e}")
+
+def connect_database(db_path):
+    """
+    Connects to the SQLite database.
+
+    Args:
+        db_path (str): Path to the SQLite database file.
+
+    Returns:
+        sqlite3.Connection: SQLite connection object.
+    """
+    try:
+        conn = sqlite3.connect(db_path)
+        return conn
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Error connecting to database: {e}")
+        sys.exit(1)
+
+def check_mcu_exists(conn, mcu_name):
+    """
+    Checks if the MCU already exists in the Devices table.
+
+    Args:
+        conn (sqlite3.Connection): SQLite connection object.
+        mcu_name (str): The MCU name to check.
+
+    Returns:
+        bool: True if exists, False otherwise.
+    """
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM Devices WHERE name = ?", (mcu_name,))
+        count = cursor.fetchone()[0]
+        return count > 0
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Database error while checking MCU existence: {e}")
+        return False
+
+def insert_device(conn, mcu_name, installer_packages):
+    """
+    Inserts a new MCU into the Devices table.
+
+    Args:
+        conn (sqlite3.Connection): SQLite connection object.
+        mcu_name (str): The MCU name.
+        installer_packages (dict): Dictionary mapping compilers to packages.
+
+    Returns:
+        bool: True if inserted successfully, False otherwise.
+    """
+    try:
+        cursor = conn.cursor()
+        sdk_config = {
+            "MCU_NAME": mcu_name,
+            "CORE_NAME": "M0",
+            "_MSDK_HAL_LOW_LEVEL_TARGET_": "mikroe",
+            "_MSDK_ETH_PHY_CHIP_": "NULL",
+            "AI_GENERATED_SDK": "True"
+        }
+        sdk_config_json = json.dumps(sdk_config)
+
+        installer_package_json = json.dumps(installer_packages)
+
+        cursor.execute("""
+            INSERT INTO Devices (
+                def_file,
+                family_uid,
+                flash,
+                icon,
+                max_speed,
+                name,
+                ram,
+                sdk_config,
+                necto_config,
+                uid,
+                vendor,
+                tft_socket,
+                sdk_support,
+                installer_package
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            f"{mcu_name}.json",        # def_file
+            "STM32",                   # family_uid
+            1024,                      # flash
+            "images/mcu/stm32.png",    # icon
+            64.000,                    # max_speed
+            mcu_name,                  # name
+            327680,                    # ram
+            sdk_config_json,           # sdk_config
+            None,                      # necto_config
+            mcu_name,                  # uid
+            "STMicroelectronics",      # vendor
+            1,                         # tft_socket
+            1,                         # sdk_support
+            installer_package_json     # installer_package
+        ))
+        conn.commit()
+        return True
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Database error while inserting device '{mcu_name}': {e}")
+        return False
+
+def insert_board_to_device(conn, mcu_name):
+    """
+    Inserts a record into the BoardToDevice table.
+
+    Args:
+        conn (sqlite3.Connection): SQLite connection object.
+        mcu_name (str): The MCU name.
+
+    Returns:
+        bool: True if inserted successfully, False otherwise.
+    """
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO BoardToDevice (board_uid, device_uid) VALUES (?, ?)
+        """, ("GENERIC_ARM_BOARD", mcu_name))
+        conn.commit()
+        return True
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Database error while inserting into BoardToDevice for '{mcu_name}': {e}")
+        return False
+
+def insert_sdk_to_device(conn, mcu_name):
+    """
+    Inserts a record into the SDKToDevice table.
+
+    Args:
+        conn (sqlite3.Connection): SQLite connection object.
+        mcu_name (str): The MCU name.
+
+    Returns:
+        bool: True if inserted successfully, False otherwise.
+    """
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO SDKToDevice (sdk_uid, device_uid) VALUES (?, ?)
+        """, ("mikrosdk_v2112", mcu_name))
+        conn.commit()
+        return True
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Database error while inserting into SDKToDevice for '{mcu_name}': {e}")
+        return False
+
+def insert_compiler_to_device(conn, mcu_name):
+    """
+    Inserts records into the CompilerToDevice table.
+
+    Args:
+        conn (sqlite3.Connection): SQLite connection object.
+        mcu_name (str): The MCU name.
+
+    Returns:
+        bool: True if both inserts are successful, False otherwise.
+    """
+    try:
+        cursor = conn.cursor()
+        compilers = ["gcc_arm_none_eabi", "clang-llvm"]
+        for compiler in compilers:
+            cursor.execute("""
+                INSERT INTO CompilerToDevice (device_uid, compiler_uid) VALUES (?, ?)
+            """, (mcu_name, compiler))
+        conn.commit()
+        return True
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Database error while inserting into CompilerToDevice for '{mcu_name}': {e}")
+        return False
+
+def insert_programmer_to_device(conn, mcu_name):
+    """
+    Inserts a record into the ProgrammerToDevice table.
+
+    Args:
+        conn (sqlite3.Connection): SQLite connection object.
+        mcu_name (str): The MCU name.
+
+    Returns:
+        bool: True if inserted successfully, False otherwise.
+    """
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO ProgrammerToDevice (programer_uid, device_uid) VALUES (?, ?)
+        """, ("codegrip", mcu_name))
+        conn.commit()
+        return True
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Database error while inserting into ProgrammerToDevice for '{mcu_name}': {e}")
+        return False
+
+def insert_device_to_package(conn, mcu_name, pkg):
+    """
+    Inserts a record into the DeviceToPackage table.
+
+    Args:
+        conn (sqlite3.Connection): SQLite connection object.
+        mcu_name (str): The MCU name.
+        pkg (str): The package UID.
+
+    Returns:
+        bool: True if inserted successfully, False otherwise.
+    """
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO DeviceToPackage (device_uid, package_uid) VALUES (?, ?)
+        """, (mcu_name, pkg))
+        conn.commit()
+        return True
+    except sqlite3.Error as e:
+        print(Fore.RED + f"Database error while inserting into DeviceToPackage for '{mcu_name}' and package '{pkg}': {e}")
+        return False
+
+def process_database_operations(conn, mcu_dependencies, error_log):
+    """
+    Processes the database operations based on mcu_dependencies.
+
+    Args:
+        conn (sqlite3.Connection): SQLite connection object.
+        mcu_dependencies (dict): The MCU dependencies dictionary.
+        error_log (file object): The file object for logging errors.
+    """
+    for package, doc_ds_dict in mcu_dependencies.items():
+        for doc_ds, mcus in doc_ds_dict.items():
+            for mcu_name, packages in mcus.items():
+                # Skip if mcu_name is already in Devices
+                if check_mcu_exists(conn, mcu_name):
+                    error_message = f"{package}, {doc_ds}: {mcu_name} - MCU already exists in Devices."
+                    print(Fore.RED + f"Error: MCU '{mcu_name}' already exists in Devices.")
+                    error_log.write(error_message + "\n")
+                    continue
+
+                # Prepare installer_package dictionary based on build.json package
+                # Map each compiler to list containing the current package (from build.json)
+                installer_packages = {
+                    "clang-llvm": package,
+                    "gcc_arm_none_eabi": package
+                }
+
+                # Insert into Devices
+                if not insert_device(conn, mcu_name, installer_packages):
+                    error_message = f"{package}, {doc_ds}: {mcu_name} - Failed to insert into Devices."
+                    error_log.write(error_message + "\n")
+                    continue
+
+                # Insert into BoardToDevice
+                if not insert_board_to_device(conn, mcu_name):
+                    error_message = f"{package}, {doc_ds}: {mcu_name} - Failed to insert into BoardToDevice."
+                    error_log.write(error_message + "\n")
+
+                # Insert into SDKToDevice
+                if not insert_sdk_to_device(conn, mcu_name):
+                    error_message = f"{package}, {doc_ds}: {mcu_name} - Failed to insert into SDKToDevice."
+                    error_log.write(error_message + "\n")
+
+                # Insert into CompilerToDevice
+                if not insert_compiler_to_device(conn, mcu_name):
+                    error_message = f"{package}, {doc_ds}: {mcu_name} - Failed to insert into CompilerToDevice."
+                    error_log.write(error_message + "\n")
+
+                # Insert into ProgrammerToDevice
+                if not insert_programmer_to_device(conn, mcu_name):
+                    error_message = f"{package}, {doc_ds}: {mcu_name} - Failed to insert into ProgrammerToDevice."
+                    error_log.write(error_message + "\n")
+
+                # Insert into DeviceToPackage for each valid package
+                for pkg in packages:
+                    if pkg == "ERROR":
+                        continue  # Skip invalid packages
+                    if not insert_device_to_package(conn, mcu_name, pkg):
+                        error_message = f"{package}, {doc_ds}: {mcu_name}, {pkg} - Failed to insert into DeviceToPackage."
+                        error_log.write(error_message + "\n")
+
+def find_mcu_packages(mcu_name, mcu_definitions_dir, error_log, package, doc_ds):
+    """
+    Searches for the MCU folder and retrieves its package folders. Validates and rearranges package names.
+
+    Args:
+        mcu_name (str): The name of the MCU to search for.
+        mcu_definitions_dir (str): The path to the STM32 MCU definitions directory.
+        error_log (file object): The file object for logging errors.
+        package (str): The package name being processed.
+        doc_ds (str): The doc_ds number being processed.
+
+    Returns:
+        list: A list of validated and rearranged mcu_packages if found, else None.
+    """
+    target_mcu_dir = os.path.join(mcu_definitions_dir, mcu_name)
+    if not os.path.isdir(target_mcu_dir):
+        error_message = f"{package}, {doc_ds}: {mcu_name}, N/A - MCU folder '{mcu_name}' not found."
+        print(Fore.RED + f"Error: MCU folder '{mcu_name}' not found in {mcu_definitions_dir}")
+        error_log.write(error_message + "\n")
+        return None
+
+    try:
+        # List all subdirectories (mcu_packages) within the MCU folder
+        raw_mcu_packages = [item for item in os.listdir(target_mcu_dir)
+                            if os.path.isdir(os.path.join(target_mcu_dir, item))]
+        validated_mcu_packages = []
+        for pkg in raw_mcu_packages:
+            # Validate and rearrange pkg
+            rearranged_pkg, error = validate_and_rearrange_pkg(pkg)
+            if rearranged_pkg:
+                validated_mcu_packages.append(rearranged_pkg)
+            else:
+                # Log error and append "ERROR"
+                error_message = f"{package}, {doc_ds}: {mcu_name}, {pkg} - {error}"
+                print(Fore.RED + f"Error: {error}")
+                error_log.write(error_message + "\n")
+                validated_mcu_packages.append("ERROR")
+        return validated_mcu_packages
+    except Exception as e:
+        error_message = f"{package}, {doc_ds}: {mcu_name}, N/A - Error accessing '{target_mcu_dir}': {e}"
+        print(Fore.RED + f"An error occurred while accessing '{target_mcu_dir}': {e}")
+        error_log.write(error_message + "\n")
+        return None
 
 if __name__ == "__main__":
     main()

@@ -1,5 +1,0 @@
-if(${_MSDK_BOARD_NAME_} STREQUAL "MIKROMEDIA7FORSTM32F4")
-    set(BOARD_PATH   "include/boards/mikromedia_7_stm32f4")
-    set(MCU_CARD  FALSE)
-    set(SHIELD TRUE)
-endif()

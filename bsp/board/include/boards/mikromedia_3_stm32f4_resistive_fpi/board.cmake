@@ -1,5 +1,0 @@
-if(${_MSDK_BOARD_NAME_} STREQUAL "MIKROMEDIA3FORSTM32F4RESISTIVEFPI")
-    set(BOARD_PATH   "include/boards/mikromedia_3_stm32f4_resistive_fpi")
-    set(MCU_CARD  FALSE)
-    set(SHIELD FALSE)
-endif()

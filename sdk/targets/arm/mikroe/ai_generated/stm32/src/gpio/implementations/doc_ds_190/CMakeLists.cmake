@@ -1,0 +1,8 @@
+if(${MCU_NAME} MATCHES "^STM32WL33C8$|^STM32WL33CB$|^STM32WL33CC$|^STM32WL33K8$|^STM32WL33KB$|^STM32WL33KC$")
+    set(gpio_subimplementation "${CMAKE_CURRENT_LIST_DIR}/hal_ll_gpio_port.c")
+    set(rcc_subimplementation "${CMAKE_CURRENT_SOURCE_DIR}/../../include/rcc/implementations/doc_ds_190")
+    set(gpio_subimplementation_include_dir "${CMAKE_CURRENT_SOURCE_DIR}/../../include/gpio/implementations/doc_ds_190")
+    list(APPEND hal_ll_def_list "STM32WLxx")
+    list(APPEND hal_ll_def_list "STM32WL3xx")
+    list(APPEND hal_ll_def_list "STM32WL33xx")
+endif()
