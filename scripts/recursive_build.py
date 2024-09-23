@@ -1,14 +1,15 @@
+
 import os
 import json
 import sys
 import re
 import sqlite3
 import subprocess
-from colorama import init, Fore, Style
-import shutil  # Add this line with the other imports
+import shutil
+from colorama import init, Fore
 
-# Initialize colorama
-init(autoreset=True)
+# Initialize colorama with environment variable support
+init(autoreset=True, strip=False, convert=False)
 
 # Global variable to trace failed tests.
 build_failed = False
@@ -51,7 +52,7 @@ def get_sdk_version():
 # Runs the bash command.
 def run_cmd(cmd):
     global build_failed
-    # Blue color for build tool command command.
+    # Blue color for build tool command.
     print(f"\033[94m{cmd}\033[0m")
 
     try:
@@ -59,32 +60,26 @@ def run_cmd(cmd):
         output = subprocess.check_output(cmd, shell=True, text=True)
         for line in output.splitlines():
             if line.startswith("Building:"):
-
                 # White color for the current setup build.
                 print(line)
             elif "Build success!" in line:
-
                 # Green color for success.
-                print("\033[92m{}\033[0m".format(line))
+                print(f"\033[92m{line}\033[0m")
             elif "Build failed" in line:
-
                 # Red color for failure.
-                print("\033[91m{}\033[0m".format(line))
+                print(f"\033[91m{line}\033[0m")
                 build_failed = True
 
     # Error handling for failed builds not to fail the job.
     except subprocess.CalledProcessError as e:
         for line in e.output.splitlines():
             if line.startswith("Building:"):
-
                 # White color for the current setup build.
                 print(line)
             elif "Build success!" in line:
-
                 # Green color for success.
                 print(f"\033[92m{line}\033[0m")
             elif "Build failed" in line:
-
                 # Red color for failure.
                 print(f"\033[91m{line}\033[0m")
                 build_failed = True
@@ -562,9 +557,9 @@ def copy_sdk_files(dependencies, script_repo_dir, mcu_dependencies, error_log):
         try:
             if os.path.exists(target_mcu_def_dir):
                 shutil.rmtree(target_mcu_def_dir)
-                print(Fore.GREEN + f"    Cleared existing directory: '{target_mcu_def_dir}'")
+                # print(Fore.GREEN + f"    Cleared existing directory: '{target_mcu_def_dir}'")
             os.makedirs(target_mcu_def_dir, exist_ok=True)
-            print(Fore.GREEN + f"    Created directory: '{target_mcu_def_dir}'")
+            # print(Fore.GREEN + f"    Created directory: '{target_mcu_def_dir}'")
         except Exception as e:
             error_message = f"Failed to clear/create MCU definitions directory '{target_mcu_def_dir}': {e}"
             print(Fore.RED + f"Error: {error_message}")
@@ -583,7 +578,7 @@ def copy_sdk_files(dependencies, script_repo_dir, mcu_dependencies, error_log):
 
             try:
                 shutil.copytree(src_mcu_def, target_mcu_def, dirs_exist_ok=True)
-                print(Fore.GREEN + f"    Copied MCU definitions for '{mcu_name}' from '{src_mcu_def}' to '{target_mcu_def}'")
+                # print(Fore.GREEN + f"    Copied MCU definitions for '{mcu_name}' from '{src_mcu_def}' to '{target_mcu_def}'")
             except Exception as e:
                 error_message = f"Failed to copy MCU definitions for '{mcu_name}' from '{src_mcu_def}' to '{target_mcu_def}': {e}"
                 print(Fore.RED + f"Error: {error_message}")
@@ -597,9 +592,9 @@ def copy_sdk_files(dependencies, script_repo_dir, mcu_dependencies, error_log):
         try:
             if os.path.exists(target_mcu_reg_dir):
                 shutil.rmtree(target_mcu_reg_dir)
-                print(Fore.GREEN + f"    Cleared existing directory: '{target_mcu_reg_dir}'")
+                # print(Fore.GREEN + f"    Cleared existing directory: '{target_mcu_reg_dir}'")
             os.makedirs(target_mcu_reg_dir, exist_ok=True)
-            print(Fore.GREEN + f"    Created directory: '{target_mcu_reg_dir}'")
+            # print(Fore.GREEN + f"    Created directory: '{target_mcu_reg_dir}'")
         except Exception as e:
             error_message = f"Failed to clear/create MCU register addresses directory '{target_mcu_reg_dir}': {e}"
             print(Fore.RED + f"Error: {error_message}")
@@ -618,7 +613,7 @@ def copy_sdk_files(dependencies, script_repo_dir, mcu_dependencies, error_log):
 
             try:
                 shutil.copytree(src_mcu_reg, target_mcu_reg, dirs_exist_ok=True)
-                print(Fore.GREEN + f"    Copied MCU register addresses for '{mcu_name}' from '{src_mcu_reg}' to '{target_mcu_reg}'")
+                # print(Fore.GREEN + f"    Copied MCU register addresses for '{mcu_name}' from '{src_mcu_reg}' to '{target_mcu_reg}'")
             except Exception as e:
                 error_message = f"Failed to copy MCU register addresses for '{mcu_name}' from '{src_mcu_reg}' to '{target_mcu_reg}': {e}"
                 print(Fore.RED + f"Error: {error_message}")
@@ -636,7 +631,7 @@ def copy_sdk_files(dependencies, script_repo_dir, mcu_dependencies, error_log):
         else:
             try:
                 module_implementations = [d for d in os.listdir(src_stm32_src_dir) if os.path.isdir(os.path.join(src_stm32_src_dir, d))]
-                print(Fore.GREEN + f"    Found module implementations: {module_implementations}")
+                # print(Fore.GREEN + f"    Found module implementations: {module_implementations}")
             except Exception as e:
                 error_message = f"Failed to list module implementations in '{src_stm32_src_dir}': {e}"
                 print(Fore.RED + f"Error: {error_message}")
@@ -652,9 +647,9 @@ def copy_sdk_files(dependencies, script_repo_dir, mcu_dependencies, error_log):
                 try:
                     if os.path.exists(target_module_impl):
                         shutil.rmtree(target_module_impl)
-                        print(Fore.GREEN + f"        Cleared existing directory: '{target_module_impl}'")
+                        # print(Fore.GREEN + f"        Cleared existing directory: '{target_module_impl}'")
                     os.makedirs(target_module_impl, exist_ok=True)
-                    print(Fore.GREEN + f"        Created directory: '{target_module_impl}'")
+                    # print(Fore.GREEN + f"        Created directory: '{target_module_impl}'")
                 except Exception as e:
                     error_message = f"Failed to clear/create implementations directory '{target_module_impl}': {e}"
                     print(Fore.RED + f"Error: {error_message}")
@@ -670,7 +665,7 @@ def copy_sdk_files(dependencies, script_repo_dir, mcu_dependencies, error_log):
                 else:
                     try:
                         shutil.copytree(src_module_impl, target_module_impl, dirs_exist_ok=True)
-                        print(Fore.GREEN + f"        Copied implementations from '{src_module_impl}' to '{target_module_impl}'")
+                        # print(Fore.GREEN + f"        Copied implementations from '{src_module_impl}' to '{target_module_impl}'")
                     except Exception as e:
                         error_message = f"Failed to copy implementations from '{src_module_impl}' to '{target_module_impl}': {e}"
                         print(Fore.RED + f"Error: {error_message}")
@@ -688,7 +683,7 @@ def copy_sdk_files(dependencies, script_repo_dir, mcu_dependencies, error_log):
         else:
             try:
                 module_implementations_include = [d for d in os.listdir(src_stm32_include_dir) if os.path.isdir(os.path.join(src_stm32_include_dir, d))]
-                print(Fore.GREEN + f"    Found module implementations: {module_implementations_include}")
+                # print(Fore.GREEN + f"    Found module implementations: {module_implementations_include}")
             except Exception as e:
                 error_message = f"Failed to list module implementations in '{src_stm32_include_dir}': {e}"
                 print(Fore.RED + f"Error: {error_message}")
@@ -709,9 +704,9 @@ def copy_sdk_files(dependencies, script_repo_dir, mcu_dependencies, error_log):
                 try:
                     if os.path.exists(target_module_include):
                         shutil.rmtree(target_module_include)
-                        print(Fore.GREEN + f"        Cleared existing directory: '{target_module_include}'")
+                        # print(Fore.GREEN + f"        Cleared existing directory: '{target_module_include}'")
                     os.makedirs(target_module_include, exist_ok=True)
-                    print(Fore.GREEN + f"        Created directory: '{target_module_include}'")
+                    # print(Fore.GREEN + f"        Created directory: '{target_module_include}'")
                 except Exception as e:
                     error_message = f"Failed to clear/create implementations directory '{target_module_include}': {e}"
                     print(Fore.RED + f"Error: {error_message}")
@@ -729,7 +724,7 @@ def copy_sdk_files(dependencies, script_repo_dir, mcu_dependencies, error_log):
                 else:
                     try:
                         shutil.copytree(src_module_include, target_module_include, dirs_exist_ok=True)
-                        print(Fore.GREEN + f"        Copied implementations from '{src_module_include}' to '{target_module_include}'")
+                        # print(Fore.GREEN + f"        Copied implementations from '{src_module_include}' to '{target_module_include}'")
                     except Exception as e:
                         error_message = f"Failed to copy implementations from '{src_module_include}' to '{target_module_include}': {e}"
                         print(Fore.RED + f"Error: {error_message}")
@@ -945,7 +940,7 @@ def copy_output_files(testPath, parent_dir, error_log):
         # Copy error.txt
         if os.path.isfile(src_error_txt):
             shutil.copy2(src_error_txt, dest_error_txt)
-            print(Fore.GREEN + f"  Copied 'error.txt' to '{testPath}'.")
+            # print(Fore.GREEN + f"  Copied 'error.txt' to '{testPath}'.")
         else:
             error_message = f"'error.txt' not found at '{src_error_txt}'."
             print(Fore.RED + f"Error: {error_message}")
