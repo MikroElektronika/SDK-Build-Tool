@@ -911,6 +911,51 @@ def copy_core_files(dependencies, parent_dir, mcu_dependencies, error_log):
 
         print(Fore.CYAN + f"Completed processing for package '{package}'.\n")
 
+def copy_output_files(testPath, parent_dir, error_log):
+    """
+    Copies 'mcu_dependencies.json' and 'error.txt' to the specified testPath directory.
+
+    Args:
+        testPath (str): Destination directory path.
+        parent_dir (str): Source directory path where the files are located.
+        error_log (file object): File object for logging errors.
+    """
+    try:
+        # Ensure the destination directory exists
+        os.makedirs(testPath, exist_ok=True)
+        print(Fore.BLUE + f"  Ensured that destination directory '{testPath}' exists.")
+
+        # Define source file paths
+        src_mcu_deps = os.path.join(parent_dir, 'mcu_dependencies.json')
+        src_error_txt = os.path.join(parent_dir, 'error.txt')
+
+        # Define destination file paths
+        dest_mcu_deps = os.path.join(testPath, 'mcu_dependencies.json')
+        dest_error_txt = os.path.join(testPath, 'error.txt')
+
+        # Copy mcu_dependencies.json
+        if os.path.isfile(src_mcu_deps):
+            shutil.copy2(src_mcu_deps, dest_mcu_deps)
+            print(Fore.GREEN + f"  Copied 'mcu_dependencies.json' to '{testPath}'.")
+        else:
+            error_message = f"'mcu_dependencies.json' not found at '{src_mcu_deps}'."
+            print(Fore.RED + f"Error: {error_message}")
+            error_log.write(error_message + "\n")
+
+        # Copy error.txt
+        if os.path.isfile(src_error_txt):
+            shutil.copy2(src_error_txt, dest_error_txt)
+            print(Fore.GREEN + f"  Copied 'error.txt' to '{testPath}'.")
+        else:
+            error_message = f"'error.txt' not found at '{src_error_txt}'."
+            print(Fore.RED + f"Error: {error_message}")
+            error_log.write(error_message + "\n")
+
+    except Exception as e:
+        error_message = f"Failed to copy files to '{testPath}': {e}"
+        print(Fore.RED + f"Error: {error_message}")
+        error_log.write(error_message + "\n")
+
 def main():
     global build_failed
     # Load dependencies from build.json
@@ -1037,6 +1082,8 @@ def main():
 
     with open(error_txt_path, 'a', encoding='utf-8') as error_log:
         copy_sdk_files(dependencies, parent_dir, mcu_dependencies, error_log)
+
+    copy_output_files(testPath, parent_dir, error_log)
 
     if build_failed == True:
         # Red text for failure.
