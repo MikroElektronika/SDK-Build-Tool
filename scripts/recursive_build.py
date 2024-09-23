@@ -3,13 +3,104 @@ import json
 import sys
 import re
 import sqlite3
+import subprocess
 from colorama import init, Fore, Style
+import shutil  # Add this line with the other imports
 
 # Initialize colorama
 init(autoreset=True)
 
+# Global variable to trace failed tests.
+build_failed = False
+
+# Path for storing artifacts.
+testPath = '/home/runner/test_results'
+
 # Global variable for local_app_data_path
-local_app_data_path = 'c:/Users/stefan.djordjevic/AppData/Local/MIKROE/NECTOStudio7'
+local_app_data_path = '/home/runner/.MIKROE/NECTOStudio7'
+
+# Path to sdk_build_automation tool.
+toolPath = '/home/runner/MikroElektronika/NECTOStudio/bin'
+
+# Function to extract numeric value after 'mikrosdk_v'.
+def extract_version_number(uid):
+    match = re.search(r'_v(\d+)', uid)
+    return int(match.group(1)) if match else 0
+
+# Extracts the SDK version from the manifest.json file.
+def get_sdk_version():
+    dbPath = os.path.join(local_app_data_path, 'databases', 'necto_db.db')
+    # Connect to the database.
+    conn = sqlite3.connect(dbPath)
+    cursor = conn.cursor()
+
+    cursor.execute(f"""
+        SELECT uid
+        FROM SDKs
+        WHERE installed = '1';
+    """)
+    sdk_versions = cursor.fetchall()
+
+    # Sort the SDK versions based on the extracted numeric value and get the highest one
+    latest_sdk = max(sdk_versions, key=lambda x: extract_version_number(x[0]))[0]
+
+    conn.close()
+
+    return latest_sdk
+
+# Runs the bash command.
+def run_cmd(cmd):
+    global build_failed
+    # Blue color for build tool command command.
+    print(f"\033[94m{cmd}\033[0m")
+
+    try:
+        # Store all the output lines to print only important ones.
+        output = subprocess.check_output(cmd, shell=True, text=True)
+        for line in output.splitlines():
+            if line.startswith("Building:"):
+
+                # White color for the current setup build.
+                print(line)
+            elif "Build success!" in line:
+
+                # Green color for success.
+                print("\033[92m{}\033[0m".format(line))
+            elif "Build failed" in line:
+
+                # Red color for failure.
+                print("\033[91m{}\033[0m".format(line))
+                build_failed = True
+
+    # Error handling for failed builds not to fail the job.
+    except subprocess.CalledProcessError as e:
+        for line in e.output.splitlines():
+            if line.startswith("Building:"):
+
+                # White color for the current setup build.
+                print(line)
+            elif "Build success!" in line:
+
+                # Green color for success.
+                print(f"\033[92m{line}\033[0m")
+            elif "Build failed" in line:
+
+                # Red color for failure.
+                print(f"\033[91m{line}\033[0m")
+                build_failed = True
+
+# Runs recursive builds.
+def run_builds(mcu_dependencies, current_package, doc_ds):
+    sdk = get_sdk_version()
+    compilers = ['gcc_arm_none_eabi', 'clang-llvm']
+    # Run build for all MCUs from package.
+    print(f"\033[93mRunning build for {current_package}\033[0m")
+    for mcu in mcu_dependencies[current_package][doc_ds]:
+        print(f"\033[93mRunning build for {len(mcu_dependencies[current_package][doc_ds])} MCUs\033[0m")
+        for compiler in compilers:
+            print(f"\033[93mRunning build for {mcu} MCU with {compiler}\033[0m")
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk}" --board "GENERIC_ARM_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
+            run_cmd(cmd)
 
 def load_build_json():
     """
@@ -448,7 +539,380 @@ def process_database_operations(conn, mcu_dependencies, error_log):
                     error_message = f"{doc_ds}: {mcu_name}, {pkg} - Failed to insert into DeviceToPackage."
                     error_log.write(error_message + "\n")
 
+def copy_sdk_files(dependencies, script_repo_dir, mcu_dependencies, error_log):
+    """
+    Creates SDK package folders and copies required files from the script repository to the target directory.
+
+    Args:
+        dependencies (dict): Dictionary containing package names and their corresponding doc_ds numbers.
+        script_repo_dir (str): Path to the script repository directory.
+        mcu_dependencies (dict): Dictionary containing MCU dependencies.
+        error_log (file object): File object for logging errors.
+    """
+    target_sdk_base_dir = os.path.join(local_app_data_path, 'packages', 'sdk', 'mikroSDK_v2', 'src', 'targets', 'arm', 'mikroe')
+
+    for package, doc_ds in dependencies.items():
+        print(Fore.CYAN + f"Processing SDK files for Package: '{package}', doc_ds: '{doc_ds}'")
+
+        # 1. Handle mcu_definitions
+        src_mcu_def_dir = os.path.join(script_repo_dir, 'sdk', 'targets', 'arm', 'mikroe', 'common', 'include', 'mcu_definitions', 'ai_generated', 'STM32')
+        target_mcu_def_dir = os.path.join(target_sdk_base_dir, 'common', 'include', 'mcu_definitions', 'ai_generated', 'STM32')
+
+        print(Fore.BLUE + f"  Clearing target MCU definitions directory: '{target_mcu_def_dir}'")
+        try:
+            if os.path.exists(target_mcu_def_dir):
+                shutil.rmtree(target_mcu_def_dir)
+                print(Fore.GREEN + f"    Cleared existing directory: '{target_mcu_def_dir}'")
+            os.makedirs(target_mcu_def_dir, exist_ok=True)
+            print(Fore.GREEN + f"    Created directory: '{target_mcu_def_dir}'")
+        except Exception as e:
+            error_message = f"Failed to clear/create MCU definitions directory '{target_mcu_def_dir}': {e}"
+            print(Fore.RED + f"Error: {error_message}")
+            error_log.write(error_message + "\n")
+            continue  # Skip to the next package
+
+        # Find and copy mcu_definitions for each MCU in the current package
+        for mcu_name in mcu_dependencies.get(package, {}).get(doc_ds, {}):
+            src_mcu_def = os.path.join(src_mcu_def_dir, mcu_name)
+            target_mcu_def = os.path.join(target_mcu_def_dir, mcu_name)
+            if not os.path.isdir(src_mcu_def):
+                error_message = f"MCU definitions folder for MCU '{mcu_name}' not found at '{src_mcu_def}'."
+                print(Fore.RED + f"Error: {error_message}")
+                error_log.write(error_message + "\n")
+                continue  # Skip to the next MCU
+
+            try:
+                shutil.copytree(src_mcu_def, target_mcu_def, dirs_exist_ok=True)
+                print(Fore.GREEN + f"    Copied MCU definitions for '{mcu_name}' from '{src_mcu_def}' to '{target_mcu_def}'")
+            except Exception as e:
+                error_message = f"Failed to copy MCU definitions for '{mcu_name}' from '{src_mcu_def}' to '{target_mcu_def}': {e}"
+                print(Fore.RED + f"Error: {error_message}")
+                error_log.write(error_message + "\n")
+
+        # 2. Handle mcu_reg_addresses
+        src_mcu_reg_dir = os.path.join(script_repo_dir, 'sdk', 'targets', 'arm', 'mikroe', 'common', 'include', 'mcu_reg_addresses', 'ai_generated', 'STM32')
+        target_mcu_reg_dir = os.path.join(target_sdk_base_dir, 'common', 'include', 'mcu_reg_addresses', 'ai_generated', 'STM32')
+
+        print(Fore.BLUE + f"  Clearing target MCU register addresses directory: '{target_mcu_reg_dir}'")
+        try:
+            if os.path.exists(target_mcu_reg_dir):
+                shutil.rmtree(target_mcu_reg_dir)
+                print(Fore.GREEN + f"    Cleared existing directory: '{target_mcu_reg_dir}'")
+            os.makedirs(target_mcu_reg_dir, exist_ok=True)
+            print(Fore.GREEN + f"    Created directory: '{target_mcu_reg_dir}'")
+        except Exception as e:
+            error_message = f"Failed to clear/create MCU register addresses directory '{target_mcu_reg_dir}': {e}"
+            print(Fore.RED + f"Error: {error_message}")
+            error_log.write(error_message + "\n")
+            continue  # Skip to the next package
+
+        # Find and copy mcu_reg_addresses for each MCU in the current package
+        for mcu_name in mcu_dependencies.get(package, {}).get(doc_ds, {}):
+            src_mcu_reg = os.path.join(src_mcu_reg_dir, mcu_name)
+            target_mcu_reg = os.path.join(target_mcu_reg_dir, mcu_name)
+            if not os.path.isdir(src_mcu_reg):
+                error_message = f"MCU register addresses folder for MCU '{mcu_name}' not found at '{src_mcu_reg}'."
+                print(Fore.RED + f"Error: {error_message}")
+                error_log.write(error_message + "\n")
+                continue  # Skip to the next MCU
+
+            try:
+                shutil.copytree(src_mcu_reg, target_mcu_reg, dirs_exist_ok=True)
+                print(Fore.GREEN + f"    Copied MCU register addresses for '{mcu_name}' from '{src_mcu_reg}' to '{target_mcu_reg}'")
+            except Exception as e:
+                error_message = f"Failed to copy MCU register addresses for '{mcu_name}' from '{src_mcu_reg}' to '{target_mcu_reg}': {e}"
+                print(Fore.RED + f"Error: {error_message}")
+                error_log.write(error_message + "\n")
+
+        # 3. Handle module implementations in stm32/src
+        src_stm32_src_dir = os.path.join(script_repo_dir, 'sdk', 'targets', 'arm', 'mikroe', 'ai_generated', 'stm32', 'src')
+        target_stm32_src_dir = os.path.join(target_sdk_base_dir, 'ai_generated', 'stm32', 'src')
+
+        print(Fore.BLUE + f"  Processing module implementations in 'ai_generated/stm32/src'...")
+        if not os.path.isdir(src_stm32_src_dir):
+            error_message = f"Source stm32/src directory not found at '{src_stm32_src_dir}'."
+            print(Fore.RED + f"Error: {error_message}")
+            error_log.write(error_message + "\n")
+        else:
+            try:
+                module_implementations = [d for d in os.listdir(src_stm32_src_dir) if os.path.isdir(os.path.join(src_stm32_src_dir, d))]
+                print(Fore.GREEN + f"    Found module implementations: {module_implementations}")
+            except Exception as e:
+                error_message = f"Failed to list module implementations in '{src_stm32_src_dir}': {e}"
+                print(Fore.RED + f"Error: {error_message}")
+                error_log.write(error_message + "\n")
+                module_implementations = []
+
+            for module in module_implementations:
+                print(Fore.CYAN + f"    Processing module implementation: '{module}'")
+                src_module_impl = os.path.join(src_stm32_src_dir, module, 'implementations', doc_ds)
+                target_module_impl = os.path.join(target_stm32_src_dir, module, 'implementations',  doc_ds)
+
+                print(Fore.BLUE + f"      Clearing target implementations directory: '{target_module_impl}'")
+                try:
+                    if os.path.exists(target_module_impl):
+                        shutil.rmtree(target_module_impl)
+                        print(Fore.GREEN + f"        Cleared existing directory: '{target_module_impl}'")
+                    os.makedirs(target_module_impl, exist_ok=True)
+                    print(Fore.GREEN + f"        Created directory: '{target_module_impl}'")
+                except Exception as e:
+                    error_message = f"Failed to clear/create implementations directory '{target_module_impl}': {e}"
+                    print(Fore.RED + f"Error: {error_message}")
+                    error_log.write(error_message + "\n")
+                    continue  # Skip to the next module
+
+                # Copy doc_ds_number folder
+                if not os.path.isdir(src_module_impl):
+                    error_message = f"Source implementations folder for doc_ds '{doc_ds}' not found at '{src_module_impl}'."
+                    print(Fore.RED + f"Error: {error_message}")
+                    error_log.write(error_message + "\n")
+                    continue  # Skip copying this module's implementations
+                else:
+                    try:
+                        shutil.copytree(src_module_impl, target_module_impl, dirs_exist_ok=True)
+                        print(Fore.GREEN + f"        Copied implementations from '{src_module_impl}' to '{target_module_impl}'")
+                    except Exception as e:
+                        error_message = f"Failed to copy implementations from '{src_module_impl}' to '{target_module_impl}': {e}"
+                        print(Fore.RED + f"Error: {error_message}")
+                        error_log.write(error_message + "\n")
+
+        # 4. Handle module implementations in stm32/include
+        src_stm32_include_dir = os.path.join(script_repo_dir, 'sdk', 'targets', 'arm', 'mikroe', 'ai_generated', 'stm32', 'include')
+        target_stm32_include_dir = os.path.join(target_sdk_base_dir, 'ai_generated', 'stm32', 'include')
+
+        print(Fore.BLUE + f"  Processing module implementations in 'ai_generated/stm32/include'...")
+        if not os.path.isdir(src_stm32_include_dir):
+            error_message = f"Source stm32/include directory not found at '{src_stm32_include_dir}'."
+            print(Fore.RED + f"Error: {error_message}")
+            error_log.write(error_message + "\n")
+        else:
+            try:
+                module_implementations_include = [d for d in os.listdir(src_stm32_include_dir) if os.path.isdir(os.path.join(src_stm32_include_dir, d))]
+                print(Fore.GREEN + f"    Found module implementations: {module_implementations_include}")
+            except Exception as e:
+                error_message = f"Failed to list module implementations in '{src_stm32_include_dir}': {e}"
+                print(Fore.RED + f"Error: {error_message}")
+                error_log.write(error_message + "\n")
+                module_implementations_include = []
+
+            for module in module_implementations_include:
+                print(Fore.CYAN + f"    Processing module implementation: '{module}'")
+                if module.lower() == 'rcc':
+                    src_module_include = os.path.join(src_stm32_include_dir, module, 'implementations', doc_ds)
+                    target_module_include = os.path.join(target_stm32_include_dir, module, 'implementations')
+                else:
+                    # One folder deep regardless of name
+                    src_module_include = os.path.join(src_stm32_include_dir, module, f'hal_ll_{module}_pin_map', 'implementations', doc_ds)
+                    target_module_include = os.path.join(target_stm32_include_dir, module, f'hal_ll_{module}_pin_map', 'implementations')
+
+                print(Fore.BLUE + f"      Clearing target implementations directory: '{target_module_include}'")
+                try:
+                    if os.path.exists(target_module_include):
+                        shutil.rmtree(target_module_include)
+                        print(Fore.GREEN + f"        Cleared existing directory: '{target_module_include}'")
+                    os.makedirs(target_module_include, exist_ok=True)
+                    print(Fore.GREEN + f"        Created directory: '{target_module_include}'")
+                except Exception as e:
+                    error_message = f"Failed to clear/create implementations directory '{target_module_include}': {e}"
+                    print(Fore.RED + f"Error: {error_message}")
+                    error_log.write(error_message + "\n")
+                    continue  # Skip to the next module
+
+                target_module_include = os.path.join(target_module_include, doc_ds)
+
+                # Copy implementations
+                if not os.path.isdir(src_module_include):
+                    error_message = f"Source implementations folder not found at '{src_module_include}'."
+                    print(Fore.RED + f"Error: {error_message}")
+                    error_log.write(error_message + "\n")
+                    continue  # Skip copying this module's implementations
+                else:
+                    try:
+                        shutil.copytree(src_module_include, target_module_include, dirs_exist_ok=True)
+                        print(Fore.GREEN + f"        Copied implementations from '{src_module_include}' to '{target_module_include}'")
+                    except Exception as e:
+                        error_message = f"Failed to copy implementations from '{src_module_include}' to '{target_module_include}': {e}"
+                        print(Fore.RED + f"Error: {error_message}")
+                        error_log.write(error_message + "\n")
+
+        # Run recursive build for the package
+        run_builds(mcu_dependencies, package, doc_ds)
+
+def copy_core_files(dependencies, parent_dir, mcu_dependencies, error_log):
+    """
+    Creates package folders and copies required files based on dependencies.
+
+    Args:
+        dependencies (dict): Dictionary containing package names as keys and doc_ds numbers as values.
+        parent_dir (str): The parent directory path.
+        mcu_dependencies (dict): The MCU dependencies dictionary.
+        error_log (file object): The file object for logging errors.
+    """
+    for package, doc_ds in dependencies.items():
+        print(Fore.CYAN + f"Creating package folder for '{package}'...")
+        package_folder = os.path.join(local_app_data_path, 'packages', 'core', 'ARM', 'gcc_clang', package)
+        try:
+            os.makedirs(package_folder, exist_ok=True)
+            # print(Fore.GREEN + f"Successfully created/verified package folder: {package_folder}")
+        except Exception as e:
+            error_message = f"Package '{package}': Failed to create package folder '{package_folder}': {e}"
+            print(Fore.RED + f"Error: {error_message}")
+            error_log.write(error_message + "\n")
+            continue  # Skip to the next package
+
+        # Step 1: Copy doc_ds_num.cmake from ../core/cmake/stm
+        src_cmake_stm = os.path.join(parent_dir, 'core', 'cmake', 'stm', f"{doc_ds}.cmake")
+        dest_cmake_stm = os.path.join(package_folder, 'cmake', 'stm')
+        try:
+            os.makedirs(dest_cmake_stm, exist_ok=True)
+            shutil.copy(src_cmake_stm, dest_cmake_stm)
+            # print(Fore.GREEN + f"Copied '{src_cmake_stm}' to '{dest_cmake_stm}'")
+        except FileNotFoundError:
+            error_message = f"Package '{package}': Source file '{src_cmake_stm}' not found."
+            print(Fore.RED + f"Error: {error_message}")
+            error_log.write(error_message + "\n")
+        except Exception as e:
+            error_message = f"Package '{package}': Failed to copy '{src_cmake_stm}' to '{dest_cmake_stm}': {e}"
+            print(Fore.RED + f"Error: {error_message}")
+            error_log.write(error_message + "\n")
+
+        # Step 2: Copy doc_ds_num.cmake from ../core/cmake/stm/delays
+        src_cmake_delays = os.path.join(parent_dir, 'core', 'cmake', 'stm', 'delays', f"{doc_ds}.cmake")
+        dest_cmake_delays = os.path.join(package_folder, 'cmake', 'stm', 'delays')
+        try:
+            os.makedirs(dest_cmake_delays, exist_ok=True)
+            shutil.copy(src_cmake_delays, dest_cmake_delays)
+            # print(Fore.GREEN + f"Copied '{src_cmake_delays}' to '{dest_cmake_delays}'")
+        except FileNotFoundError:
+            error_message = f"Package '{package}': Source file '{src_cmake_delays}' not found."
+            print(Fore.RED + f"Error: {error_message}")
+            error_log.write(error_message + "\n")
+        except Exception as e:
+            error_message = f"Package '{package}': Failed to copy '{src_cmake_delays}' to '{dest_cmake_delays}': {e}"
+            print(Fore.RED + f"Error: {error_message}")
+            error_log.write(error_message + "\n")
+
+        # Step 3: Copy MCU-specific files
+        for mcu_name in mcu_dependencies.get(package, {}).get(doc_ds, []):
+            if mcu_name == "ERROR":
+                print(Fore.YELLOW + f"Skipping MCU '{mcu_name}' due to previous errors.")
+                continue
+
+            mcu_name_lower = mcu_name.lower()
+            print(Fore.CYAN + f"Processing MCU '{mcu_name}'...")
+
+            # a. Copy mcu_name.json from ../core/def
+            src_json = os.path.join(parent_dir, 'core', 'def', f"{mcu_name}.json")
+            dest_def = os.path.join(package_folder, 'def')
+            try:
+                os.makedirs(dest_def, exist_ok=True)
+                shutil.copy(src_json, dest_def)
+                # print(Fore.GREEN + f"Copied '{src_json}' to '{dest_def}'")
+            except FileNotFoundError:
+                error_message = f"MCU '{mcu_name}': Source file '{src_json}' not found."
+                print(Fore.RED + f"Error: {error_message}")
+                error_log.write(error_message + "\n")
+            except Exception as e:
+                error_message = f"MCU '{mcu_name}': Failed to copy '{src_json}' to '{dest_def}': {e}"
+                print(Fore.RED + f"Error: {error_message}")
+                error_log.write(error_message + "\n")
+
+            # b. Copy mcu_name folder from ../core/def/stm
+            src_def_stm = os.path.join(parent_dir, 'core', 'def', 'stm', mcu_name)
+            dest_def_stm = os.path.join(package_folder, 'def', 'stm', mcu_name)
+            try:
+                shutil.copytree(src_def_stm, dest_def_stm, dirs_exist_ok=True)
+                # print(Fore.GREEN + f"Copied folder '{src_def_stm}' to '{dest_def_stm}'")
+            except FileNotFoundError:
+                error_message = f"MCU '{mcu_name}': Source folder '{src_def_stm}' not found."
+                print(Fore.RED + f"Error: {error_message}")
+                error_log.write(error_message + "\n")
+            except Exception as e:
+                error_message = f"MCU '{mcu_name}': Failed to copy folder '{src_def_stm}' to '{dest_def_stm}': {e}"
+                print(Fore.RED + f"Error: {error_message}")
+                error_log.write(error_message + "\n")
+
+            # c. Copy mcu_name_lower folder from ../core/interrupts/include/interrupts_mcu
+            src_interrupts = os.path.join(parent_dir, 'core', 'interrupts', 'include', 'interrupts_mcu', mcu_name_lower)
+            dest_interrupts = os.path.join(package_folder, 'interrupts', 'include', 'interrupts_mcu', mcu_name_lower)
+            try:
+                shutil.copytree(src_interrupts, dest_interrupts, dirs_exist_ok=True)
+                # print(Fore.GREEN + f"Copied folder '{src_interrupts}' to '{dest_interrupts}'")
+            except FileNotFoundError:
+                error_message = f"MCU '{mcu_name}': Source folder '{src_interrupts}' not found."
+                print(Fore.RED + f"Error: {error_message}")
+                error_log.write(error_message + "\n")
+            except Exception as e:
+                error_message = f"MCU '{mcu_name}': Failed to copy folder '{src_interrupts}' to '{dest_interrupts}': {e}"
+                print(Fore.RED + f"Error: {error_message}")
+                error_log.write(error_message + "\n")
+
+            # d. Copy mcu_name_lower.ld from ../core/linker_scripts/stm
+            src_ld = os.path.join(parent_dir, 'core', 'linker_scripts', 'stm', f"{mcu_name_lower}.ld")
+            dest_ld = os.path.join(package_folder, 'linker_scripts', 'stm')
+            try:
+                os.makedirs(dest_ld, exist_ok=True)
+                shutil.copy(src_ld, dest_ld)
+                # print(Fore.GREEN + f"Copied '{src_ld}' to '{dest_ld}'")
+            except FileNotFoundError:
+                error_message = f"MCU '{mcu_name}': Source file '{src_ld}' not found."
+                print(Fore.RED + f"Error: {error_message}")
+                error_log.write(error_message + "\n")
+            except Exception as e:
+                error_message = f"MCU '{mcu_name}': Failed to copy '{src_ld}' to '{dest_ld}': {e}"
+                print(Fore.RED + f"Error: {error_message}")
+                error_log.write(error_message + "\n")
+
+            # e. Copy mcu_name_lower.s from ../core/startup/stm
+            src_s = os.path.join(parent_dir, 'core', 'startup', 'stm', f"{mcu_name_lower}.s")
+            dest_s = os.path.join(package_folder, 'startup', 'stm')
+            try:
+                os.makedirs(dest_s, exist_ok=True)
+                shutil.copy(src_s, dest_s)
+                # print(Fore.GREEN + f"Copied '{src_s}' to '{dest_s}'")
+            except FileNotFoundError:
+                error_message = f"MCU '{mcu_name}': Source file '{src_s}' not found."
+                print(Fore.RED + f"Error: {error_message}")
+                error_log.write(error_message + "\n")
+            except Exception as e:
+                error_message = f"MCU '{mcu_name}': Failed to copy '{src_s}' to '{dest_s}': {e}"
+                print(Fore.RED + f"Error: {error_message}")
+                error_log.write(error_message + "\n")
+
+            # f. Copy doc_ds_num folder from ../core/system/src/stm
+            src_system = os.path.join(parent_dir, 'core', 'system', 'src', 'stm', doc_ds)
+            dest_system = os.path.join(package_folder, 'system', 'src', 'stm', doc_ds)
+            try:
+                shutil.copytree(src_system, dest_system, dirs_exist_ok=True)
+                # print(Fore.GREEN + f"Copied folder '{src_system}' to '{dest_system}'")
+            except FileNotFoundError:
+                error_message = f"MCU '{mcu_name}': Source folder '{src_system}' not found."
+                print(Fore.RED + f"Error: {error_message}")
+                error_log.write(error_message + "\n")
+            except Exception as e:
+                error_message = f"MCU '{mcu_name}': Failed to copy folder '{src_system}' to '{dest_system}': {e}"
+                print(Fore.RED + f"Error: {error_message}")
+                error_log.write(error_message + "\n")
+
+        # Step 4: Copy everything from ../common to package_folder/common
+        src_common = os.path.join(parent_dir, 'common')
+        dest_common = os.path.join(package_folder)
+        try:
+            shutil.copytree(src_common, dest_common, dirs_exist_ok=True)
+            # print(Fore.GREEN + f"Copied folder '{src_common}' to '{dest_common}'")
+        except FileNotFoundError:
+            error_message = f"Package '{package}': Source folder '{src_common}' not found."
+            print(Fore.RED + f"Error: {error_message}")
+            error_log.write(error_message + "\n")
+        except Exception as e:
+            error_message = f"Package '{package}': Failed to copy folder '{src_common}' to '{dest_common}': {e}"
+            print(Fore.RED + f"Error: {error_message}")
+            error_log.write(error_message + "\n")
+
+        print(Fore.CYAN + f"Completed processing for package '{package}'.\n")
+
 def main():
+    global build_failed
     # Load dependencies from build.json
     dependencies = load_build_json()
 
@@ -567,6 +1031,21 @@ def main():
         print(f"MCU dependencies have been written to {output_file}")
     except Exception as e:
         print(Fore.RED + f"Error writing to {output_file}: {e}")
+
+    with open(error_txt_path, 'a', encoding='utf-8') as error_log:
+        copy_core_files(dependencies, parent_dir, mcu_dependencies, error_log)
+
+    with open(error_txt_path, 'a', encoding='utf-8') as error_log:
+        copy_sdk_files(dependencies, parent_dir, mcu_dependencies, error_log)
+
+    if build_failed == True:
+        # Red text for failure.
+        print("\033[91mRecursive Build Failed!\033[0m")
+        # Fail the job as well.
+        exit(1)
+    else:
+        # Green text for success.
+        print("\033[92mRecursive Build Success!\033[0m")
 
 def connect_database(db_path):
     """

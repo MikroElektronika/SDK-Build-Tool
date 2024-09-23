@@ -1,0 +1,263 @@
+{
+    "doc_ds_193": {
+        "doc_ds_193": {
+            "STM32H7S3A8": [
+                "169/UFBGA"
+            ],
+            "STM32H7S3I8": [
+                "176/LQFP",
+                "176/UFBGA"
+            ],
+            "STM32H7S3L8": [
+                "ERROR",
+                "ERROR"
+            ],
+            "STM32H7S3R8": [
+                "68/VFQFPN"
+            ],
+            "STM32H7S3V8": [
+                "100/LQFP",
+                "100/TFBGA",
+                "101/WLCSP"
+            ],
+            "STM32H7S3Z8": [
+                "144/LQFP",
+                "144/UFBGA"
+            ],
+            "STM32H7S7A8": [
+                "169/UFBGA"
+            ],
+            "STM32H7S7I8": [
+                "176/LQFP",
+                "176/UFBGA"
+            ],
+            "STM32H7S7L8": [
+                "ERROR",
+                "ERROR"
+            ],
+            "STM32H7S7Z8": [
+                "144/UFBGA"
+            ]
+        }
+    },
+    "doc_ds_196": {
+        "doc_ds_196": {
+            "STM32U083KC": [
+                "32/UFQFPN"
+            ],
+            "STM32U083HC": [
+                "42/WLCSP"
+            ],
+            "STM32U083CC": [
+                "48/LQFP",
+                "48/UFQFPN"
+            ],
+            "STM32U083RC": [
+                "64/LQFP",
+                "64/UFBGA"
+            ],
+            "STM32U083MC": [
+                "80/LQFP",
+                "81/UFBGA"
+            ]
+        }
+    },
+    "doc_ds_179": {
+        "doc_ds_179": {
+            "STM32U545CE": [
+                "48/LQFP",
+                "48/UFQFPN"
+            ],
+            "STM32U545JE": [
+                "72/WLCSP"
+            ],
+            "STM32U545NE": [
+                "56/WLCSP"
+            ],
+            "STM32U545RE": [
+                "64/LQFP",
+                "64/UFBGA"
+            ],
+            "STM32U545VE": [
+                "100/LQFP",
+                "100/UFBGA"
+            ]
+        }
+    },
+    "doc_ds_91": {
+        "doc_ds_91": {
+            "STM32H562AG": [
+                "169/UFBGA"
+            ],
+            "STM32H562AI": [
+                "169/UFBGA"
+            ],
+            "STM32H562IG": [
+                "176/LQFP",
+                "176/UFBGA"
+            ],
+            "STM32H562II": [
+                "176/LQFP",
+                "176/UFBGA"
+            ],
+            "STM32H562RG": [
+                "64/LQFP",
+                "68/VFQFPN"
+            ],
+            "STM32H562RI": [
+                "64/LQFP",
+                "68/VFQFPN"
+            ],
+            "STM32H562VG": [
+                "100/LQFP"
+            ],
+            "STM32H562VI": [
+                "100/LQFP"
+            ],
+            "STM32H562ZG": [
+                "144/LQFP"
+            ],
+            "STM32H562ZI": [
+                "144/LQFP"
+            ],
+            "STM32H563AG": [
+                "169/UFBGA"
+            ],
+            "STM32H563AI": [
+                "169/UFBGA"
+            ],
+            "STM32H563IG": [
+                "176/LQFP",
+                "176/UFBGA"
+            ],
+            "STM32H563II": [
+                "176/LQFP",
+                "176/UFBGA"
+            ],
+            "STM32H563MI": [
+                "80/WLCSP"
+            ],
+            "STM32H563RG": [
+                "64/LQFP",
+                "68/VFQFPN"
+            ],
+            "STM32H563RI": [
+                "64/LQFP",
+                "68/VFQFPN"
+            ],
+            "STM32H563VG": [
+                "100/LQFP"
+            ],
+            "STM32H563VI": [
+                "100/LQFP"
+            ],
+            "STM32H563ZG": [
+                "144/LQFP"
+            ],
+            "STM32H563ZI": [
+                "144/LQFP"
+            ]
+        }
+    },
+    "doc_ds_190": {
+        "doc_ds_190": {
+            "STM32WL33C8": [
+                "48/VFQFPN"
+            ],
+            "STM32WL33CB": [
+                "48/VFQFPN"
+            ],
+            "STM32WL33CC": [
+                "48/VFQFPN"
+            ],
+            "STM32WL33K8": [
+                "32/VFQFPN"
+            ],
+            "STM32WL33KB": [
+                "32/VFQFPN"
+            ],
+            "STM32WL33KC": [
+                "32/VFQFPN"
+            ]
+        }
+    },
+    "doc_ds_192": {
+        "doc_ds_192": {
+            "STM32WLE5C8": [
+                "48/UFQFPN"
+            ],
+            "STM32WLE5CB": [
+                "48/UFQFPN"
+            ],
+            "STM32WLE5CC": [
+                "48/UFQFPN"
+            ],
+            "STM32WLE5J8": [
+                "73/UFBGA"
+            ],
+            "STM32WLE5JB": [
+                "73/UFBGA"
+            ],
+            "STM32WLE5JC": [
+                "73/UFBGA"
+            ],
+            "STM32WLE4C8": [
+                "48/UFQFPN"
+            ],
+            "STM32WLE4CB": [
+                "48/UFQFPN"
+            ],
+            "STM32WLE4CC": [
+                "48/UFQFPN"
+            ],
+            "STM32WLE4J8": [
+                "73/UFBGA"
+            ],
+            "STM32WLE4JB": [
+                "73/UFBGA"
+            ],
+            "STM32WLE4JC": [
+                "73/UFBGA"
+            ]
+        }
+    },
+    "doc_ds_164": {
+        "doc_ds_164": {
+            "STM32L552CC": [
+                "48/LQFP",
+                "48/UFQFPN"
+            ],
+            "STM32L552CE": [
+                "48/LQFP",
+                "48/UFQFPN"
+            ],
+            "STM32L552ME": [
+                "81/WLCSP"
+            ],
+            "STM32L552QC": [
+                "132/UFBGA"
+            ],
+            "STM32L552QE": [
+                "132/UFBGA"
+            ],
+            "STM32L552RC": [
+                "64/LQFP"
+            ],
+            "STM32L552RE": [
+                "64/LQFP"
+            ],
+            "STM32L552VC": [
+                "100/LQFP"
+            ],
+            "STM32L552VE": [
+                "100/LQFP"
+            ],
+            "STM32L552ZC": [
+                "144/LQFP"
+            ],
+            "STM32L552ZE": [
+                "144/LQFP"
+            ]
+        }
+    }
+}
