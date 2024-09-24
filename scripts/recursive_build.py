@@ -30,22 +30,28 @@ def extract_version_number(uid):
 
 # Extracts the SDK version from the manifest.json file.
 def get_sdk_version():
-    dbPath = os.path.join(local_app_data_path, 'databases', 'necto_db.db')
-    # Connect to the database.
-    conn = sqlite3.connect(dbPath)
-    cursor = conn.cursor()
+    # Construct the path to the manifest.json file
+    manifest_path = os.path.join(
+        local_app_data_path,
+        'packages',
+        'sdk',
+        'mikroSDK_v2',
+        'src',
+        'manifest.json'
+    )
 
-    cursor.execute(f"""
-        SELECT uid
-        FROM SDKs
-        WHERE installed = '1';
-    """)
-    sdk_versions = cursor.fetchall()
+    # Read and parse the manifest.json file
+    with open(manifest_path, 'r') as f:
+        manifest = json.load(f)
 
-    # Sort the SDK versions based on the extracted numeric value and get the highest one
-    latest_sdk = max(sdk_versions, key=lambda x: extract_version_number(x[0]))[0]
+    # Get the SDK version from the manifest
+    sdk_version = manifest.get('sdk-version')
+    if not sdk_version:
+        raise ValueError("The 'sdk-version' key was not found in manifest.json")
 
-    conn.close()
+    # Remove dots from the version number and format it
+    version_number = sdk_version.replace('.', '')
+    latest_sdk = f"mikrosdk_v{version_number}"
 
     return latest_sdk
 
