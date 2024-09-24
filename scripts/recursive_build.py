@@ -23,6 +23,31 @@ local_app_data_path = '/home/runner/.MIKROE/NECTOStudio7'
 # Path to sdk_build_automation tool.
 toolPath = '/home/runner/MikroElektronika/NECTOStudio/bin'
 
+def print_directory_structure(root_dir, prefix=""):
+    # Check if the root directory exists
+    if not os.path.exists(root_dir):
+        print(f"The path '{root_dir}' does not exist.")
+        return
+
+    # List all files and directories in the current directory
+    items = os.listdir(root_dir)
+
+    # Iterate over each item in the directory
+    for index, item in enumerate(sorted(items)):
+        path = os.path.join(root_dir, item)
+
+        # Check if the current item is the last in the list
+        is_last = index == len(items) - 1
+        connector = "└─" if is_last else "├─"
+
+        # Print the current item with appropriate formatting
+        print(f"{prefix}{connector}{item}")
+
+        # If the item is a directory, recursively print its contents
+        if os.path.isdir(path):
+            extension = "    " if is_last else "│   "
+            print_directory_structure(path, prefix + extension)
+
 # Function to extract numeric value after 'mikrosdk_v'.
 def extract_version_number(uid):
     match = re.search(r'_v(\d+)', uid)
@@ -735,6 +760,8 @@ def copy_sdk_files(dependencies, script_repo_dir, mcu_dependencies, error_log):
                         print(Fore.RED + f"Error: {error_message}")
                         error_log.write(error_message + "\n")
 
+        core_folder = os.path.join(local_app_data_path, "packages", "sdk", "mikroSDK_v2", "src", "targets", "arm", "mikroe", "core")
+        print_directory_structure(core_folder)
         # Run recursive build for the package
         run_builds(mcu_dependencies, package, doc_ds)
 
