@@ -92,6 +92,10 @@ def run_builds(mcu_dependencies, current_package, doc_ds):
     print(f"\033[93mRunning build for {len(mcu_dependencies[current_package][doc_ds])} MCUs in {current_package}\033[0m")
     for mcu in mcu_dependencies[current_package][doc_ds]:
         for compiler in compilers:
+            # Construct the directory path
+            dir_to_create = os.path.join(testPath, 'mcu_build', compiler)
+            # Create the directory if it doesn't exist
+            os.makedirs(dir_to_create, exist_ok=True)
             print(f"\033[93mRunning build for {mcu} MCU with {compiler}\033[0m")
             cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk}" --board "GENERIC_ARM_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
             run_cmd(cmd)
