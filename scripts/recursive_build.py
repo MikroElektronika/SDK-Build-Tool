@@ -697,7 +697,7 @@ def copy_sdk_files(dependencies, script_repo_dir, mcu_dependencies, error_log):
 
             for module in module_implementations_include:
                 print(Fore.CYAN + f"    Processing module implementation: '{module}'")
-                if module.lower() == 'rcc':
+                if module.lower() == 'rcc' or module.lower() == 'gpio':
                     src_module_include = os.path.join(src_stm32_include_dir, module, 'implementations', doc_ds)
                     target_module_include = os.path.join(target_stm32_include_dir, module, 'implementations')
                 else:
