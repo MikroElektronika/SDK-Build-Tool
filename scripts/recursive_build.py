@@ -89,9 +89,8 @@ def run_builds(mcu_dependencies, current_package, doc_ds):
     sdk = get_sdk_version()
     compilers = ['gcc_arm_none_eabi', 'clang-llvm']
     # Run build for all MCUs from package.
-    print(f"\033[93mRunning build for {current_package}\033[0m")
+    print(f"\033[93mRunning build for {len(mcu_dependencies[current_package][doc_ds])} MCUs in {current_package}\033[0m")
     for mcu in mcu_dependencies[current_package][doc_ds]:
-        print(f"\033[93mRunning build for {len(mcu_dependencies[current_package][doc_ds])} MCUs\033[0m")
         for compiler in compilers:
             print(f"\033[93mRunning build for {mcu} MCU with {compiler}\033[0m")
             cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk}" --board "GENERIC_ARM_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
