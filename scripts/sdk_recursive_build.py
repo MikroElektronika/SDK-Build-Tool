@@ -10,6 +10,9 @@ from pathlib import Path
 repo_owner = "MikroElektronika"
 repo_name = "mikrosdk_v2"
 
+# Global variable for local_app_data_path
+local_app_data_path = '/home/runner/.MIKROE/NECTOStudio7'
+
 # Path to the necto_db.db file.
 dbPath = '/home/runner/.MIKROE/NECTOStudio7/databases/necto_db.db'
 
@@ -36,11 +39,31 @@ compiler_list = {
 }
 
 # Extracts the SDK version from the manifest.json file.
-def get_sdk_version(manifest_path):
+def get_sdk_version():
+    # Construct the path to the manifest.json file
+    manifest_path = os.path.join(
+        local_app_data_path,
+        'packages',
+        'sdk',
+        'mikroSDK_v2',
+        'src',
+        'manifest.json'
+    )
+
+    # Read and parse the manifest.json file
     with open(manifest_path, 'r') as f:
         manifest = json.load(f)
 
-        return manifest.get("sdk-version", "")
+    # Get the SDK version from the manifest
+    sdk_version = manifest.get('sdk-version')
+    if not sdk_version:
+        raise ValueError("The 'sdk-version' key was not found in manifest.json")
+
+    # Remove dots from the version number and format it
+    version_number = sdk_version.replace('.', '')
+    latest_sdk = f"mikrosdk_v{version_number}"
+
+    return latest_sdk
 
 # Runs the bash command.
 def run_cmd(cmd, changes_dict, status_key):
@@ -86,7 +109,7 @@ def run_cmd(cmd, changes_dict, status_key):
 # Runs the build commands for each member of mcu_list, board_list, and mcu_card_list.
 def run_builds(changes_dict):
     # Get the SDK version from manifest.json file.
-    sdk_version = get_sdk_version('manifest.json').replace(".", "")
+    sdk_version = get_sdk_version()
 
     # Run build for all MCUs from mcu_list.
     print(f"\033[93mRunning build for {len(changes_dict['mcu_list'])} MCUs\033[0m")
