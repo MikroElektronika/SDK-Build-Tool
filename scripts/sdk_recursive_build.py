@@ -24,7 +24,7 @@ build_failed = False
 
 # Supported compilers list for each architecture.
 compiler_list = {
-    'ARM': ['gcc_arm_none_eabi', 'clang-llvm', 'mikrocarm'],
+    'ARM': ['mikrocarm', 'gcc_arm_none_eabi', 'clang-llvm'],
     'RISCV': ['xpack-riscv-none-embed-gcc', 'clang-llvm-riscv'],
     'PIC': ['mikrocpic', 'mchp_xc8'],
     'DSPIC': ['mikrocdspic', 'mchp_xc16'],
