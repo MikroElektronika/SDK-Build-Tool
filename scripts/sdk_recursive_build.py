@@ -127,11 +127,11 @@ def run_builds(changes_dict):
     # Run build for all MCU cards from mcu_card_list.
     print(f"\033[93mRunning build for {len(changes_dict['mcu_card_list'])} MCU cards\033[0m")
     compilers = get_compilers('MCU_CARD_FOR_KINETIS_MK64FN1M0VDC12', is_mcu=True)
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "0" --compiler "{compilers[0]}" --sdk "{sdk_version}" --mcu "MCU_CARD_FOR_KINETIS_MK64FN1M0VDC12" --installPrefix "{testPath}/mcu_card_build/"'
-    run_cmd(cmd, changes_dict, 'MCU_CARD_FOR_KINETIS_MK64FN1M0VDC12' + ' ' + 'gcc_arm_none_eabi')
+    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "0" --compiler "{compilers[0][0]}" --sdk "{sdk_version}" --mcu "MCU_CARD_FOR_KINETIS_MK64FN1M0VDC12" --installPrefix "{testPath}/mcu_card_build/"'
+    run_cmd(cmd, changes_dict, 'MCU_CARD_FOR_KINETIS_MK64FN1M0VDC12' + ' ' + compilers[0][0])
     # for mcu_card in changes_dict['mcu_card_list']:
         # compilers = get_compilers(mcu_card, is_mcu=True)
-        # cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "0" --compiler "{compilers[0]}" --sdk "{sdk_version}" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build/"'
+        # cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "0" --compiler "{compilers[0][0]}" --sdk "{sdk_version}" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build/"'
         # run_cmd(cmd, changes_dict, mcu + ' ' + compilers[0])
 
 # Returns the list of compilers based on the given name and type.
