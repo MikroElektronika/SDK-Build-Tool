@@ -60,7 +60,14 @@ def get_sdk_version():
     if rows:
         sdk_list.extend([row[0] for row in rows])
 
-    return sorted(sdk_list)[-1]
+    # Function to extract the numeric version from a string
+    def extract_version(version_string):
+        match = re.search(r'mikrosdk_v(\d+)', version_string)
+        if match:
+            return int(match.group(1))  # Return the version as an integer
+        return -1  # Return a default value if no match is found
+
+    return sorted(sdk_list, key=extract_version)[-1]
 
 # Runs the bash command.
 def run_cmd(cmd, changes_dict, status_key):
@@ -217,29 +224,43 @@ def get_latest_releases():
         print(f"Error fetching tags: {e}")
         return None, None
 
-# Fetches metadata.json from release.
-def fetch_metadata_json(release):
-    response = requests.get(f'https://github.com/{repo_owner}/{repo_name}/releases/download/{release}/metadata.json')
-    response.raise_for_status()
-    return response.json()
-
-def get_card_files():
+def get_card_names():
     card_names = []
-    latest, previous = get_latest_releases()
-    metadata = fetch_metadata_json(latest)
-    for package, details in metadata.get('packages', {}).items():
-        if details.get('type') == 'card':
-            card_names.append(details.get('package_name'))
+    sdk_version = get_sdk_version()
+    conn = sqlite3.connect(os.path.join(local_app_data_path, 'databases', 'necto_db.db'))
+
+    # Create REGEXP function for python script.
+    conn.create_function("REGEXP", 2, regexp)
+    cursor = conn.cursor()
+
+    cursor.execute(f"""
+        SELECT device_uid
+        FROM SDKToDevice
+        WHERE sdk_uid = "{sdk_version}";
+    """)
+    rows = cursor.fetchall()
+    if rows:
+        card_names.extend([row[0] for row in rows])
 
     return card_names
 
-def get_board_files():
+def get_board_names():
     board_names = []
-    latest, previous = get_latest_releases()
-    metadata = fetch_metadata_json(latest)
-    for package, details in metadata.get('packages', {}).items():
-        if details.get('type') == 'board':
-            board_names.append(details.get('package_name'))
+    sdk_version = get_sdk_version()
+    conn = sqlite3.connect(os.path.join(local_app_data_path, 'databases', 'necto_db.db'))
+
+    # Create REGEXP function for python script.
+    conn.create_function("REGEXP", 2, regexp)
+    cursor = conn.cursor()
+
+    cursor.execute(f"""
+        SELECT board_uid
+        FROM SDKToBoard
+        WHERE sdk_uid = "{sdk_version}";
+    """)
+    rows = cursor.fetchall()
+    if rows:
+        board_names.extend([row[0] for row in rows])
 
     return board_names
 
@@ -633,16 +654,16 @@ def main():
 
         # Classify the changed files.
         classify_changes(changes_dict)
+
+        # Get the necessary data from the database.
+        query_database(changes_dict)
     else:
         # Check if it's a job for Boards build or not.
         if os.getenv('BUILD_BOARDS') == '1':
-            changes_dict['board_list'] = get_board_files()
+            changes_dict['board_list'] = get_board_names()
         # Check if it's a job for Cards build or not.
         if os.getenv('BUILD_CARDS') == '1':
-            changes_dict['mcu_card_list'] = get_card_files()
-
-    # Get the necessary data from the database.
-    query_database(changes_dict)
+            changes_dict['mcu_card_list'] = get_card_names()
 
     # Finally, run the SDK build tool.
     run_builds(changes_dict)
