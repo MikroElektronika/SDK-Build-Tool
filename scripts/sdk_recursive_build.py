@@ -481,6 +481,11 @@ def check_cmake_file_for_include_path(cmake_file_path, include_path):
 
 # Define a REGEXP function for SQLite.
 def regexp(expr, item):
+    # Handle the case where item is None
+    if item is None:
+        return False
+
+    # Compile the regular expression and search the item
     reg = re.compile(expr)
     return reg.search(item) is not None
 
