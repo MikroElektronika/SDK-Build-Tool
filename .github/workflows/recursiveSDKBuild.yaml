@@ -64,13 +64,13 @@ jobs:
           if [[ "${{ github.event.inputs.build_type }}" == 'All changed files' ]]; then
             export BUILD_CHANGED_FILES=1
             echo "Building all changed files."
-          else if [[ "${{ github.event.inputs.build_type }}" == 'All Boards' ]]; then
+          elif [[ "${{ github.event.inputs.build_type }}" == 'All Boards' ]]; then
             export BUILD_BOARDS=1
             echo "Building Board files."
-          else if [[ "${{ github.event.inputs.build_type }}" == 'All Cards' ]]; then
+          elif [[ "${{ github.event.inputs.build_type }}" == 'All Cards' ]]; then
             export BUILD_CARDS=1
             echo "Building Card files."
-          else if [[ "${{ github.event.inputs.build_type }}" == 'All Cards and Boards' ]]; then
+          elif [[ "${{ github.event.inputs.build_type }}" == 'All Cards and Boards' ]]; then
             export BUILD_CARDS=1
             export BUILD_BOARDS=1
             echo "Building Card and Board files."
