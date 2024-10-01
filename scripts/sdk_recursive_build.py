@@ -13,17 +13,11 @@ repo_name = "mikrosdk_v2"
 # Global variable for local_app_data_path
 local_app_data_path = '/home/runner/.MIKROE/NECTOStudio7'
 
-# Path to the necto_db.db file.
-dbPath = '/home/runner/.MIKROE/NECTOStudio7/databases/necto_db.db'
-
-# Path to the released SDK folder.
-sdkPath = '/home/runner/.MIKROE/NECTOStudio7/packages/sdk/mikroSDK_v2/src'
-
 # Path for storing artifacts.
 testPath = '/home/runner/test_results'
 
 # Path to sdk_build_automation tool.
-toolPath = '/home/runner/MikroElektronika/NECTOStudio/bin'
+toolPath = '/home/runner/MikroElektronika/NECTOStudio/bin/sdk_build_automation'
 
 # Global variable to trace failed tests.
 build_failed = False
@@ -117,27 +111,27 @@ def run_builds(changes_dict):
         # Get the necessary compiler for the current MCU build.
         compilers, architecture = get_compilers(mcu, is_mcu=True)
         for compiler in compilers:
-            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
             run_cmd(cmd, changes_dict, mcu + ' ' + compiler)
 
     # Run build for all boards from board_list.
     print(f"\033[93mRunning build for {len(changes_dict['board_list'])} boards\033[0m")
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler[0]}" --sdk "{sdk_version}" --board "MIKROMEDIA_3_FOR_PIC32MZ_CAPACITIVE_FPI_WITH_FRAME" --installPrefix "{testPath}/board_build/"'
+    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "0" --compiler "{compiler[0]}" --sdk "{sdk_version}" --board "MIKROMEDIA_3_FOR_PIC32MZ_CAPACITIVE_FPI_WITH_FRAME" --installPrefix "{testPath}/board_build/"'
     compilers = get_compilers('MIKROMEDIA_3_FOR_PIC32MZ_CAPACITIVE_FPI_WITH_FRAME', is_mcu=False)
     run_cmd(cmd, changes_dict, 'MIKROMEDIA_3_FOR_PIC32MZ_CAPACITIVE_FPI_WITH_FRAME' + ' ' + compilers[0])
     # for board in changes_dict['board_list']:
         # compilers = get_compilers(board, is_mcu=False)
-        # cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler[0]}" --sdk "{sdk_version}" --board "{board}" --installPrefix "{testPath}/board_build/"'
+        # cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "0" --compiler "{compiler[0]}" --sdk "{sdk_version}" --board "{board}" --installPrefix "{testPath}/board_build/"'
         # run_cmd(cmd, changes_dict, board + ' ' + compilers[0])
 
     # Run build for all MCU cards from mcu_card_list.
     print(f"\033[93mRunning build for {len(changes_dict['mcu_card_list'])} MCU cards\033[0m")
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compilers[0]}" --sdk "{sdk_version}" --mcu "MCU_CARD_FOR_KINETIS_MK64FN1M0VDC12" --installPrefix "{testPath}/mcu_card_build/"'
+    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "0" --compiler "{compilers[0]}" --sdk "{sdk_version}" --mcu "MCU_CARD_FOR_KINETIS_MK64FN1M0VDC12" --installPrefix "{testPath}/mcu_card_build/"'
     compilers = get_compilers('MCU_CARD_FOR_KINETIS_MK64FN1M0VDC12', is_mcu=True)
     run_cmd(cmd, changes_dict, mcu + ' ' + compilers[0])
     # for mcu_card in changes_dict['mcu_card_list']:
         # compilers = get_compilers(mcu_card, is_mcu=True)
-        # cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compilers[0]}" --sdk "{sdk_version}" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build/"'
+        # cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "0" --compiler "{compilers[0]}" --sdk "{sdk_version}" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build/"'
         # run_cmd(cmd, changes_dict, mcu + ' ' + compilers[0])
 
 # Returns the list of compilers based on the given name and type.
@@ -156,7 +150,7 @@ def get_compilers(name, is_mcu=True):
         elif "AT" in name and "ATSAM" not in name:
             return compiler_list["AVR"], "AVR"
     else:
-        conn = sqlite3.connect(dbPath)
+        conn = sqlite3.connect(os.path.join(local_app_data_path, 'databases', 'necto_db.db'))
         cursor = conn.cursor()
 
         # Get all device_uids associated with the board name.
@@ -313,7 +307,7 @@ def classify_changes(changes_dict):
         if any(file.startswith(path) for path in case_2_paths):
             # Board name can differ from folder name but always has the same path.
             folder_name = Path(file).parts[4]
-            board_cmake_file = Path(sdkPath) / f'{sdk_version}/src/bsp/board/include/boards' / folder_name / 'board.cmake'
+            board_cmake_file = Path(os.path.join(local_app_data_path, 'packages', 'sdk', 'mikroSDK_v2', 'src')) / f'{sdk_version}/src/bsp/board/include/boards' / folder_name / 'board.cmake'
             # If board.cmake file was found add it to the list for building in sdk_config format.
             if board_cmake_file.exists():
                 extract_board_name(board_cmake_file, changes_dict)
@@ -361,7 +355,7 @@ def check_and_extract_regex(folder_path, changes_dict):
 # Extracts and stores regex from the given cmake file.
 def extract_regex(cmake_file, changes_dict):
     try:
-        with open(str(sdkPath) + str(cmake_file), 'r') as file:
+        with open(str(os.path.join(local_app_data_path, 'packages', 'sdk', 'mikroSDK_v2', 'src')) + str(cmake_file), 'r') as file:
             content = file.read()
             # Find all matches for MCU_* MATCHES or MCU_* STREQUAL.
             regexes = re.findall(r'\${[^}]*MCU[^}]*}\s+(?:MATCHES|STREQUAL)\s+"([^"]+)"', content)
@@ -496,7 +490,7 @@ def query_database(changes_dict):
     sdk_version = get_sdk_version()
 
     # Connect to the database.
-    conn = sqlite3.connect(dbPath)
+    conn = sqlite3.connect(os.path.join(local_app_data_path, 'databases', 'necto_db.db'))
 
     # Create REGEXP function for python script.
     conn.create_function("REGEXP", 2, regexp)
@@ -508,7 +502,7 @@ def query_database(changes_dict):
     for mcu_card in changes_dict['mcu_card_list']:
         cursor.execute(f"""
             SELECT uid
-            FROM Boards
+            FROM Devices
             WHERE installer_package REGEXP ?;
         """, (mcu_card,))
         rows = cursor.fetchall()
