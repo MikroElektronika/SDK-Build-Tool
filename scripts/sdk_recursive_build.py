@@ -32,32 +32,35 @@ compiler_list = {
     'AVR': ['mikrocavr']
 }
 
+# Define a REGEXP function for SQLite.
+def regexp(expr, item):
+    # Handle the case where item is None
+    if item is None:
+        return False
+
+    # Compile the regular expression and search the item
+    reg = re.compile(expr)
+    return reg.search(item) is not None
+
 # Extracts the SDK version from the manifest.json file.
 def get_sdk_version():
-    # Construct the path to the manifest.json file
-    manifest_path = os.path.join(
-        local_app_data_path,
-        'packages',
-        'sdk',
-        'mikroSDK_v2',
-        'src',
-        'manifest.json'
-    )
+    sdk_list = []
+    conn = sqlite3.connect(os.path.join(local_app_data_path, 'databases', 'necto_db.db'))
 
-    # Read and parse the manifest.json file
-    with open(manifest_path, 'r') as f:
-        manifest = json.load(f)
+    # Create REGEXP function for python script.
+    conn.create_function("REGEXP", 2, regexp)
+    cursor = conn.cursor()
 
-    # Get the SDK version from the manifest
-    sdk_version = manifest.get('sdk-version')
-    if not sdk_version:
-        raise ValueError("The 'sdk-version' key was not found in manifest.json")
+    cursor.execute(f"""
+        SELECT uid
+        FROM SDKs
+        WHERE uid REGEXP "mikrosdk_v";
+    """)
+    rows = cursor.fetchall()
+    if rows:
+        sdk_list.extend([row[0] for row in rows])
 
-    # Remove dots from the version number and format it
-    version_number = sdk_version.replace('.', '')
-    latest_sdk = f"mikrosdk_v{version_number}"
-
-    return latest_sdk
+    return sorted(sdk_list)[-1]
 
 # Runs the bash command.
 def run_cmd(cmd, changes_dict, status_key):
@@ -125,8 +128,8 @@ def run_builds(changes_dict):
     print(f"\033[93mRunning build for {len(changes_dict['mcu_card_list'])} MCU cards\033[0m")
     for mcu_card in changes_dict['mcu_card_list']:
         compilers, board = get_compilers(mcu_card, is_mcu=True)
-        cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "0" --compiler "{compilers[0][0]}" --sdk "{sdk_version}" --board "{board}" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build/"'
-        run_cmd(cmd, changes_dict, mcu_card + ' ' + compilers[0][0])
+        cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "0" --compiler "{compilers[0]}" --sdk "{sdk_version}" --board "{board}" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build/"'
+        run_cmd(cmd, changes_dict, mcu_card + ' ' + compilers[0])
 
 # Returns the list of compilers based on the given name and type.
 def get_compilers(name, is_mcu=True):
@@ -479,16 +482,6 @@ def check_cmake_file_for_include_path(cmake_file_path, include_path):
     except Exception as e:
         print(f"Error reading {cmake_file_path}: {e}")
     return False
-
-# Define a REGEXP function for SQLite.
-def regexp(expr, item):
-    # Handle the case where item is None
-    if item is None:
-        return False
-
-    # Compile the regular expression and search the item
-    reg = re.compile(expr)
-    return reg.search(item) is not None
 
 # Queries the database to update mcu_card_list, board_list, and mcu_list.
 def query_database(changes_dict):
