@@ -9,6 +9,7 @@ on:
         options:
           - All Cards
           - All Boards
+          - All Cards and Boards
           - All changed files
           - All files
       necto_type:
