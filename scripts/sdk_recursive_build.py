@@ -153,7 +153,7 @@ def get_compilers(name, is_mcu=True):
 
         if any(substring in name for substring in ["ATSAM", "STM", "TM4C", "MK"]):
             return compiler_list["ARM"], board_uids[0][0]
-        elif "GD32" in name:
+        elif any(substring in name for substring in ["GD32", "RISC"]):
             return compiler_list["RISCV"], board_uids[0][0]
         elif "PIC32" in name:
             return compiler_list["PIC32"], board_uids[0][0]
