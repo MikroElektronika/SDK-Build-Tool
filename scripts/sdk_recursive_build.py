@@ -109,9 +109,9 @@ def run_builds(changes_dict):
     print(f"\033[93mRunning build for {len(changes_dict['mcu_list'])} MCUs\033[0m")
     for mcu in changes_dict['mcu_list']:
         # Get the necessary compiler for the current MCU build.
-        compilers, architecture = get_compilers(mcu, is_mcu=True)
+        compilers, board = get_compilers(mcu, is_mcu=True)
         for compiler in compilers:
-            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "{board}" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
             run_cmd(cmd, changes_dict, mcu + ' ' + compiler)
 
     # Run build for all boards from board_list.
@@ -126,33 +126,40 @@ def run_builds(changes_dict):
 
     # Run build for all MCU cards from mcu_card_list.
     print(f"\033[93mRunning build for {len(changes_dict['mcu_card_list'])} MCU cards\033[0m")
-    compilers = get_compilers('MCU_CARD_FOR_KINETIS_MK64FN1M0VDC12', is_mcu=True)
-    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "0" --compiler "{compilers[0][0]}" --sdk "{sdk_version}" --board "UNI_DS_V8" --mcu "MCU_CARD_FOR_KINETIS_MK64FN1M0VDC12" --installPrefix "{testPath}/mcu_card_build/"'
-    run_cmd(cmd, changes_dict, 'MCU_CARD_FOR_KINETIS_MK64FN1M0VDC12' + ' ' + compilers[0][0])
-    # for mcu_card in changes_dict['mcu_card_list']:
-        # compilers = get_compilers(mcu_card, is_mcu=True)
-        # cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "0" --compiler "{compilers[0][0]}" --sdk "{sdk_version}" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build/"'
-        # run_cmd(cmd, changes_dict, mcu + ' ' + compilers[0])
+    # compilers, board = get_compilers('MCU_CARD_FOR_KINETIS_MK64FN1M0VDC12', is_mcu=True)
+    # cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "0" --compiler "{compilers[0][0]}" --sdk "{sdk_version}" --board "{board}" --mcu "MCU_CARD_FOR_KINETIS_MK64FN1M0VDC12" --installPrefix "{testPath}/mcu_card_build/"'
+    # run_cmd(cmd, changes_dict, 'MCU_CARD_FOR_KINETIS_MK64FN1M0VDC12' + ' ' + compilers[0][0])
+    for mcu_card in changes_dict['mcu_card_list']:
+        compilers = get_compilers(mcu_card, is_mcu=True)
+        cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "0" --compiler "{compilers[0][0]}" --sdk "{sdk_version}" --board "{board}" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build/"'
+        run_cmd(cmd, changes_dict, mcu + ' ' + compilers[0])
 
 # Returns the list of compilers based on the given name and type.
 def get_compilers(name, is_mcu=True):
+    conn = sqlite3.connect(os.path.join(local_app_data_path, 'databases', 'necto_db.db'))
+    cursor = conn.cursor()
     if is_mcu:
-        if any(substring in name for substring in ["ATSAM", "STM", "TM4C", "MK"]):
-            return compiler_list["ARM"], "ARM"
-        elif "GD32" in name:
-            return compiler_list["RISCV"], "RISCV"
-        elif "PIC32" in name:
-            return compiler_list["PIC32"], "PIC32"
-        elif any(substring in name for substring in ["DSPIC", "PIC24", "dsPIC"]):
-            return compiler_list["DSPIC"], "DSPIC"
-        elif any(substring in name for substring in ["PIC18", "PIC16", "PIC12", "PIC10"]):
-            return compiler_list["PIC"], "PIC"
-        elif "AT" in name and "ATSAM" not in name:
-            return compiler_list["AVR"], "AVR"
-    else:
-        conn = sqlite3.connect(os.path.join(local_app_data_path, 'databases', 'necto_db.db'))
-        cursor = conn.cursor()
+        # Get all board_uids associated with the board name.
+        cursor.execute(f"""
+            SELECT board_uid
+            FROM BoardToDevice
+            WHERE device_uid = '{name}';
+        """)
+        board_uids = cursor.fetchall()
 
+        if any(substring in name for substring in ["ATSAM", "STM", "TM4C", "MK"]):
+            return compiler_list["ARM"], board_uids[0][0]
+        elif "GD32" in name:
+            return compiler_list["RISCV"], board_uids[0][0]
+        elif "PIC32" in name:
+            return compiler_list["PIC32"], board_uids[0][0]
+        elif any(substring in name for substring in ["DSPIC", "PIC24", "dsPIC"]):
+            return compiler_list["DSPIC"], board_uids[0][0]
+        elif any(substring in name for substring in ["PIC18", "PIC16", "PIC12", "PIC10"]):
+            return compiler_list["PIC"], board_uids[0][0]
+        elif "AT" in name and "ATSAM" not in name:
+            return compiler_list["AVR"], board_uids[0][0]
+    else:
         # Get all device_uids associated with the board name.
         cursor.execute(f"""
             SELECT device_uid
