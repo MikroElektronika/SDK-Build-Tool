@@ -234,9 +234,11 @@ def get_card_names():
     cursor = conn.cursor()
 
     cursor.execute(f"""
-        SELECT device_uid
+        SELECT SDKToDevice.device_uid
         FROM SDKToDevice
-        WHERE sdk_uid = "{sdk_version}";
+        INNER JOIN Devices ON SDKToDevice.device_uid = Devices.uid
+        WHERE SDKToDevice.sdk_uid = '{sdk_version}'
+        AND SDKToDevice.device_uid LIKE '%\\_%' ESCAPE '\\';
     """)
     rows = cursor.fetchall()
     if rows:
