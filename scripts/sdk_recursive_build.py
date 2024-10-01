@@ -17,7 +17,7 @@ local_app_data_path = '/home/runner/.MIKROE/NECTOStudio7'
 dbPath = '/home/runner/.MIKROE/NECTOStudio7/databases/necto_db.db'
 
 # Path to the released SDK folder.
-sdkPath = '/home/runner/.MIKROE/NECTOStudio7/packages/sdk'
+sdkPath = '/home/runner/.MIKROE/NECTOStudio7/packages/sdk/mikroSDK_v2/src'
 
 # Path for storing artifacts.
 testPath = '/home/runner/test_results'
@@ -117,7 +117,7 @@ def run_builds(changes_dict):
         # Get the necessary compiler for the current MCU build.
         compilers, architecture = get_compilers(mcu, is_mcu=True)
         for compiler in compilers:
-            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v{sdk_version}" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_{architecture}_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
             run_cmd(cmd, changes_dict, mcu + ' ' + compiler)
 
     # Run build for all boards from board_list.
@@ -289,7 +289,7 @@ def classify_changes(changes_dict):
     # List for storing source and header files affected by the changes.
     other_files = []
 
-    sdk_version = get_sdk_version('manifest.json')
+    sdk_version = get_sdk_version()
 
     for file in changes_dict['changed_files']:
         # Ensure we handle paths correctly.
@@ -360,10 +360,8 @@ def check_and_extract_regex(folder_path, changes_dict):
 
 # Extracts and stores regex from the given cmake file.
 def extract_regex(cmake_file, changes_dict):
-    sdk_version = sdk_version = get_sdk_version('manifest.json')
-
     try:
-        with open(str(sdkPath) + f'/{sdk_version}/src/' + str(cmake_file), 'r') as file:
+        with open(str(sdkPath) + str(cmake_file), 'r') as file:
             content = file.read()
             # Find all matches for MCU_* MATCHES or MCU_* STREQUAL.
             regexes = re.findall(r'\${[^}]*MCU[^}]*}\s+(?:MATCHES|STREQUAL)\s+"([^"]+)"', content)
@@ -495,7 +493,7 @@ def regexp(expr, item):
 # Queries the database to update mcu_card_list, board_list, and mcu_list.
 def query_database(changes_dict):
     # Get the SDK version from the manifest.json file.
-    sdk_version = get_sdk_version('manifest.json').replace(".", "")
+    sdk_version = get_sdk_version()
 
     # Connect to the database.
     conn = sqlite3.connect(dbPath)
@@ -546,7 +544,7 @@ def query_database(changes_dict):
                 SELECT SDKToDevice.device_uid
                 FROM SDKToDevice
                 INNER JOIN Devices ON SDKToDevice.device_uid = Devices.uid
-                WHERE SDKToDevice.sdk_uid = 'mikrosdk_v{sdk_version}'
+                WHERE SDKToDevice.sdk_uid = '{sdk_version}'
                 AND SDKToDevice.device_uid REGEXP ?
                 AND Devices.sdk_support = '1'
                 AND SDKToDevice.device_uid NOT LIKE '%\\_%' ESCAPE '\\';
@@ -569,7 +567,7 @@ def query_database(changes_dict):
                 SELECT SDKToDevice.device_uid
                 FROM SDKToDevice
                 INNER JOIN Devices ON SDKToDevice.device_uid = Devices.uid
-                WHERE SDKToDevice.sdk_uid = 'mikrosdk_v{sdk_version}'
+                WHERE SDKToDevice.sdk_uid = '{sdk_version}'
                 AND Devices.sdk_support = '1'
                 AND SDKToDevice.device_uid NOT LIKE '%\\_%' ESCAPE '\\';
             """)
@@ -584,7 +582,7 @@ def query_database(changes_dict):
             cursor.execute(f"""
                 SELECT device_uid
                 FROM SDKToDevice
-                WHERE sdk_uid = 'mikrosdk_v{sdk_version}'
+                WHERE sdk_uid = '{sdk_version}'
                 AND device_uid REGEXP '_';
             """)
             rows = cursor.fetchall()
@@ -597,7 +595,7 @@ def query_database(changes_dict):
             cursor.execute(f"""
                 SELECT board_uid
                 FROM SDKToBoard
-                WHERE sdk_uid = 'mikrosdk_v{sdk_version}';
+                WHERE sdk_uid = '{sdk_version}';
             """)
             rows = cursor.fetchall()
             if rows:
