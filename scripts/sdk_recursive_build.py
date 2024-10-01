@@ -101,7 +101,8 @@ def run_builds(changes_dict):
     print(f"\033[93mRunning build for {len(changes_dict['board_list'])} boards\033[0m")
     for board in changes_dict['board_list']:
         compilers = get_compilers(board, is_mcu=False)
-        cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler[0]}" --sdk "{sdk_version}" --board "{board}" --installPrefix "{testPath}/board_build/"'
+        # cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler[0]}" --sdk "{sdk_version}" --board "{board}" --installPrefix "{testPath}/board_build/"'
+        cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler[0]}" --sdk "{sdk_version}" --board "MIKROMEDIA_3_FOR_PIC32MZ_CAPACITIVE_FPI_WITH_FRAME" --installPrefix "{testPath}/board_build/"'
         run_cmd(cmd, changes_dict, mcu + ' ' + compiler)
 
     # Run build for all MCU cards from mcu_card_list.
@@ -109,7 +110,7 @@ def run_builds(changes_dict):
     for mcu_card in changes_dict['mcu_card_list']:
         compilers = get_compilers(mcu_card, is_mcu=True)
         # cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler[0]}" --sdk "{sdk_version}" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build/{compiler}"'
-        cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler[0]}" --sdk "{sdk_version}" --mcu "{mcu_card}" --installPrefix "{testPath}/mcu_card_build/"'
+        cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler[0]}" --sdk "{sdk_version}" --mcu "MCU_CARD_FOR_KINETIS_MK64FN1M0VDC12" --installPrefix "{testPath}/mcu_card_build/"'
         run_cmd(cmd, changes_dict, mcu + ' ' + compiler)
 
 # Returns the list of compilers based on the given name and type.
