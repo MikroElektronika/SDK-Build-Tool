@@ -630,7 +630,7 @@ def updateDevicesFromCore(dbs, queries):
     return
 
 def package_asset(source_dir, output_dir, arch, entry_name, changes_dict):
-    cmake_files = find_cmake_files(os.path.join(source_dir, "cmake"))
+    cmake_files = find_cmake_files()
     file_paths = parse_files_for_paths(cmake_files, source_dir, True)
     package_to_mcu_json = []
     package_to_mcu_xlsx = []
