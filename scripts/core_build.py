@@ -208,13 +208,13 @@ def read_data_from_db(db, sql_query):
     ## Return query results
     return len(results), results
 
-def find_cmake_files():
+def find_cmake_files(path):
     """ Return a list of .cmake files in the directory, excluding specific files """
     cmake_files = []
     with open(os.path.join(os.getcwd(), "core_build.txt"), "r") as file:
         for line in file:
             # Strip any leading/trailing whitespace (like newlines) and append to the array
-            cmake_files.append(line.strip())
+            cmake_files.append(path + '/cmake/stm/' + line.strip())
     return cmake_files
 
 def parse_files_for_paths(cmake_files, source_dir, isGCC=None):
@@ -630,7 +630,7 @@ def updateDevicesFromCore(dbs, queries):
     return
 
 def package_asset(source_dir, output_dir, arch, entry_name, changes_dict):
-    cmake_files = find_cmake_files()
+    cmake_files = find_cmake_files(source_dir)
     file_paths = parse_files_for_paths(cmake_files, source_dir, True)
     package_to_mcu_json = []
     package_to_mcu_xlsx = []
