@@ -425,7 +425,7 @@ def insert_sdk_to_device(conn, mcu_name):
         cursor = conn.cursor()
         cursor.execute("""
             INSERT INTO SDKToDevice (sdk_uid, device_uid) VALUES (?, ?)
-        """, ("mikrosdk_v2112", mcu_name))
+        """, ("mikrosdk_v2113", mcu_name))
         conn.commit()
         return True
     except sqlite3.Error as e:
