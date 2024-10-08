@@ -1,9 +1,10 @@
-import os, re, subprocess, shutil, json, sqlite3, enums
+import os, re, subprocess, shutil, json, sqlite3
 
 from packaging import version
 
 # Global variable for local_app_data_path
 local_app_data_path = '/home/runner/.MIKROE/NECTOStudio7'
+# local_app_data_path = 'c:/Users/IvanRus/AppData/Local/MIKROE/NECTOStudio7'
 
 # Path for storing artifacts.
 testPath = '/home/runner/test_results'
@@ -484,6 +485,9 @@ def replace_placeholders_in_file(source_file, dest_file, replacements):
     for placeholder, replacement in replacements.items():
         if replacement is not None:
             file_content = file_content.replace(placeholder, replacement)
+            
+    if not os.path.exists(os.path.dirname(dest_file)):
+        os.makedirs(os.path.dirname(dest_file))
 
     # Write the updated content to the destination file
     with open(dest_file, 'w') as file:
@@ -508,10 +512,10 @@ def get_core_from_def(file_path):
 
 def configure_queries(mcuNames, package_name, cmake_file, source_dir, changes_dict):
     package = "128/LQFP"
-    core = get_core_from_def(os.path.join(source_dir, "def", f"{mcuNames[cmake_file]['mcu_names'][0]}"))
-    mcuNames[cmake_file]['cores'] = core
     
     for mcu_name in mcuNames[cmake_file]['mcu_names']:
+        core = get_core_from_def(os.path.join(source_dir, "def", f"{mcu_name}.json"))
+        mcuNames[cmake_file]['cores'].add(core)
         changes_dict['mcu_list'].append(mcu_name)
         # Define the replacements
         replacements = {
@@ -524,8 +528,8 @@ def configure_queries(mcuNames, package_name, cmake_file, source_dir, changes_di
         # Replace placeholders in the JSON files
         json_files = ['Devices.json', 'LinkerTables.json']
         for file_name in json_files:
-            source_file = os.path.join("../templates", file_name)
-            dest_file = os.path.join("../resources/queries/mcus", mcu_name, file_name)
+            source_file = os.path.join(os.getcwd(),"templates", file_name)
+            dest_file = os.path.join(os.getcwd(), "resources/queries/mcus", mcu_name, file_name)
             replace_placeholders_in_file(source_file, dest_file, replacements)
             
 def filter_versions(versions):
@@ -582,13 +586,13 @@ def updateDevicesFromCore(dbs, queries):
                                 collumns.append(list(eachKey[eachTableKey].keys())[0])
                                 if 'SDKToDevice' == eachTableKey:
                                     sdkVersions = read_data_from_db(eachDb, 'SELECT DISTINCT version FROM SDKs WHERE name IS "mikroSDK"')
-                                    versions = filter_versions(list(v[0] for v in sdkVersions[enums.dbSync.ELEMENTS.value]))
+                                    versions = filter_versions(list(v[0] for v in sdkVersions[1]))
                                     threshold_version = version.parse(eachKey[eachTableKey][collumns[1]][:-1])
                                     filtered_versions = [f'mikrosdk_v{v.replace('.','')}' for v in versions if version.parse(v) >= threshold_version]
                                     values.append(filtered_versions)
                                 # Add Packages if they are not present in the database
                                 elif 'DeviceToPackage' == eachTableKey:
-                                    package_uids = linkerTables['tables'][enums.dbSync.BOARDTODEVICEPACKAGES.value]['DeviceToPackage']['package_uid']
+                                    package_uids = linkerTables['tables'][2]['DeviceToPackage']['package_uid']
                                     for package_uid in package_uids:
                                         pin_count = package_uid.split('/')[0]
                                         package_name = package_uid.split('/')[1]
@@ -661,7 +665,7 @@ def package_asset(source_dir, output_dir, arch, entry_name, changes_dict):
             updateDevicesFromCore([f"{local_app_data_path}/databases/necto_db.db"], os.path.join(coreQueriesPath, 'mcus'))
 
         # Copy delay files
-        copy_delays(mcuNames, mcuNames[cmake_file]['cores'], source_dir, output_dir, base_output_dir)
+        copy_delays(mcuNames[cmake_file]['cores'], source_dir, output_dir, base_output_dir)
         # Copy std_library to every package
         std_library_path = os.path.join(source_dir, 'std_library')
         if os.path.exists(std_library_path):
@@ -716,6 +720,8 @@ def main():
                         )
         except Exception as e:
             print(f"Failed to process directories in {root_source_directory}: {e}")
+            
+    run_builds(changes_dict)
             
 if __name__ == "__main__":
     main()
