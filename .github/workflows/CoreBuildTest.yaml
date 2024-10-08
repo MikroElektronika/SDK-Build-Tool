@@ -23,7 +23,6 @@ jobs:
           pip install -r scripts/requirements/shared.txt
           pip install -r scripts/requirements/databases.txt
           pip install colorama
-          pip install version
           pip install enums
           sudo apt-get update
           sudo apt-get install p7zip-full

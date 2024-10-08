@@ -1,4 +1,6 @@
-import os, re, subprocess, shutil, json, sqlite3, version, enums
+import os, re, subprocess, shutil, json, sqlite3, enums
+
+from packaging import version
 
 # Global variable for local_app_data_path
 local_app_data_path = '/home/runner/.MIKROE/NECTOStudio7'
