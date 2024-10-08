@@ -1,9 +1,0 @@
-if(${MCU_NAME} MATCHES "^STM32H742VI$|^STM32H742ZI$|^STM32H742II$|^STM32H742BI$|^STM32H742VG$|^STM32H742ZG$|^STM32H742IG$|^STM32H742BG$|^STM32H742XG$|^STM32H742AG$|^STM32H743VI$|^STM32H743ZI$|^STM32H743II$|^STM32H743BI$|^STM32H743VG$|^STM32H743ZG$|^STM32H743IG$|^STM32H743BG$|^STM32H743XG$|^STM32H743AG$")
-    string(SUBSTRING ${MCU_NAME} 0 9 mcu_name_append)
-    target_compile_definitions(lib_core
-        PRIVATE
-            "${mcu_name_append}xx"
-        PUBLIC
-            "${mcu_name_append}xx"
-    )
-endif()

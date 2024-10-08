@@ -1,0 +1,7 @@
+if(${MCU_NAME} MATCHES "(^PIC32MZ((0512(.+))|(1024[a-zA-Z][^C](.+))|(2048[a-zA-Z][^C](.+)))$)")
+    set(SYSTEM_LIB_SOURCE "system/MICROAPTIV_FP/src/__Lib_System_MZ_EF.c")
+    set(SYSTEM_LIB_INCLUDE_DIR "system/MICROAPTIV_FP/include/")
+    set(MATH_LIB_SOURCE "math/MICROAPTIV_FP/__Lib_Math.c")
+    set(MATH_DOUBLE_SOURCE "math_double/MICROAPTIV_FP/__Lib_MathDouble.c")
+    set(DELAY_SOURCE "delay/microaptiv_fp/__lib_delays.c")
+endif()
