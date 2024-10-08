@@ -211,7 +211,7 @@ def read_data_from_db(db, sql_query):
 def find_cmake_files():
     """ Return a list of .cmake files in the directory, excluding specific files """
     cmake_files = []
-    with open("../core_build.txt", "r") as file:
+    with open(os.path.join(os.getcwd(), "core_build.txt"), "r") as file:
         for line in file:
             # Strip any leading/trailing whitespace (like newlines) and append to the array
             cmake_files.append(line.strip())
