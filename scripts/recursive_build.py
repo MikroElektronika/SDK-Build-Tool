@@ -608,7 +608,7 @@ def copy_sdk_files(dependencies, script_repo_dir, mcu_dependencies, error_log):
 
             try:
                 shutil.copytree(src_mcu_def, target_mcu_def, dirs_exist_ok=True)
-                # print(Fore.GREEN + f"    Copied MCU definitions for '{mcu_name}' from '{src_mcu_def}' to '{target_mcu_def}'")
+                print(Fore.GREEN + f"    Copied MCU definitions for '{mcu_name}' from '{src_mcu_def}' to '{target_mcu_def}'")
             except Exception as e:
                 error_message = f"Failed to copy MCU definitions for '{mcu_name}' from '{src_mcu_def}' to '{target_mcu_def}': {e}"
                 print(Fore.RED + f"Error: {error_message}")
@@ -643,7 +643,7 @@ def copy_sdk_files(dependencies, script_repo_dir, mcu_dependencies, error_log):
 
             try:
                 shutil.copytree(src_mcu_reg, target_mcu_reg, dirs_exist_ok=True)
-                # print(Fore.GREEN + f"    Copied MCU register addresses for '{mcu_name}' from '{src_mcu_reg}' to '{target_mcu_reg}'")
+                print(Fore.GREEN + f"    Copied MCU register addresses for '{mcu_name}' from '{src_mcu_reg}' to '{target_mcu_reg}'")
             except Exception as e:
                 error_message = f"Failed to copy MCU register addresses for '{mcu_name}' from '{src_mcu_reg}' to '{target_mcu_reg}': {e}"
                 print(Fore.RED + f"Error: {error_message}")
@@ -695,7 +695,7 @@ def copy_sdk_files(dependencies, script_repo_dir, mcu_dependencies, error_log):
                 else:
                     try:
                         shutil.copytree(src_module_impl, target_module_impl, dirs_exist_ok=True)
-                        # print(Fore.GREEN + f"        Copied implementations from '{src_module_impl}' to '{target_module_impl}'")
+                        print(Fore.GREEN + f"        Copied implementations from '{src_module_impl}' to '{target_module_impl}'")
                     except Exception as e:
                         error_message = f"Failed to copy implementations from '{src_module_impl}' to '{target_module_impl}': {e}"
                         print(Fore.RED + f"Error: {error_message}")
@@ -754,7 +754,7 @@ def copy_sdk_files(dependencies, script_repo_dir, mcu_dependencies, error_log):
                 else:
                     try:
                         shutil.copytree(src_module_include, target_module_include, dirs_exist_ok=True)
-                        # print(Fore.GREEN + f"        Copied implementations from '{src_module_include}' to '{target_module_include}'")
+                        print(Fore.GREEN + f"        Copied implementations from '{src_module_include}' to '{target_module_include}'")
                     except Exception as e:
                         error_message = f"Failed to copy implementations from '{src_module_include}' to '{target_module_include}': {e}"
                         print(Fore.RED + f"Error: {error_message}")
@@ -793,7 +793,7 @@ def copy_core_files(dependencies, parent_dir, mcu_dependencies, error_log):
         try:
             os.makedirs(dest_cmake_stm, exist_ok=True)
             shutil.copy(src_cmake_stm, dest_cmake_stm)
-            # print(Fore.GREEN + f"Copied '{src_cmake_stm}' to '{dest_cmake_stm}'")
+            print(Fore.GREEN + f"Copied '{src_cmake_stm}' to '{dest_cmake_stm}'")
         except FileNotFoundError:
             error_message = f"Package '{package}': Source file '{src_cmake_stm}' not found."
             print(Fore.RED + f"Error: {error_message}")
@@ -809,7 +809,7 @@ def copy_core_files(dependencies, parent_dir, mcu_dependencies, error_log):
         try:
             os.makedirs(dest_cmake_delays, exist_ok=True)
             shutil.copy(src_cmake_delays, dest_cmake_delays)
-            # print(Fore.GREEN + f"Copied '{src_cmake_delays}' to '{dest_cmake_delays}'")
+            print(Fore.GREEN + f"Copied '{src_cmake_delays}' to '{dest_cmake_delays}'")
         except FileNotFoundError:
             error_message = f"Package '{package}': Source file '{src_cmake_delays}' not found."
             print(Fore.RED + f"Error: {error_message}")
@@ -834,7 +834,7 @@ def copy_core_files(dependencies, parent_dir, mcu_dependencies, error_log):
             try:
                 os.makedirs(dest_def, exist_ok=True)
                 shutil.copy(src_json, dest_def)
-                # print(Fore.GREEN + f"Copied '{src_json}' to '{dest_def}'")
+                print(Fore.GREEN + f"Copied '{src_json}' to '{dest_def}'")
             except FileNotFoundError:
                 error_message = f"MCU '{mcu_name}': Source file '{src_json}' not found."
                 print(Fore.RED + f"Error: {error_message}")
@@ -849,7 +849,7 @@ def copy_core_files(dependencies, parent_dir, mcu_dependencies, error_log):
             dest_def_stm = os.path.join(package_folder, 'def', 'stm', mcu_name)
             try:
                 shutil.copytree(src_def_stm, dest_def_stm, dirs_exist_ok=True)
-                # print(Fore.GREEN + f"Copied folder '{src_def_stm}' to '{dest_def_stm}'")
+                print(Fore.GREEN + f"Copied folder '{src_def_stm}' to '{dest_def_stm}'")
             except FileNotFoundError:
                 error_message = f"MCU '{mcu_name}': Source folder '{src_def_stm}' not found."
                 print(Fore.RED + f"Error: {error_message}")
@@ -864,7 +864,7 @@ def copy_core_files(dependencies, parent_dir, mcu_dependencies, error_log):
             dest_interrupts = os.path.join(package_folder, 'interrupts', 'include', 'interrupts_mcu', mcu_name_lower)
             try:
                 shutil.copytree(src_interrupts, dest_interrupts, dirs_exist_ok=True)
-                # print(Fore.GREEN + f"Copied folder '{src_interrupts}' to '{dest_interrupts}'")
+                print(Fore.GREEN + f"Copied folder '{src_interrupts}' to '{dest_interrupts}'")
             except FileNotFoundError:
                 error_message = f"MCU '{mcu_name}': Source folder '{src_interrupts}' not found."
                 print(Fore.RED + f"Error: {error_message}")
@@ -880,7 +880,7 @@ def copy_core_files(dependencies, parent_dir, mcu_dependencies, error_log):
             try:
                 os.makedirs(dest_ld, exist_ok=True)
                 shutil.copy(src_ld, dest_ld)
-                # print(Fore.GREEN + f"Copied '{src_ld}' to '{dest_ld}'")
+                print(Fore.GREEN + f"Copied '{src_ld}' to '{dest_ld}'")
             except FileNotFoundError:
                 error_message = f"MCU '{mcu_name}': Source file '{src_ld}' not found."
                 print(Fore.RED + f"Error: {error_message}")
@@ -896,7 +896,7 @@ def copy_core_files(dependencies, parent_dir, mcu_dependencies, error_log):
             try:
                 os.makedirs(dest_s, exist_ok=True)
                 shutil.copy(src_s, dest_s)
-                # print(Fore.GREEN + f"Copied '{src_s}' to '{dest_s}'")
+                print(Fore.GREEN + f"Copied '{src_s}' to '{dest_s}'")
             except FileNotFoundError:
                 error_message = f"MCU '{mcu_name}': Source file '{src_s}' not found."
                 print(Fore.RED + f"Error: {error_message}")
@@ -911,7 +911,7 @@ def copy_core_files(dependencies, parent_dir, mcu_dependencies, error_log):
             dest_system = os.path.join(package_folder, 'system', 'src', 'stm', doc_ds)
             try:
                 shutil.copytree(src_system, dest_system, dirs_exist_ok=True)
-                # print(Fore.GREEN + f"Copied folder '{src_system}' to '{dest_system}'")
+                print(Fore.GREEN + f"Copied folder '{src_system}' to '{dest_system}'")
             except FileNotFoundError:
                 error_message = f"MCU '{mcu_name}': Source folder '{src_system}' not found."
                 print(Fore.RED + f"Error: {error_message}")
@@ -926,7 +926,7 @@ def copy_core_files(dependencies, parent_dir, mcu_dependencies, error_log):
         dest_common = os.path.join(package_folder)
         try:
             shutil.copytree(src_common, dest_common, dirs_exist_ok=True)
-            # print(Fore.GREEN + f"Copied folder '{src_common}' to '{dest_common}'")
+            print(Fore.GREEN + f"Copied folder '{src_common}' to '{dest_common}'")
         except FileNotFoundError:
             error_message = f"Package '{package}': Source folder '{src_common}' not found."
             print(Fore.RED + f"Error: {error_message}")
@@ -972,7 +972,7 @@ def copy_output_files(testPath, parent_dir, error_log):
         # Copy error.txt
         if os.path.isfile(src_error_txt):
             shutil.copy2(src_error_txt, dest_error_txt)
-            # print(Fore.GREEN + f"  Copied 'error.txt' to '{testPath}'.")
+            print(Fore.GREEN + f"  Copied 'error.txt' to '{testPath}'.")
         else:
             error_message = f"'error.txt' not found at '{src_error_txt}'."
             print(Fore.RED + f"Error: {error_message}")
