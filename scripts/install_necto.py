@@ -75,17 +75,6 @@ def main():
     for file in os.listdir(os.getcwd()):
         print(file)
 
-    print("Step 14: Check for the existence of the bsp folder")
-    bsp_path = "/home/runner/.MIKROE/NECTOStudio7/packages/sdk/mikroSDK_v2/src/bsp"
-    os.chdir("/home/runner/.MIKROE/NECTOStudio7/packages/sdk/mikroSDK_v2/src")
-    for file in os.listdir(os.getcwd()):
-        print(file)
-
-    if not os.path.exists(bsp_path):
-        print("\033[92mSUCCESS\033[0m")
-    else:
-        print("bsp folder exists.")
-
     os.chdir(original_working_dir)
     print(f"Returned to original working directory: {os.getcwd()}")
 
