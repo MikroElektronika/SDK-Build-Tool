@@ -710,6 +710,8 @@ def main():
             with os.scandir(root_source_directory) as entries:
                 print(entries)
                 for entry in entries:
+                    if 'mikroC' in entry:
+                        continue
                     print(root_source_directory)
                     print(entry)
                     if entry.is_dir():
