@@ -710,7 +710,7 @@ def main():
             with os.scandir(root_source_directory) as entries:
                 print(entries)
                 for entry in entries:
-                    if 'mikroC' in entry:
+                    if 'mikroC' in entry.name:
                         continue
                     print(root_source_directory)
                     print(entry)
