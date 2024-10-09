@@ -4,7 +4,7 @@ from packaging import version
 
 # Global variable for local_app_data_path
 local_app_data_path = '/home/runner/.MIKROE/NECTOStudio7'
-# local_app_data_path = 'c:/Users/IvanRus/AppData/Local/MIKROE/NECTOStudio7'
+# local_app_data_path = 'c:/Users/stefan.djordjevic/AppData/Local/MIKROE/NECTOStudio7'
 
 # Path for storing artifacts.
 testPath = '/home/runner/test_results'
@@ -419,7 +419,7 @@ def copy_cmake_files(cmake_file, source_dir, output_dir, regex):
         delay_relative_path = os.path.relpath(delays_cmake_dir, start=source_dir)
         delay_destination_path = os.path.join(output_dir, delay_relative_path)
         copy_files_based_on_regex(delays_cmake_dir, delay_destination_path, mcuFileName)
-        
+
 def copy_schemas(mcus, source_dir, output_dir, base_path):
 
     for mcu in mcus:
@@ -475,7 +475,7 @@ def copy_delays(cores, source_dir, output_dir, base_path):
         if os.path.exists(delays_dir):
             os.makedirs(dest_path, exist_ok=True)
             shutil.copytree(delays_dir, dest_path, dirs_exist_ok=True)
-            
+
 # Function to replace placeholders in a single file
 def replace_placeholders_in_file(source_file, dest_file, replacements):
     with open(source_file, 'r') as file:
@@ -485,21 +485,21 @@ def replace_placeholders_in_file(source_file, dest_file, replacements):
     for placeholder, replacement in replacements.items():
         if replacement is not None:
             file_content = file_content.replace(placeholder, replacement)
-            
+
     if not os.path.exists(os.path.dirname(dest_file)):
         os.makedirs(os.path.dirname(dest_file))
 
     # Write the updated content to the destination file
     with open(dest_file, 'w') as file:
         file.write(file_content)
-        
+
 def get_core_from_def(file_path):
     # Check if the file exists
     if os.path.exists(file_path):
         # Open the JSON file and load its contents
         with open(file_path, 'r') as file:
             data = json.load(file)
-            
+
             # Check if the "core" key exists in the JSON data
             if 'core' in data:
                 core = data['core']
@@ -507,16 +507,17 @@ def get_core_from_def(file_path):
                 print(f'Warning: "core" key not found in {file_path}')
     else:
         print(f'Error: File {file_path} does not exist.')
-        
+
     return core
 
-def configure_queries(mcuNames, package_name, cmake_file, source_dir, changes_dict):
+def configure_queries(mcuNames, package_name, cmake_file, source_dir):
     package = "128/LQFP"
-    
+    mcu_names = []
+
     for mcu_name in mcuNames[cmake_file]['mcu_names']:
         core = get_core_from_def(os.path.join(source_dir, "def", f"{mcu_name}.json"))
         mcuNames[cmake_file]['cores'].add(core)
-        changes_dict['mcu_list'].append(mcu_name)
+        mcu_names.append(mcu_name)
         # Define the replacements
         replacements = {
             '{mcu_name}': mcu_name,
@@ -531,12 +532,16 @@ def configure_queries(mcuNames, package_name, cmake_file, source_dir, changes_di
             source_file = os.path.join(os.getcwd(),"templates", file_name)
             dest_file = os.path.join(os.getcwd(), "resources/queries/mcus", mcu_name, file_name)
             replace_placeholders_in_file(source_file, dest_file, replacements)
-            
+
+    shutil.copytree(os.path.join(os.getcwd(), "resources"), testPath)
+
+    return mcu_names
+
 def filter_versions(versions):
     # Filter out versions that contain non-numeric characters (e.g., words or suffixes)
     filtered_versions = [v for v in versions if all(part.isdigit() for part in v.split('.'))]
     return filtered_versions
-            
+
 def insertIntoTable(db, tableName, values, columns):
     import sqlite3
 
@@ -548,7 +553,7 @@ def insertIntoTable(db, tableName, values, columns):
     cur.execute(f'INSERT OR IGNORE INTO {tableName} ({columns}) VALUES ({numOfItems[:-1]})', values)
     conn.commit()
     conn.close()
-            
+
 def updateDevicesFromCore(dbs, queries):
     allDevicesDirs = os.listdir(queries)
     for eachDeviceDir in allDevicesDirs:
@@ -659,7 +664,7 @@ def package_asset(source_dir, output_dir, arch, entry_name, changes_dict):
         # Copy linker scirpts
         copy_files_from_dir(mcuNames[cmake_file]['mcu_names'], source_dir, output_dir, base_output_dir, 'linker_scripts')
 
-        configure_queries(mcuNames, f"{arch.lower()}_{entry_name.lower()}_{cmake_file}", cmake_file, source_dir, changes_dict)
+        mcu_names = configure_queries(mcuNames, f"{arch.lower()}_{entry_name.lower()}_{cmake_file}", cmake_file, source_dir)
         coreQueriesPath = os.path.join(os.getcwd(), 'resources/queries')
         if os.path.exists(os.path.join(coreQueriesPath, 'mcus')):
             updateDevicesFromCore([f"{local_app_data_path}/databases/necto_db.db"], os.path.join(coreQueriesPath, 'mcus'))
@@ -683,9 +688,11 @@ def package_asset(source_dir, output_dir, arch, entry_name, changes_dict):
         shutil.copytree(os.path.join(source_dir, 'common'), os.path.join(base_output_dir, "common"), dirs_exist_ok=True)
         # Copy base CMakeLists.txt to every package
         shutil.copy(os.path.join(source_dir, "CMakeLists.txt"), base_output_dir)
-        
+
         # Finally copy everthing to AppData location
         shutil.copytree(base_output_dir, os.path.join(local_app_data_path, "packages", "core", arch, entry_name, f"{arch.lower()}_{entry_name.lower()}_{cmake_file}"))
+
+    return mcu_names
 
 def main():
     architectures = ["ARM"]
@@ -715,13 +722,12 @@ def main():
                         output_directory = os.path.join(root_output_directory, entry.name)
 
                         print(f"Processing {source_directory} to {output_directory}")
-                        package_asset(
-                            source_directory, output_directory, arch, entry.name, changes_dict
-                        )
+                        changes_dict['mcu_list'].append(package_asset(source_directory, output_directory, arch, entry.name, changes_dict))
         except Exception as e:
             print(f"Failed to process directories in {root_source_directory}: {e}")
-            
+
     run_builds(changes_dict)
-            
+
+
 if __name__ == "__main__":
     main()
