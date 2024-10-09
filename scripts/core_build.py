@@ -510,14 +510,13 @@ def get_core_from_def(file_path):
 
     return core
 
-def configure_queries(mcuNames, package_name, cmake_file, source_dir):
+def configure_queries(mcuNames, package_name, cmake_file, source_dir, changes_dict):
     package = "128/LQFP"
-    mcu_names = []
 
     for mcu_name in mcuNames[cmake_file]['mcu_names']:
         core = get_core_from_def(os.path.join(source_dir, "def", f"{mcu_name}.json"))
         mcuNames[cmake_file]['cores'].add(core)
-        mcu_names.append(mcu_name)
+        changes_dict['mcu_list'].append(mcu_name)
         # Define the replacements
         replacements = {
             '{mcu_name}': mcu_name,
@@ -534,8 +533,6 @@ def configure_queries(mcuNames, package_name, cmake_file, source_dir):
             replace_placeholders_in_file(source_file, dest_file, replacements)
 
     shutil.copytree(os.path.join(os.getcwd(), "resources"), testPath)
-
-    return mcu_names
 
 def filter_versions(versions):
     # Filter out versions that contain non-numeric characters (e.g., words or suffixes)
@@ -664,7 +661,7 @@ def package_asset(source_dir, output_dir, arch, entry_name, changes_dict):
         # Copy linker scirpts
         copy_files_from_dir(mcuNames[cmake_file]['mcu_names'], source_dir, output_dir, base_output_dir, 'linker_scripts')
 
-        mcu_names = configure_queries(mcuNames, f"{arch.lower()}_{entry_name.lower()}_{cmake_file}", cmake_file, source_dir)
+        configure_queries(mcuNames, f"{arch.lower()}_{entry_name.lower()}_{cmake_file}", cmake_file, source_dir, changes_dict)
         coreQueriesPath = os.path.join(os.getcwd(), 'resources/queries')
         if os.path.exists(os.path.join(coreQueriesPath, 'mcus')):
             updateDevicesFromCore([f"{local_app_data_path}/databases/necto_db.db"], os.path.join(coreQueriesPath, 'mcus'))
@@ -691,8 +688,6 @@ def package_asset(source_dir, output_dir, arch, entry_name, changes_dict):
 
         # Finally copy everthing to AppData location
         shutil.copytree(base_output_dir, os.path.join(local_app_data_path, "packages", "core", arch, entry_name, f"{arch.lower()}_{entry_name.lower()}_{cmake_file}"))
-
-    return mcu_names
 
 def main():
     architectures = ["ARM"]
@@ -722,7 +717,7 @@ def main():
                         output_directory = os.path.join(root_output_directory, entry.name)
 
                         print(f"Processing {source_directory} to {output_directory}")
-                        changes_dict['mcu_list'].append(package_asset(source_directory, output_directory, arch, entry.name, changes_dict))
+                        package_asset(source_directory, output_directory, arch, entry.name, changes_dict)
         except Exception as e:
             print(f"Failed to process directories in {root_source_directory}: {e}")
 
