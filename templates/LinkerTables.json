@@ -27,6 +27,11 @@
             }
         },
         {
+            "ProgrammerToDevice": {
+                "programer_uid": ["codegrip"]
+            }
+        },
+        {
             "SDKToDevice": {
                 "sdk_uid": "2.11.3+"
             }
