@@ -4,7 +4,7 @@ from packaging import version
 
 # Global variable for local_app_data_path
 local_app_data_path = '/home/runner/.MIKROE/NECTOStudio7'
-# local_app_data_path = 'c:/Users/stefan.djordjevic/AppData/Local/MIKROE/NECTOStudio7'
+# local_app_data_path = 'c:/Users/IvanRus/AppData/Local/MIKROE/NECTOStudio7'
 
 # Path for storing artifacts.
 testPath = '/home/runner/test_results'
@@ -108,14 +108,15 @@ def run_builds(changes_dict):
     # Get the SDK version from manifest.json file.
     sdk_version = get_sdk_version()
 
-    # Run build for all MCUs from mcu_list.
-    print(f"\033[93mRunning build for {len(changes_dict['mcu_list'])} MCUs\033[0m")
-    for mcu in changes_dict['mcu_list']:
-        # Get the necessary compiler for the current MCU build.
-        compilers, board = get_compilers(mcu, is_mcu=True)
-        for compiler in compilers:
-            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk_version}" --board "{board}" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
-            run_cmd(cmd, changes_dict, mcu + ' ' + compiler)
+    for i in range(2):
+        # Run build for all MCUs from mcu_list.
+        print(f"\033[93mRunning build for {len(changes_dict['mcu_list'])} MCUs\033[0m")
+        for mcu in changes_dict['mcu_list']:
+            # Get the necessary compiler for the current MCU build.
+            compilers, board = get_compilers(mcu, is_mcu=True)
+            for compiler in compilers:
+                cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk_version}" --board "{board}" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
+                run_cmd(cmd, changes_dict, mcu + ' ' + compiler)
 
 # Returns the list of compilers based on the given name and type.
 def get_compilers(name, is_mcu=True):
