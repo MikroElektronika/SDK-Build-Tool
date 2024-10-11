@@ -214,7 +214,7 @@ def find_cmake_files(path):
     with open(os.path.join(os.getcwd(), "core_build.txt"), "r") as file:
         for line in file:
             # Strip any leading/trailing whitespace (like newlines) and append to the array
-            cmake_files.append(path + '/cmake/stm/' + line.strip())
+            cmake_files.append(path + '/cmake/stm/' + line.strip() + '.cmake')
     return cmake_files
 
 def parse_files_for_paths(cmake_files, source_dir, isGCC=None):

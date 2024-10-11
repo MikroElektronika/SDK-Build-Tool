@@ -1,1 +1,1 @@
-doc_ds_196.cmake
+doc_ds_196
