@@ -108,15 +108,14 @@ def run_builds(changes_dict):
     # Get the SDK version from manifest.json file.
     sdk_version = get_sdk_version()
 
-    for i in range(2):
-        # Run build for all MCUs from mcu_list.
-        print(f"\033[93mRunning build for {len(changes_dict['mcu_list'])} MCUs\033[0m")
-        for mcu in changes_dict['mcu_list']:
-            # Get the necessary compiler for the current MCU build.
-            compilers, board = get_compilers(mcu, is_mcu=True)
-            for compiler in compilers:
-                cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk_version}" --board "{board}" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
-                run_cmd(cmd, changes_dict, mcu + ' ' + compiler)
+    # Run build for all MCUs from mcu_list.
+    print(f"\033[93mRunning build for {len(changes_dict['mcu_list'])} MCUs\033[0m")
+    for mcu in changes_dict['mcu_list']:
+        # Get the necessary compiler for the current MCU build.
+        compilers, board = get_compilers(mcu, is_mcu=True)
+        for compiler in compilers:
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk_version}" --board "{board}" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
+            run_cmd(cmd, changes_dict, mcu + ' ' + compiler)
 
 # Returns the list of compilers based on the given name and type.
 def get_compilers(name, is_mcu=True):
@@ -201,7 +200,6 @@ def read_data_from_db(db, sql_query):
 
     ## Execute the desired query
     results = cur.execute(sql_query).fetchall()
-    # results = cur.fetchall()
 
     ## Close the connection
     cur.close()
@@ -690,6 +688,16 @@ def package_asset(source_dir, output_dir, arch, entry_name, changes_dict):
         # Finally copy everthing to AppData location
         shutil.copytree(base_output_dir, os.path.join(local_app_data_path, "packages", "core", arch, entry_name, f"{arch.lower()}_{entry_name.lower()}_{cmake_file}"))
 
+# Writes the result dictionary to a JSON file and ensures testPath exists.
+def write_results_to_file(changes_dict):
+    with open(f'{testPath}/built_changes.json', 'w+') as json_file:
+        json.dump(changes_dict, json_file, indent=4)
+
+    print(f"All the data for build has been written to {testPath}/built_changes.json")
+
+    for item in changes_dict['unused']:
+        print(f"Couldn't find {item} in the database")
+
 def main():
     architectures = ["ARM"]
     changes_dict = {
@@ -725,6 +733,20 @@ def main():
             print(f"Failed to process directories in {root_source_directory}: {e}")
 
     run_builds(changes_dict)
+
+    # Write all the used info for building to artifact folder.
+    write_results_to_file(changes_dict)
+
+    shutil.copyfile(os.path.join(local_app_data_path, 'databases', 'neto_db.db'), os.path.join(testPath, 'neto_db.db'))
+
+    if build_failed == True:
+        # Red text for failure.
+        print("\033[91mRecursive Build Failed!\033[0m")
+        # Fail the job as well.
+        exit(1)
+    else:
+        # Green text for success.
+        print("\033[92mRecursive Build Success!\033[0m")
 
 
 if __name__ == "__main__":
