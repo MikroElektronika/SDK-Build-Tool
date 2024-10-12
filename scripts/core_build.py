@@ -737,7 +737,7 @@ def main():
     # Write all the used info for building to artifact folder.
     write_results_to_file(changes_dict)
 
-    shutil.copyfile(os.path.join(local_app_data_path, 'databases', 'neto_db.db'), os.path.join(testPath, 'neto_db.db'))
+    shutil.copyfile(os.path.join(local_app_data_path, 'databases', 'necto_db.db'), os.path.join(testPath, 'necto_db.db'))
 
     if build_failed == True:
         # Red text for failure.
