@@ -633,6 +633,9 @@ def package_asset(source_dir, output_dir, arch, entry_name, changes_dict):
 
         # Finally copy everthing to AppData location
         shutil.copytree(base_output_dir, os.path.join(local_app_data_path, "packages", "core", arch, entry_name, f"{arch.lower()}_{entry_name.lower()}_{cmake_file}"))
+        
+        # Copy packages to artifacts as well
+        shutil.copytree(base_output_dir, os.path.join(testPath, "packages", f"{arch.lower()}_{entry_name.lower()}_{cmake_file}"))
 
 # Writes the result dictionary to a JSON file and ensures testPath exists.
 def write_results_to_file(changes_dict):
