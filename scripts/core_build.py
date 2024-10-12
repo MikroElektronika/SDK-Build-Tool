@@ -17,12 +17,11 @@ build_failed = False
 
 # Supported compilers list for each architecture.
 compiler_list = {
-    'ARM': ['gcc_arm_none_eabi', 'mikrocarm', 'clang-llvm'],
+    'ARM': ['gcc_arm_none_eabi', 'clang-llvm'],
     'RISCV': ['xpack-riscv-none-embed-gcc', 'clang-llvm-riscv'],
-    'PIC': ['mikrocpic', 'mchp_xc8'],
-    'DSPIC': ['mikrocdspic', 'mchp_xc16'],
-    'PIC32': ['mikrocpic32', 'mchp_xc32'],
-    'AVR': ['mikrocavr']
+    'PIC': ['mchp_xc8'],
+    'DSPIC': ['mchp_xc16'],
+    'PIC32': ['mchp_xc32']
 }
 
 # Define a REGEXP function for SQLite.
@@ -112,79 +111,26 @@ def run_builds(changes_dict):
     print(f"\033[93mRunning build for {len(changes_dict['mcu_list'])} MCUs\033[0m")
     for mcu in changes_dict['mcu_list']:
         # Get the necessary compiler for the current MCU build.
-        compilers, board = get_compilers(mcu, is_mcu=True)
+        compilers = get_compilers(mcu, is_mcu=True)
         for compiler in compilers:
-            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk_version}" --board "{board}" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_ARM_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
             run_cmd(cmd, changes_dict, mcu + ' ' + compiler)
 
 # Returns the list of compilers based on the given name and type.
 def get_compilers(name, is_mcu=True):
-    conn = sqlite3.connect(os.path.join(local_app_data_path, 'databases', 'necto_db.db'))
-    cursor = conn.cursor()
     if is_mcu:
-        # Get all board_uids associated with the board name.
-        cursor.execute(f"""
-            SELECT board_uid
-            FROM BoardToDevice
-            WHERE device_uid = '{name}';
-        """)
-        board_uids = cursor.fetchall()
-
         if any(substring in name for substring in ["ATSAM", "STM", "TM4C", "MK"]):
-            return compiler_list["ARM"], board_uids[0][0]
+            return compiler_list["ARM"]
         elif any(substring in name for substring in ["GD32", "RISC"]):
-            return compiler_list["RISCV"], board_uids[0][0]
+            return compiler_list["RISCV"]
         elif "PIC32" in name:
-            return compiler_list["PIC32"], board_uids[0][0]
+            return compiler_list["PIC32"]
         elif any(substring in name for substring in ["DSPIC", "PIC24", "dsPIC"]):
-            return compiler_list["DSPIC"], board_uids[0][0]
+            return compiler_list["DSPIC"]
         elif any(substring in name for substring in ["PIC18", "PIC16", "PIC12", "PIC10"]):
-            return compiler_list["PIC"], board_uids[0][0]
+            return compiler_list["PIC"]
         elif "AT" in name and "ATSAM" not in name:
-            return compiler_list["AVR"], board_uids[0][0]
-    else:
-        # Get all device_uids associated with the board name.
-        cursor.execute(f"""
-            SELECT device_uid
-            FROM BoardToDevice
-            WHERE board_uid = '{name}';
-        """)
-        device_uids = cursor.fetchall()
-
-        # Initialize an empty set to store unique compiler keys.
-        unique_compilers = set()
-        result_compilers = []
-
-        # Get necessary compilers for all supported MCU cards for this board.
-        for device_uid in device_uids:
-            device_uid = device_uid[0]
-            if any(substring in device_uid for substring in ["ATSAM", "STM", "TM4C", "MK"]):
-                if "ARM" not in unique_compilers:
-                    unique_compilers.add("ARM")
-                    result_compilers.extend(compiler_list["ARM"])
-            elif "GD32" in device_uid:
-                if "RISCV" not in unique_compilers:
-                    unique_compilers.add("RISCV")
-                    result_compilers.extend(compiler_list["RISCV"])
-            elif "PIC32" in device_uid:
-                if "PIC32" not in unique_compilers:
-                    unique_compilers.add("PIC32")
-                    result_compilers.extend(compiler_list["PIC32"])
-            elif any(substring in device_uid for substring in ["dsPIC", "PIC24"]):
-                if "DSPIC" not in unique_compilers:
-                    unique_compilers.add("DSPIC")
-                    result_compilers.extend(compiler_list["DSPIC"])
-            elif any(substring in device_uid for substring in ["PIC18", "PIC16", "PIC12", "PIC10"]):
-                if "PIC" not in unique_compilers:
-                    unique_compilers.add("PIC")
-                    result_compilers.extend(compiler_list["PIC"])
-            elif "AT" in device_uid and "ATSAM" not in device_uid:
-                if "AVR" not in unique_compilers:
-                    unique_compilers.add("AVR")
-                    result_compilers.extend(compiler_list["AVR"])
-
-        conn.close()
-        return result_compilers
+            return compiler_list["AVR"]
 
 def functionRegex(value, pattern):
     c_pattern = re.compile(r"\b" + pattern.lower() + r"\b")
