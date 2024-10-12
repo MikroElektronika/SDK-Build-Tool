@@ -58,6 +58,13 @@
 static RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 static RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
+typedef struct RCC_ClocksTypeDef {
+    uint32_t SYSCLK_Frequency; // SYSCLK clock frequency  in Hz
+    uint32_t HCLK_Frequency;   // HCLK   clock frequency  in Hz
+    uint32_t PCLK1_Frequency;  // PCLK1  clock frequency  in Hz
+    uint32_t PCLK2_Frequency;  // PCLK2  clock frequency  in Hz
+} RCC_ClocksTypeDef_t;
+
 extern uint32_t uwTick;
 extern uint32_t uwTickFreq;
 
@@ -67,6 +74,9 @@ __attribute__ ((interrupt("IRQ"))) void SysTick_Handler(void) {
 
 void clockConfig(void) {
     uint8_t flatency;
+
+    /* Enable FPU. */
+    SCB->CPACR |= (0xFUL << 20);
 
     /* Reset of all peripherals, initialize the Flash interface and the Systick. */
     HAL_Init();
@@ -177,4 +187,48 @@ void clockConfig(void) {
     /* Configure RCC configuration register */
     if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, flatency) != HAL_OK)
         while(1);
+}
+
+//*****************************************************************************
+// Prescaler tables.
+//*****************************************************************************
+
+static const uint16_t AHBPrescArray[9] = {1, 2, 4, 8, 32, 64, 128, 256, 512};
+static const uint8_t APBPrescArray[5] = {1, 2, 4, 8, 16};
+
+//*****************************************************************************
+// Compute HCLK, PCLK1, PCLK2 and ADCCLK clocks frequencies.
+//*****************************************************************************
+
+void RCC_GetClocksFrequency(RCC_ClocksTypeDef_t *RCC_Clocks) {
+    volatile uint32_t tmp = 0, presc = 0;
+
+    RCC_Clocks->SYSCLK_Frequency = FOSC_KHZ_VALUE * 1000;
+
+    /* Get HCLK prescaler */
+    tmp = READ_REG(RCC->CFGR) & RCC_CFGR_HPRE_Msk;
+    tmp = tmp >> RCC_CFGR_HPRE_Pos;
+    if (tmp < 8) { tmp = 7; }
+    presc = AHBPrescArray[tmp - 7];
+
+    /* HCLK clock frequency */
+    RCC_Clocks->HCLK_Frequency = RCC_Clocks->SYSCLK_Frequency / presc;
+
+    /* Get PCLK1 prescaler */
+    tmp = READ_REG(RCC->CFGR) & RCC_CFGR_PPRE1_Msk;
+    tmp = tmp >> RCC_CFGR_PPRE1_Pos;
+    if (tmp < 4) { tmp = 3; }
+    presc = APBPrescArray[tmp - 3];
+
+    /* PCLK1 clock frequency */
+    RCC_Clocks->PCLK1_Frequency = RCC_Clocks->HCLK_Frequency / presc;
+
+    /* Get PCLK2 prescaler */
+    tmp = READ_REG(RCC->CFGR) & RCC_CFGR_PPRE2_Msk;
+    tmp = tmp >> RCC_CFGR_PPRE2_Pos;
+    if (tmp < 4) { tmp = 3; }
+    presc = APBPrescArray[tmp - 3];
+
+    /* PCLK2 clock frequency */
+    RCC_Clocks->PCLK2_Frequency = RCC_Clocks->HCLK_Frequency / presc;
 }

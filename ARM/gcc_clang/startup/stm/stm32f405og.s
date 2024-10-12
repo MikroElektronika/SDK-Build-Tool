@@ -59,9 +59,6 @@ defined in linker script */
   .type  Reset_Handler, %function
 Reset_Handler:  
   ldr   sp, =_estack     /* set stack pointer */
-  
-/* Call the clock system initialization function.*/
-  // bl  SystemInit /* Removed call for Mikroe implementation. */  
 
 /* Copy the data segment initializers from flash to SRAM */  
   ldr r0, =_sdata
@@ -93,11 +90,12 @@ FillZerobss:
 LoopFillZerobss:
   cmp r2, r4
   bcc FillZerobss
- 
+
+/* Call the clock system initialization function.*/
+  bl systemInit /* Changed to call MikroE system init API. */   
 /* Call static constructors */
     bl __libc_init_array
 /* Call the application's entry point.*/
-  bl  clockConfig /* Added to call MikroE system clock configuration API. */
   bl  main
   bx  lr    
 .size  Reset_Handler, .-Reset_Handler
@@ -123,6 +121,7 @@ Infinite_Loop:
 *******************************************************************************/
    .section  .isr_vector,"a",%progbits
   .type  g_pfnVectors, %object
+  .size  g_pfnVectors, .-g_pfnVectors
     
 
 	
@@ -230,9 +229,6 @@ g_pfnVectors:
   .word     FPU_IRQHandler                    /* FPU                          */
 
                       
-
-  .size  g_pfnVectors, .-g_pfnVectors
-
 /*******************************************************************************
 *
 * Provide weak aliases for each Exception handler to the Default_Handler. 

@@ -1,3 +1,0 @@
-if(${MCU_NAME} MATCHES "^STM32H7B3RI$|^STM32H7B3VI$|^STM32H7B3QI$|^STM32H7B3ZI$|^STM32H7B3AI$|^STM32H7B3II$|^STM32H7B3NI$|^STM32H7B3LI$")
-    list(APPEND local_list_macros "getClockValue(_clock) (_clock/1000UL/2)")
-endif()

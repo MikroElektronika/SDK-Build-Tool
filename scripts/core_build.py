@@ -606,7 +606,7 @@ def package_asset(source_dir, output_dir, arch, entry_name, changes_dict):
         # Copy linker scirpts
         copy_files_from_dir(mcuNames[cmake_file]['mcu_names'], source_dir, output_dir, base_output_dir, 'linker_scripts')
 
-        configure_queries(mcuNames, f"{arch.lower()}_{entry_name.lower()}_{cmake_file}", cmake_file, source_dir, changes_dict)
+        # configure_queries(mcuNames, f"{arch.lower()}_{entry_name.lower()}_{cmake_file}", cmake_file, source_dir, changes_dict)s
         coreQueriesPath = os.path.join(os.getcwd(), 'resources/queries')
         if os.path.exists(os.path.join(coreQueriesPath, 'mcus')):
             updateDevicesFromCore([f"{local_app_data_path}/databases/necto_db.db"], os.path.join(coreQueriesPath, 'mcus'))

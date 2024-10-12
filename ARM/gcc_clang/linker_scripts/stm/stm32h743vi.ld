@@ -21,7 +21,7 @@
 *****************************************************************************
 ** @attention
 **
-** Copyright (c) 2023 STMicroelectronics.
+** Copyright (c) 2022 STMicroelectronics.
 ** All rights reserved.
 **
 ** This software is licensed under terms that can be found in the LICENSE file
@@ -34,8 +34,9 @@
 /* Entry Point */
 ENTRY(Reset_Handler)
 
-_Min_Heap_Size = 0x200;      /* required amount of heap  */
-_Min_Stack_Size = 0x400; /* required amount of stack */
+/* Generate a link error if heap and stack don't fit into RAM */
+_Min_Heap_Size = 0x200 ;      /* required amount of heap  */
+_Min_Stack_Size = 0x400 ; /* required amount of stack */
 
 /* Specify the memory areas */
 MEMORY
@@ -50,7 +51,7 @@ MEMORY
 
 /* Highest address of the user mode stack */
 _estack = ORIGIN(RAM_D1) + LENGTH(RAM_D1);    /* end of RAM */
-/* Generate a link error if heap and stack don't fit into RAM */
+
 /* Define output sections */
 SECTIONS
 {
@@ -172,4 +173,5 @@ SECTIONS
 
   .ARM.attributes 0 : { *(.ARM.attributes) }
 }
+
 

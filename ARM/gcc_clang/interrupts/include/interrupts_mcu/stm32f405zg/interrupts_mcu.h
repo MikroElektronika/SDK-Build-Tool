@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2024 MikroElektronika d.o.o.
+** Copyright (C) 2023 MikroElektronika d.o.o.
 ** Contact: https://www.mikroe.com/contact
 **
 ** This file is part of the mikroSDK package
@@ -38,19 +38,25 @@
 ****************************************************************************/
 /*!
 * @file  interrupts_mcu.h
-* @brief STM32F405ZG MCU specific interrupt per module definitions.
+* @brief stm32f405zg MCU specific interrupt per module definitions.
 */
 
 #ifndef _INTERRUPTS_MCU_H_
 #define _INTERRUPTS_MCU_H_
 
 // Interrupt table
-static const int INTERRUPTS_NONMASKABLEINT = 2;
-static const int INTERRUPTS_MEMORYMANAGEMENT = 4;
+static const int INTERRUPTS_NMI = 2;
+static const int INTERRUPTS_HARDFAULT = 3;
+static const int INTERRUPTS_MEMMANAGE = 4;
 static const int INTERRUPTS_BUSFAULT = 5;
 static const int INTERRUPTS_USAGEFAULT = 6;
+static const int INTERRUPTS_RESERVED1 = 7;
+static const int INTERRUPTS_RESERVED2 = 8;
+static const int INTERRUPTS_RESERVED3 = 9;
+static const int INTERRUPTS_RESERVED4 = 10;
 static const int INTERRUPTS_SVCALL = 11;
-static const int INTERRUPTS_DEBUGMONITOR = 12;
+static const int INTERRUPTS_DEBUGMON = 12;
+static const int INTERRUPTS_RESERVED5 = 13;
 static const int INTERRUPTS_PENDSV = 14;
 static const int INTERRUPTS_SYSTICK = 15;
 static const int INTERRUPTS_WWDG = 16;
@@ -114,6 +120,8 @@ static const int INTERRUPTS_DMA2_STREAM1 = 73;
 static const int INTERRUPTS_DMA2_STREAM2 = 74;
 static const int INTERRUPTS_DMA2_STREAM3 = 75;
 static const int INTERRUPTS_DMA2_STREAM4 = 76;
+static const int INTERRUPTS_ETH = 77;
+static const int INTERRUPTS_ETH_WKUP = 78;
 static const int INTERRUPTS_CAN2_TX = 79;
 static const int INTERRUPTS_CAN2_RX0 = 80;
 static const int INTERRUPTS_CAN2_RX1 = 81;
@@ -129,16 +137,18 @@ static const int INTERRUPTS_OTG_HS_EP1_OUT = 90;
 static const int INTERRUPTS_OTG_HS_EP1_IN = 91;
 static const int INTERRUPTS_OTG_HS_WKUP = 92;
 static const int INTERRUPTS_OTG_HS = 93;
-static const int INTERRUPTS_RNG = 96;
+static const int INTERRUPTS_OTG_DCMI = 94;
+static const int INTERRUPTS_OTG_CRYP = 95;
+static const int INTERRUPTS_OTG_HASH_RNG = 96;
 static const int INTERRUPTS_FPU = 97;
 // EOF Interrupt table
 
 // Interrupt addresses
-// No interrupt registers for STM32F405ZG.
+// No interrupt registers for stm32f405zg.
 // EOF Interrupt addresses
 
 // Interrupt register bit values
-// No interrupt bits for STM32F405ZG.
+// No interrupt bits for stm32f405zg.
 // EOF Interrupt register bit values
 
 #endif // _INTERRUPTS_MCU_H_
