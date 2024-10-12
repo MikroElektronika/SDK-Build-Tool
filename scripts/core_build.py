@@ -463,21 +463,21 @@ def configure_queries(mcuNames, package_name, cmake_file, source_dir, changes_di
         mcuNames[cmake_file]['cores'].add(core)
         changes_dict['mcu_list'].append(mcu_name)
         # Define the replacements
-        replacements = {
-            '{mcu_name}': mcu_name,
-            '{core}': core,
-            '{package_name}': package_name,
-            '{package}': package
-        }
+        # replacements = {
+        #     '{mcu_name}': mcu_name,
+        #     '{core}': core,
+        #     '{package_name}': package_name,
+            # '{package}': package
+        # }
 
         # Replace placeholders in the JSON files
-        json_files = ['Devices.json', 'LinkerTables.json']
-        for file_name in json_files:
-            source_file = os.path.join(os.getcwd(),"templates", file_name)
-            dest_file = os.path.join(os.getcwd(), "resources/queries/mcus", mcu_name, file_name)
-            replace_placeholders_in_file(source_file, dest_file, replacements)
+        # json_files = ['Devices.json', 'LinkerTables.json']
+        # for file_name in json_files:
+            # source_file = os.path.join(os.getcwd(),"templates", file_name)
+            # dest_file = os.path.join(os.getcwd(), "resources/queries/mcus", mcu_name, file_name)
+            # replace_placeholders_in_file(source_file, dest_file, replacements)
 
-    shutil.copytree(os.path.join(os.getcwd(), "resources"), testPath)
+    # shutil.copytree(os.path.join(os.getcwd(), "resources"), testPath)
 
 def filter_versions(versions):
     # Filter out versions that contain non-numeric characters (e.g., words or suffixes)
@@ -606,7 +606,7 @@ def package_asset(source_dir, output_dir, arch, entry_name, changes_dict):
         # Copy linker scirpts
         copy_files_from_dir(mcuNames[cmake_file]['mcu_names'], source_dir, output_dir, base_output_dir, 'linker_scripts')
 
-        # configure_queries(mcuNames, f"{arch.lower()}_{entry_name.lower()}_{cmake_file}", cmake_file, source_dir, changes_dict)s
+        configure_queries(mcuNames, f"{arch.lower()}_{entry_name.lower()}_{cmake_file}", cmake_file, source_dir, changes_dict)
         coreQueriesPath = os.path.join(os.getcwd(), 'resources/queries')
         if os.path.exists(os.path.join(coreQueriesPath, 'mcus')):
             updateDevicesFromCore([f"{local_app_data_path}/databases/necto_db.db"], os.path.join(coreQueriesPath, 'mcus'))
@@ -636,6 +636,8 @@ def package_asset(source_dir, output_dir, arch, entry_name, changes_dict):
 
 # Writes the result dictionary to a JSON file and ensures testPath exists.
 def write_results_to_file(changes_dict):
+    os.makedirs(testPath, exist_ok=True)
+
     with open(f'{testPath}/built_changes.json', 'w+') as json_file:
         json.dump(changes_dict, json_file, indent=4)
 
