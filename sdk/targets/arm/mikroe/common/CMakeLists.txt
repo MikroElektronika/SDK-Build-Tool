@@ -2,6 +2,8 @@
 set(mcu_regs_path ${MCU_NAME})
 set(mcu_header_path ${MCU_NAME})
 
+set(AI_GENERATED_SDK "True")
+
 if(${MCU_NAME} MATCHES "(^STM32(.+)$)")
     set(architecture_macro "STM32")
     if(AI_GENERATED_SDK)

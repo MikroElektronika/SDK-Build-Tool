@@ -769,27 +769,7 @@ def main():
 
         print(f"\033[93mRunning build for {cmake_file}.\033[0m")
 
-        conn = sqlite3.connect(f"{local_app_data_path}/databases/necto_db.db")
-        cur = conn.cursor()
-        for mcu in changes_dict['mcu_list']:
-            cur.execute(f'SELECT sdk_config FROM Devices WHERE uid = "{mcu}"')
-            result = cur.fetchone()
-
-            if result:
-                print(result[0])
-        conn.close()
-
         run_builds(changes_dict)
-
-    conn = sqlite3.connect(f"{local_app_data_path}/databases/necto_db.db")
-    cur = conn.cursor()
-    for mcu in changes_dict['mcu_list']:
-        cur.execute(f'SELECT sdk_config FROM Devices WHERE uid = "{mcu}"')
-        result = cur.fetchone()
-
-        if result:
-            print(result[0])
-    conn.close()
 
     # Write all the used info for building to artifact folder.
     write_results_to_file(changes_dict)
