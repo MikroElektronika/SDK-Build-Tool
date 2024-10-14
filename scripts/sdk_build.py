@@ -4,7 +4,7 @@ from packaging import version
 
 # Global variable for local_app_data_path
 local_app_data_path = '/home/runner/.MIKROE/NECTOStudio7'
-# local_app_data_path = 'c:/Users/ivan.ruzavin/AppData/Local/MIKROE/NECTOStudio7Live'
+# local_app_data_path = 'c:/Users/footb/AppData/Local/MIKROE/NECTOStudio7'
 
 # Path for storing artifacts.
 testPath = '/home/runner/test_results'
@@ -769,7 +769,7 @@ def main():
 
         print(f"\033[93mRunning build for {cmake_file}.\033[0m")
 
-        run_builds(changes_dict)
+        # run_builds(changes_dict)
 
 
     # Write all the used info for building to artifact folder.
@@ -779,7 +779,10 @@ def main():
     cur = conn.cursor()
     for mcu in changes_dict['mcu_list']:
         cur.execute(f'SELECT sdk_config FROM Devices WHERE uid = "{mcu}"')
-        print(cur.fetchone[0])
+        result = cur.fetchone()
+
+        if result:
+            print(result[0])
     conn.close()
 
     shutil.copyfile(os.path.join(local_app_data_path, 'databases', 'necto_db.db'), os.path.join(testPath, 'necto_db.db'))
