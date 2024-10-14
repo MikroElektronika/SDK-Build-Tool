@@ -773,6 +773,7 @@ def main():
     write_results_to_file(changes_dict)
 
     shutil.copyfile(os.path.join(local_app_data_path, 'databases', 'necto_db.db'), os.path.join(testPath, 'necto_db.db'))
+    shutil.copytree(os.path.join(local_app_data_path, 'packages/sdk'), os.path.join(testPath, 'sdk'))
 
     if build_failed == True:
         # Red text for failure.
