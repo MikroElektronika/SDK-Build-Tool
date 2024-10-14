@@ -22,13 +22,9 @@ stm32u083cc_mc_rc
 stm32u083hc_kc
 stm32u545ce_je
 stm32u545ne_re_ve
-stm32wl33c8_b
-stm32wl33cc_k8
-stm32wl33kb_c
 stm32wle4c8_b
 stm32wle4cc_j8
 stm32wle4jb_c
 stm32wle5c8_b
 stm32wle5cc_j8
-stm32wle5jb_c
 stm32wle5jb_c

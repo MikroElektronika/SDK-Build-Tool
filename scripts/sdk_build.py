@@ -113,7 +113,7 @@ def run_builds(changes_dict):
         # Get the necessary compiler for the current MCU build.
         compilers = get_compilers(mcu, is_mcu=True)
         for compiler in compilers:
-            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_ARM_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_ARM_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
             run_cmd(cmd, changes_dict, mcu + ' ' + compiler)
 
 # Returns the list of compilers based on the given name and type.
@@ -157,7 +157,7 @@ def read_data_from_db(db, sql_query):
 def find_cmake_files(path):
     """ Return a list of .cmake files in the directory, excluding specific files """
     cmake_files = []
-    with open(os.path.join(os.getcwd(), "core_build.txt"), "r") as file:
+    with open(os.path.join(os.getcwd(), "sdk_build.txt"), "r") as file:
         for line in file:
             # Strip any leading/trailing whitespace (like newlines) and append to the array
             cmake_files.append(path + '/cmake/stm/' + line.strip() + '.cmake')
@@ -270,6 +270,16 @@ def extract_mcu_names(file_name, source_dir, output_dir, regex):
                                 mcus[file_name]['cores'].add(configJson['CORE_NAME'])
 
     return mcus
+
+def get_doc_ds(file):
+    with open(file, 'r') as cmake_file:
+        lines = cmake_file.readlines()
+    for line in lines:
+        match = re.search(r'doc_ds_\d+_?[1-5]?', line)
+        if match:
+            return match.group(0)  # Return the matched 'doc_ds_xx' part
+
+    return None  # Return None if not found
 
 def find_first_matching_mcu_name(source_dir, regex):
     """
@@ -461,7 +471,6 @@ def configure_queries(mcuNames, package_name, cmake_file, source_dir, changes_di
     for mcu_name in mcuNames[cmake_file]['mcu_names']:
         core = get_core_from_def(os.path.join(source_dir, "def", f"{mcu_name}.json"))
         mcuNames[cmake_file]['cores'].add(core)
-        changes_dict['mcu_list'].append(mcu_name)
         # Define the replacements
         # replacements = {
         #     '{mcu_name}': mcu_name,
@@ -633,6 +642,63 @@ def package_asset(source_dir, output_dir, arch, entry_name, changes_dict):
         # Copy packages to artifacts as well
         shutil.copytree(base_output_dir, os.path.join(testPath, "packages", f"{arch.lower()}_{entry_name.lower()}_{cmake_file}"))
 
+def process_sdk_files(cmake_file, changes_dict, source_dir):
+    cmake_files = []
+    changes_dict['mcu_list'] = []
+    sdk_source_folder = os.path.join(os.getcwd(), 'sdk/targets/arm/mikroe')
+    sdk_implementation_folders = ['adc', 'can', 'dma', 'gpio', 'i2c', 'spi_master', 'tim', 'uart', 'one_wire', 'rtc', 'rcc']
+    sdk_definition_folders = ['mcu_definitions', 'mcu_reg_addresses']
+    cmake_files.append(cmake_file)
+    file_paths = parse_files_for_paths(cmake_files, source_dir, True)
+    # Remove all older files from SDK
+    for folder in sdk_definition_folders:
+        shutil.rmtree(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/common/include', folder, 'ai_generated/STM32'))
+    for folder in sdk_implementation_folders:
+        if os.path.exists(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/src', folder, 'implementations')):
+            shutil.rmtree(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/src', folder, 'implementations'))
+        if os.path.exists(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/include', folder, f'hal_ll_{folder}_pin_map', 'implementations')):
+            shutil.rmtree(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/include', folder, f'hal_ll_{folder}_pin_map', 'implementations'))
+        if os.path.exists(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/include', folder, 'implementations')):
+            shutil.rmtree(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/include', folder, 'implementations'))
+    print(f"\033[93mAll implementations and mcu defs have been removed successfully from mikroSDK.\033[0m")
+
+    for cmake_file, data in file_paths.items():
+        mcuNames = extract_mcu_names(cmake_file, source_dir, source_dir, data['regex'])
+        doc_ds_name = get_doc_ds(cmake_file)
+        for mcu_name in mcuNames:
+            changes_dict['mcu_list'].append(mcu_name)
+            # Now copy provided mcu definition and reg addresses files
+            for folder in sdk_definition_folders:
+                src_folder = os.path.join(sdk_source_folder, 'common/include', folder, 'ai_generated/STM32', mcu_name)
+                output_folder = os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/common/include', folder, 'ai_generated/STM32')
+                if os.path.exists(src_folder):
+                    shutil.copytree(src_folder, output_folder)
+
+        # Now copy provided implementations based on doc_ds number
+        for folder in sdk_implementation_folders:
+            missing_implementation = 1
+            src_folder = os.path.join(sdk_source_folder, 'ai_generated/stm32/src', folder, 'implementations', doc_ds_name)
+            output_folder = os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/src', folder, 'implementations')
+            if os.path.exists(src_folder):
+                shutil.copytree(src_folder, output_folder)
+                missing_implementation = 0
+            src_folder = os.path.join(sdk_source_folder, 'ai_generated/stm32/include', folder, f'hal_ll_{folder}_pin_map', 'implementations', doc_ds_name)
+            output_folder = os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/include', folder, f'hal_ll_{folder}_pin_map', 'implementations')
+            if os.path.exists(src_folder):
+                shutil.copytree(src_folder, output_folder)
+                missing_implementation = 0
+            src_folder = os.path.join(sdk_source_folder, 'ai_generated/stm32/include', folder, 'implementations', doc_ds_name)
+            output_folder = os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/include', folder, 'implementations')
+            if os.path.exists(src_folder):
+                shutil.copytree(src_folder, output_folder)
+                missing_implementation = 0
+
+            if missing_implementation:
+                print(f"\033[91mMissing {folder} implementation for {doc_ds_name}\033[0m")
+                changes_dict['missing_files'].append(f'{folder} for {doc_ds_name}')
+
+    return
+
 # Writes the result dictionary to a JSON file and ensures testPath exists.
 def write_results_to_file(changes_dict):
     os.makedirs(testPath, exist_ok=True)
@@ -649,6 +715,7 @@ def main():
     architectures = ["ARM"]
     changes_dict = {
         'mcu_list': [],
+        'missing_files': [],
         'build_status': {}
     }
 
@@ -674,6 +741,11 @@ def main():
             print(f"Failed to process directories in {root_source_directory}: {e}")
 
     print(f"\033[93mAll requested core packages have been generated successfully.\033[0m")
+
+    source_directory = os.path.join(root_source_directory, 'gcc_clang')
+    cmake_files = find_cmake_files(source_directory)
+    for cmake_file in cmake_files:
+        process_sdk_files(cmake_file, changes_dict, source_directory)
 
     run_builds(changes_dict)
 

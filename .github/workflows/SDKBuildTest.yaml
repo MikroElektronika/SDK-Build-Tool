@@ -1,14 +1,10 @@
-name: Cards/Boards Recursive Build
+name: New SDK Files Build Test
 
 on:
   workflow_dispatch:
-    inputs:
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  recursiveBuild:
+  recursiveSDKBuild:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -25,7 +21,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r scripts/requirements/shared.txt
+          pip install -r scripts/requirements/databases.txt
           pip install colorama
+          pip install enums
           sudo apt-get update
           sudo apt-get install p7zip-full
           sudo apt-get install libopus-dev
@@ -43,9 +41,9 @@ jobs:
           export NECTO_DOWNLOAD_URL=${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
           python -u scripts/install_necto.py
 
-      - name: Run Recursive Build
+      - name: Run SDK Files Build
         run: |
-          python -u scripts/recursive_build.py
+          python -u scripts/sdk_build.py
 
       - name: Archive test results
         uses: actions/upload-artifact@v4
