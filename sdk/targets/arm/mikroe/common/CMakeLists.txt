@@ -3,6 +3,8 @@ set(mcu_regs_path ${MCU_NAME})
 set(mcu_header_path ${MCU_NAME})
 
 set(AI_GENERATED_SDK "True")
+set(_MSDK_PACKAGE_ID_ "{package_id}")
+set(_MSDK_PACKAGE_PIN_COUNT_ "{package_pin_count}")
 
 if(${MCU_NAME} MATCHES "(^STM32(.+)$)")
     set(architecture_macro "STM32")

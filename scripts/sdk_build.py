@@ -466,8 +466,6 @@ def get_core_from_def(file_path):
     return core
 
 def configure_queries(mcuNames, package_name, cmake_file, source_dir, changes_dict):
-    package = "128/LQFP"
-
     for mcu_name in mcuNames[cmake_file]['mcu_names']:
         core = get_core_from_def(os.path.join(source_dir, "def", f"{mcu_name}.json"))
         mcuNames[cmake_file]['cores'].add(core)
@@ -497,13 +495,6 @@ def set_sdk_support(db, mcus):
     conn = sqlite3.connect(db)
     cur = conn.cursor()
     for mcu in mcus:
-        with open(os.path.join(os.getcwd(), 'resources/queries/mcus', mcu, 'LinkerTables.json'), 'r') as file:
-            linkerTables = json.load(file)
-        file.close()
-        package_uids = linkerTables['tables'][2]['DeviceToPackage']['package_uid']
-        for package_uid in package_uids:
-            pin_count = package_uid.split('/')[0]
-            package_name = package_uid.split('/')[1]
         cur.execute(f'UPDATE Devices SET sdk_support = 1 WHERE uid = "{mcu}"')
         conn.commit()
         cur.execute('''
@@ -511,12 +502,6 @@ def set_sdk_support(db, mcus):
             SET sdk_config = REPLACE(sdk_config, '}', ',"AI_GENERATED_SDK":"True"}')
             WHERE uid = ?
             ''', (mcu,))
-        conn.commit()
-        cur.execute('''
-            UPDATE Packages
-            SET sdk_config = REPLACE(sdk_config, '}', ?)
-            WHERE uid = ?
-            ''', (',"_MSDK_PACKAGE_ID_":"' + package_name + '","_MSDK_PACKAGE_PIN_COUNT_":"' + pin_count + '"}', package_uid))
         conn.commit()
     conn.close()
 
@@ -692,7 +677,6 @@ def process_sdk_files(cmake_file, changes_dict, source_dir):
         mcuNames = extract_mcu_names(cmake_file, source_dir, source_dir, data['regex'])
         doc_ds_name = get_doc_ds(source_dir, cmake_file)
         for mcu_name in mcuNames[cmake_file]['mcu_names']:
-            changes_dict['mcu_list'].append(mcu_name)
             # Now copy provided mcu definition and reg addresses files
             for folder in sdk_definition_folders:
                 src_folder = os.path.join(sdk_source_folder, 'common/include', folder, 'ai_generated/STM32', mcu_name)
@@ -732,6 +716,29 @@ def process_sdk_files(cmake_file, changes_dict, source_dir):
         output_file = os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/common/CMakeLists.txt')
         os.remove(output_file)
         shutil.copyfile(src_file, output_file)
+
+        for mcu_name in mcuNames[cmake_file]['mcu_names']:
+            changes_dict['mcu_list'].append(mcu_name)
+            with open(os.path.join(os.getcwd(), 'resources/queries/mcus', mcu_name, 'LinkerTables.json'), 'r') as file:
+                linkerTables = json.load(file)
+            file.close()
+            package_uids = linkerTables['tables'][2]['DeviceToPackage']['package_uid']
+            for package_uid in package_uids:
+                pin_count = package_uid.split('/')[0]
+                package_name = package_uid.split('/')[1]
+
+            # Define the replacements
+            replacements = {
+                '{package_id}': package_name,
+                '{package_pin_count}': pin_count
+            }
+
+            # Replace placeholders in the JSON files
+            replace_placeholders_in_file(output_file, output_file, replacements)
+
+            print(f"\033[93mRunning build for {cmake_file}.\033[0m")
+
+            run_builds(changes_dict)
 
     return
 
@@ -779,10 +786,6 @@ def main():
     cmake_files = find_cmake_files(source_directory)
     for cmake_file in cmake_files:
         process_sdk_files(cmake_file, changes_dict, source_directory)
-
-        print(f"\033[93mRunning build for {cmake_file}.\033[0m")
-
-        run_builds(changes_dict)
 
     # Write all the used info for building to artifact folder.
     write_results_to_file(changes_dict)
