@@ -717,6 +717,13 @@ def process_sdk_files(cmake_file, changes_dict, source_dir):
         # Finally update the database with sdk support
         set_sdk_support(f"{local_app_data_path}/databases/necto_db.db", mcuNames[cmake_file]['mcu_names'])
 
+        # TODO - remove after
+        # Copy common cmake for debugging
+        src_file = os.path.join(sdk_source_folder, 'common/CmakeLists.txt')
+        output_file = os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/common/CmakeLists.txt')
+        shutil.rmtree(output_file)
+        shutil.copyfile(src_file, output_file)
+
     return
 
 # Writes the result dictionary to a JSON file and ensures testPath exists.
@@ -773,7 +780,6 @@ def main():
     write_results_to_file(changes_dict)
 
     shutil.copyfile(os.path.join(local_app_data_path, 'databases', 'necto_db.db'), os.path.join(testPath, 'necto_db.db'))
-    shutil.copytree(os.path.join(local_app_data_path, 'packages/sdk'), os.path.join(testPath, 'sdk'))
 
     if build_failed == True:
         # Red text for failure.
