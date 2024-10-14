@@ -271,8 +271,8 @@ def extract_mcu_names(file_name, source_dir, output_dir, regex):
 
     return mcus
 
-def get_doc_ds(file):
-    with open(f'{file}.cmake', 'r') as cmake_file:
+def get_doc_ds(source_dir, file):
+    with open(os.path.join(source_dir, 'cmake/stm', f'{file}.cmake'), 'r') as cmake_file:
         lines = cmake_file.readlines()
     for line in lines:
         match = re.search(r'doc_ds_\d+_?[1-5]?', line)
@@ -674,7 +674,7 @@ def process_sdk_files(cmake_file, changes_dict, source_dir):
 
     for cmake_file, data in file_paths.items():
         mcuNames = extract_mcu_names(cmake_file, source_dir, source_dir, data['regex'])
-        doc_ds_name = get_doc_ds(cmake_file)
+        doc_ds_name = get_doc_ds(source_dir, cmake_file)
         for mcu_name in mcuNames[cmake_file]['mcu_names']:
             changes_dict['mcu_list'].append(mcu_name)
             # Now copy provided mcu definition and reg addresses files
