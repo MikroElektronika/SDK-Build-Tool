@@ -721,7 +721,7 @@ def process_sdk_files(cmake_file, changes_dict, source_dir):
         # Copy common cmake for debugging
         src_file = os.path.join(sdk_source_folder, 'common/CMakeLists.txt')
         output_file = os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/common/CMakeLists.txt')
-        shutil.rmtree(output_file)
+        os.remove(output_file)
         shutil.copyfile(src_file, output_file)
 
     return
