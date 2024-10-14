@@ -37,6 +37,7 @@ endif()
 set(header_files "")
 get_files(include/mcu_definitions/${architecture}/${mcu_header_path} header_files h)
 
+message(INFO " _MSDK_HAL_LOW_LEVEL_TARGET_ is ${_MSDK_HAL_LOW_LEVEL_TARGET_}")
 message(INFO " AI_GENERATED_SDK is ${AI_GENERATED_SDK}")
 message(INFO " arcitecture is ${architecture}")
 message(INFO " mcu_regs_path is ${mcu_regs_path}")

@@ -494,8 +494,6 @@ def filter_versions(versions):
     return filtered_versions
 
 def set_sdk_support(db, mcus):
-    import sqlite3
-
     conn = sqlite3.connect(db)
     cur = conn.cursor()
     for mcu in mcus:
@@ -510,8 +508,6 @@ def set_sdk_support(db, mcus):
     conn.close()
 
 def insertIntoTable(db, tableName, values, columns):
-    import sqlite3
-
     conn = sqlite3.connect(db)
     cur = conn.cursor()
     numOfItems = ''
@@ -778,6 +774,13 @@ def main():
 
     # Write all the used info for building to artifact folder.
     write_results_to_file(changes_dict)
+
+    conn = sqlite3.connect(f"{local_app_data_path}/databases/necto_db.db")
+    cur = conn.cursor()
+    for mcu in changes_dict['mcu_list']:
+        cur.execute(f'SELECT sdk_config FROM Devices WHERE uid = "{mcu}"')
+        print(cur.fetchone)
+    conn.close()
 
     shutil.copyfile(os.path.join(local_app_data_path, 'databases', 'necto_db.db'), os.path.join(testPath, 'necto_db.db'))
 
