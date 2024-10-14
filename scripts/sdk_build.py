@@ -272,7 +272,7 @@ def extract_mcu_names(file_name, source_dir, output_dir, regex):
     return mcus
 
 def get_doc_ds(file):
-    with open(file, 'r') as cmake_file:
+    with open(f'{file}.cmake', 'r') as cmake_file:
         lines = cmake_file.readlines()
     for line in lines:
         match = re.search(r'doc_ds_\d+_?[1-5]?', line)
