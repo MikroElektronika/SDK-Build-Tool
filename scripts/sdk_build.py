@@ -497,6 +497,13 @@ def set_sdk_support(db, mcus):
     conn = sqlite3.connect(db)
     cur = conn.cursor()
     for mcu in mcus:
+        with open(os.path.join(os.getcwd(), 'resources/queries/mcus', mcu, 'LinkerTables.json'), 'r') as file:
+            linkerTables = json.load(file)
+        file.close()
+        package_uids = linkerTables['tables'][2]['DeviceToPackage']['package_uid']
+        for package_uid in package_uids:
+            pin_count = package_uid.split('/')[0]
+            package_name = package_uid.split('/')[1]
         cur.execute(f'UPDATE Devices SET sdk_support = 1 WHERE uid = "{mcu}"')
         conn.commit()
         cur.execute('''
@@ -504,6 +511,12 @@ def set_sdk_support(db, mcus):
             SET sdk_config = REPLACE(sdk_config, '}', ',"AI_GENERATED_SDK":"True"}')
             WHERE uid = ?
             ''', (mcu,))
+        conn.commit()
+        cur.execute('''
+            UPDATE Packages
+            SET sdk_config = REPLACE(sdk_config, '}', ?)
+            WHERE uid = ?
+            ''', (',"_MSDK_PACKAGE_ID_":"' + package_name + '","_MSDK_PACKAGE_PIN_COUNT_":"' + pin_count + '"}', package_uid))
         conn.commit()
     conn.close()
 
