@@ -493,6 +493,16 @@ def filter_versions(versions):
     filtered_versions = [v for v in versions if all(part.isdigit() for part in v.split('.'))]
     return filtered_versions
 
+def set_sdk_support(db, mcus):
+    import sqlite3
+
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
+    for mcu in mcus:
+        cur.execute(f'UPDATE Devices SET sdk_support = 1 WHERE uid = "{mcu}"')
+        conn.commit()
+    conn.close()
+
 def insertIntoTable(db, tableName, values, columns):
     import sqlite3
 
@@ -665,7 +675,7 @@ def process_sdk_files(cmake_file, changes_dict, source_dir):
     for cmake_file, data in file_paths.items():
         mcuNames = extract_mcu_names(cmake_file, source_dir, source_dir, data['regex'])
         doc_ds_name = get_doc_ds(cmake_file)
-        for mcu_name in mcuNames:
+        for mcu_name in mcuNames[cmake_file]['mcu_names']:
             changes_dict['mcu_list'].append(mcu_name)
             # Now copy provided mcu definition and reg addresses files
             for folder in sdk_definition_folders:
@@ -696,6 +706,9 @@ def process_sdk_files(cmake_file, changes_dict, source_dir):
             if missing_implementation:
                 print(f"\033[91mMissing {folder} implementation for {doc_ds_name}\033[0m")
                 changes_dict['missing_files'].append(f'{folder} for {doc_ds_name}')
+
+        # Finally update the database with sdk support
+        set_sdk_support(f"{local_app_data_path}/databases/necto_db.db", mcuNames[cmake_file]['mcu_names'])
 
     return
 
@@ -747,7 +760,10 @@ def main():
     for cmake_file in cmake_files:
         process_sdk_files(cmake_file, changes_dict, source_directory)
 
-    run_builds(changes_dict)
+        print(f"\033[93mRunning build for {cmake_file}.\033[0m")
+
+        run_builds(changes_dict)
+
 
     # Write all the used info for building to artifact folder.
     write_results_to_file(changes_dict)
