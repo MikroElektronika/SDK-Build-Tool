@@ -1,2 +1,2 @@
-arm_gcc_clang_stm32c011x4_x6
+stm32c011x4_x6
 stm32h7s3a8_i8
