@@ -501,6 +501,12 @@ def set_sdk_support(db, mcus):
     for mcu in mcus:
         cur.execute(f'UPDATE Devices SET sdk_support = 1 WHERE uid = "{mcu}"')
         conn.commit()
+        cur.execute('''
+            UPDATE Devices
+            SET sdk_config = REPLACE(sdk_config, '}', ',"AI_GENERATED_SDK":"True"}')
+            WHERE uid = ?
+            ''', (mcu,))
+        conn.commit()
     conn.close()
 
 def insertIntoTable(db, tableName, values, columns):
