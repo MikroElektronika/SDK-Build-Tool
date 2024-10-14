@@ -16,8 +16,8 @@
 
 Support added for following hardware:
 
-- STM32WLE5JB_C MCU Support package for GCC & Clang
-  - STM32WLE5JB
-  - STM32WLE5JC
+- STM32H7S3A8_I8 MCU Support package for GCC & Clang
+  - STM32H7S3A8
+  - STM32H7S3I8
 
 ---
