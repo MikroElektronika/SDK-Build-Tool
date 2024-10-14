@@ -642,9 +642,6 @@ def write_results_to_file(changes_dict):
 
     print(f"All the data for build has been written to {testPath}/built_changes.json")
 
-    for item in changes_dict['unused']:
-        print(f"Couldn't find {item} in the database")
-
 def main():
     architectures = ["ARM"]
     changes_dict = {
