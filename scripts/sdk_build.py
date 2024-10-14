@@ -779,7 +779,7 @@ def main():
     cur = conn.cursor()
     for mcu in changes_dict['mcu_list']:
         cur.execute(f'SELECT sdk_config FROM Devices WHERE uid = "{mcu}"')
-        print(cur.fetchone)
+        print(cur.fetchone[0])
     conn.close()
 
     shutil.copyfile(os.path.join(local_app_data_path, 'databases', 'necto_db.db'), os.path.join(testPath, 'necto_db.db'))
