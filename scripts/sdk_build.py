@@ -701,37 +701,41 @@ def process_sdk_files(cmake_file, changes_dict, source_dir):
         for mcu_name in mcuNames[cmake_file]['mcu_names']:
             changes_dict['mcu_list'].append(mcu_name)
             # Now copy provided mcu definition and reg addresses files
-            for folder in sdk_definition_folders:
-                src_folder = os.path.join(sdk_source_folder, 'common/include', folder, 'ai_generated/STM32', mcu_name)
-                output_folder = os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/common/include', folder, 'ai_generated/STM32', mcu_name)
-                if os.path.exists(src_folder):
-                    shutil.copytree(src_folder, output_folder)
+            # for folder in sdk_definition_folders:
+            #     src_folder = os.path.join(sdk_source_folder, 'common/include', folder, 'ai_generated/STM32', mcu_name)
+            #     output_folder = os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/common/include', folder, 'ai_generated/STM32', mcu_name)
+            #     if os.path.exists(src_folder):
+            #         shutil.copytree(src_folder, output_folder)
 
         # Now copy provided implementations based on doc_ds number
-        for folder in sdk_implementation_folders:
-            missing_implementation = 1
-            src_folder = os.path.join(sdk_source_folder, 'ai_generated/stm32/src', folder, 'implementations', doc_ds_name)
-            output_folder = os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/src', folder, 'implementations', doc_ds_name)
-            if os.path.exists(src_folder):
-                shutil.copytree(src_folder, output_folder)
-                missing_implementation = 0
-            src_folder = os.path.join(sdk_source_folder, 'ai_generated/stm32/include', folder, f'hal_ll_{folder}_pin_map', 'implementations', doc_ds_name)
-            output_folder = os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/include', folder, f'hal_ll_{folder}_pin_map', 'implementations', doc_ds_name)
-            if os.path.exists(src_folder):
-                shutil.copytree(src_folder, output_folder)
-                missing_implementation = 0
-            src_folder = os.path.join(sdk_source_folder, 'ai_generated/stm32/include', folder, 'implementations', doc_ds_name)
-            output_folder = os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/include', folder, 'implementations', doc_ds_name)
-            if os.path.exists(src_folder):
-                shutil.copytree(src_folder, output_folder)
-                missing_implementation = 0
+        # for folder in sdk_implementation_folders:
+        #     missing_implementation = 1
+        #     src_folder = os.path.join(sdk_source_folder, 'ai_generated/stm32/src', folder, 'implementations', doc_ds_name)
+        #     output_folder = os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/src', folder, 'implementations', doc_ds_name)
+        #     if os.path.exists(src_folder):
+        #         shutil.copytree(src_folder, output_folder)
+        #         missing_implementation = 0
+        #     src_folder = os.path.join(sdk_source_folder, 'ai_generated/stm32/include', folder, f'hal_ll_{folder}_pin_map', 'implementations', doc_ds_name)
+        #     output_folder = os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/include', folder, f'hal_ll_{folder}_pin_map', 'implementations', doc_ds_name)
+        #     if os.path.exists(src_folder):
+        #         shutil.copytree(src_folder, output_folder)
+        #         missing_implementation = 0
+        #     src_folder = os.path.join(sdk_source_folder, 'ai_generated/stm32/include', folder, 'implementations', doc_ds_name)
+        #     output_folder = os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/include', folder, 'implementations', doc_ds_name)
+        #     if os.path.exists(src_folder):
+        #         shutil.copytree(src_folder, output_folder)
+        #         missing_implementation = 0
 
-            if missing_implementation:
-                print(f"\033[91mMissing {folder} implementation for {doc_ds_name}\033[0m")
-                changes_dict['missing_files'].append(f'{folder} for {doc_ds_name}')
+        #     if missing_implementation:
+        #         print(f"\033[91mMissing {folder} implementation for {doc_ds_name}\033[0m")
+        #         changes_dict['missing_files'].append(f'{folder} for {doc_ds_name}')
 
         # Finally update the database with sdk support
         set_sdk_support(f"{local_app_data_path}/databases/necto_db.db", mcuNames[cmake_file]['mcu_names'])
+
+        # TODO - remove after
+        # Copy SDK targets fully
+        shutil.copytree(os.path.join(sdk_source_folder), os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe'))
 
         # TODO - remove after
         # Copy common cmake for debugging
