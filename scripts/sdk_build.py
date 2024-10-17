@@ -683,17 +683,17 @@ def process_sdk_files(cmake_file, changes_dict, source_dir):
     cmake_files.append(cmake_file)
     file_paths = parse_files_for_paths(cmake_files, source_dir, True)
     # Remove all older files from SDK
-    for folder in sdk_definition_folders:
-        if os.path.exists(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/common/include', folder, 'ai_generated/STM32')):
-            shutil.rmtree(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/common/include', folder, 'ai_generated/STM32'))
-    for folder in sdk_implementation_folders:
-        if os.path.exists(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/src', folder, 'implementations')):
-            shutil.rmtree(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/src', folder, 'implementations'))
-        if os.path.exists(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/include', folder, f'hal_ll_{folder}_pin_map', 'implementations')):
-            shutil.rmtree(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/include', folder, f'hal_ll_{folder}_pin_map', 'implementations'))
-        if os.path.exists(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/include', folder, 'implementations')):
-            shutil.rmtree(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/include', folder, 'implementations'))
-    print(f"\033[93mAll implementations and mcu defs have been removed successfully from mikroSDK.\033[0m")
+    # for folder in sdk_definition_folders:
+        # if os.path.exists(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/common/include', folder, 'ai_generated/STM32')):
+            # shutil.rmtree(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/common/include', folder, 'ai_generated/STM32'))
+    # for folder in sdk_implementation_folders:
+        # if os.path.exists(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/src', folder, 'implementations')):
+        #     shutil.rmtree(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/src', folder, 'implementations'))
+        # if os.path.exists(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/include', folder, f'hal_ll_{folder}_pin_map', 'implementations')):
+        #     shutil.rmtree(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/include', folder, f'hal_ll_{folder}_pin_map', 'implementations'))
+        # if os.path.exists(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/include', folder, 'implementations')):
+        #     shutil.rmtree(os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/ai_generated/stm32/include', folder, 'implementations'))
+    # print(f"\033[93mAll implementations and mcu defs have been removed successfully from mikroSDK.\033[0m")
 
     for cmake_file, data in file_paths.items():
         mcuNames = extract_mcu_names(cmake_file, source_dir, source_dir, data['regex'])

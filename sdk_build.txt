@@ -1,1 +1,2 @@
+stm32h562ag_i
 stm32h7s3a8_i8
