@@ -735,37 +735,37 @@ def process_sdk_files(cmake_file, changes_dict, source_dir):
 
         # TODO - remove after
         # Copy common cmake for debugging
-        src_file = os.path.join(sdk_source_folder, 'common/CMakeLists.txt')
-        output_file = os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/common/CMakeLists.txt')
-        os.remove(output_file)
-        shutil.copyfile(src_file, output_file)
+        # src_file = os.path.join(sdk_source_folder, 'common/CMakeLists.txt')
+        # output_file = os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/common/CMakeLists.txt')
+        # os.remove(output_file)
+        # shutil.copyfile(src_file, output_file)
 
-        for mcu_name in mcuNames[cmake_file]['mcu_names']:
-            with open(os.path.join(os.getcwd(), 'resources/queries/mcus', mcu_name, 'LinkerTables.json'), 'r') as file:
-                linkerTables = json.load(file)
-            file.close()
-            package_uids = linkerTables['tables'][2]['DeviceToPackage']['package_uid']
-            for package_uid in package_uids:
-                pin_count = package_uid.split('/')[0]
-                package_name = package_uid.split('/')[1]
+        # for mcu_name in mcuNames[cmake_file]['mcu_names']:
+        #     with open(os.path.join(os.getcwd(), 'resources/queries/mcus', mcu_name, 'LinkerTables.json'), 'r') as file:
+        #         linkerTables = json.load(file)
+        #     file.close()
+        #     package_uids = linkerTables['tables'][2]['DeviceToPackage']['package_uid']
+        #     for package_uid in package_uids:
+        #         pin_count = package_uid.split('/')[0]
+        #         package_name = package_uid.split('/')[1]
 
-            # Define the replacements
-            replacements = {
-                '{package_id}': package_name,
-                '{package_pin_count}': pin_count
-            }
+        #     # Define the replacements
+        #     replacements = {
+        #         '{package_id}': package_name,
+        #         '{package_pin_count}': pin_count
+        #     }
 
-            # Replace placeholders in the JSON files
-            replace_placeholders_in_file(output_file, output_file, replacements)
+        #     # Replace placeholders in the JSON files
+        #     replace_placeholders_in_file(output_file, output_file, replacements)
 
-            src_file = os.path.join(sdk_source_folder, 'CMakeLists.txt')
-            output_file = os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/CMakeLists.txt')
-            os.remove(output_file)
-            shutil.copyfile(src_file, output_file)
+        #     src_file = os.path.join(sdk_source_folder, 'CMakeLists.txt')
+        #     output_file = os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/CMakeLists.txt')
+        #     os.remove(output_file)
+        #     shutil.copyfile(src_file, output_file)
 
-            print(f"\033[93mRunning build for {cmake_file}.\033[0m")
+        #     print(f"\033[93mRunning build for {cmake_file}.\033[0m")
 
-            run_builds(changes_dict)
+        #     run_builds(changes_dict)
 
     return
 
@@ -814,9 +814,9 @@ def main():
     for cmake_file in cmake_files:
         process_sdk_files(cmake_file, changes_dict, source_directory)
 
-        # print(f"\033[93mRunning build for {cmake_file}.\033[0m")
+        print(f"\033[93mRunning build for {cmake_file}.\033[0m")
 
-        # run_builds(changes_dict)
+        run_builds(changes_dict)
 
     # Write all the used info for building to artifact folder.
     write_results_to_file(changes_dict)
