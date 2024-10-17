@@ -731,7 +731,7 @@ def process_sdk_files(cmake_file, changes_dict, source_dir):
                 changes_dict['missing_files'].append(f'{folder} for {doc_ds_name}')
 
         # Finally update the database with sdk support
-        # set_sdk_support(f"{local_app_data_path}/databases/necto_db.db", mcuNames[cmake_file]['mcu_names'])
+        set_sdk_support(f"{local_app_data_path}/databases/necto_db.db", mcuNames[cmake_file]['mcu_names'])
 
         # TODO - remove after
         # Copy common cmake for debugging
