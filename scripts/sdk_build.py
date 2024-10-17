@@ -113,7 +113,7 @@ def run_builds(changes_dict):
         # Get the necessary compiler for the current MCU build.
         compilers = get_compilers(mcu, is_mcu=True)
         for compiler in compilers:
-            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "0" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_ARM_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
+            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_ARM_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
             run_cmd(cmd, changes_dict, mcu + ' ' + compiler)
 
 # Returns the list of compilers based on the given name and type.
