@@ -486,6 +486,28 @@ def configure_queries(mcuNames, package_name, cmake_file, source_dir, changes_di
 
     # shutil.copytree(os.path.join(os.getcwd(), "resources"), testPath)
 
+    # Define the new entry
+    new_entry = {
+        "ProgrammerToDevice": {
+            "programer_uid": ["gdb_general"]
+        }
+    }
+
+    # Path to the JSON file
+    json_path = os.path.join(os.getcwd(), "resources/queries/mcus", mcu_name, "LinkerTables.json")
+
+    # Read the existing content of the JSON file
+    with open(json_path, 'r') as file:
+        json_content = json.load(file)
+
+    # Add the new entry to "tables"
+    json_content["tables"].append(new_entry)
+
+    # Write the updated content back to the file
+    with open(json_path, 'w') as file:
+        json.dump(json_content, file, indent=4)
+
+
 def filter_versions(versions):
     # Filter out versions that contain non-numeric characters (e.g., words or suffixes)
     filtered_versions = [v for v in versions if all(part.isdigit() for part in v.split('.'))]
@@ -712,33 +734,29 @@ def process_sdk_files(cmake_file, changes_dict, source_dir):
 
         # TODO - remove after
         # Copy common cmake for debugging
-        src_file = os.path.join(sdk_source_folder, 'common/CMakeLists.txt')
-        output_file = os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/common/CMakeLists.txt')
-        os.remove(output_file)
-        shutil.copyfile(src_file, output_file)
+        # src_file = os.path.join(sdk_source_folder, 'common/CMakeLists.txt')
+        # output_file = os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe/common/CMakeLists.txt')
+        # os.remove(output_file)
+        # shutil.copyfile(src_file, output_file)
 
-        for mcu_name in mcuNames[cmake_file]['mcu_names']:
-            changes_dict['mcu_list'].append(mcu_name)
-            with open(os.path.join(os.getcwd(), 'resources/queries/mcus', mcu_name, 'LinkerTables.json'), 'r') as file:
-                linkerTables = json.load(file)
-            file.close()
-            package_uids = linkerTables['tables'][2]['DeviceToPackage']['package_uid']
-            for package_uid in package_uids:
-                pin_count = package_uid.split('/')[0]
-                package_name = package_uid.split('/')[1]
+        # for mcu_name in mcuNames[cmake_file]['mcu_names']:
+        #     changes_dict['mcu_list'].append(mcu_name)
+        #     with open(os.path.join(os.getcwd(), 'resources/queries/mcus', mcu_name, 'LinkerTables.json'), 'r') as file:
+        #         linkerTables = json.load(file)
+        #     file.close()
+        #     package_uids = linkerTables['tables'][2]['DeviceToPackage']['package_uid']
+        #     for package_uid in package_uids:
+        #         pin_count = package_uid.split('/')[0]
+        #         package_name = package_uid.split('/')[1]
 
-            # Define the replacements
-            replacements = {
-                '{package_id}': package_name,
-                '{package_pin_count}': pin_count
-            }
+        #     # Define the replacements
+        #     replacements = {
+        #         '{package_id}': package_name,
+        #         '{package_pin_count}': pin_count
+        #     }
 
-            # Replace placeholders in the JSON files
-            replace_placeholders_in_file(output_file, output_file, replacements)
-
-            print(f"\033[93mRunning build for {cmake_file}.\033[0m")
-
-            run_builds(changes_dict)
+        #     # Replace placeholders in the JSON files
+        #     replace_placeholders_in_file(output_file, output_file, replacements)
 
     return
 
@@ -787,9 +805,12 @@ def main():
     for cmake_file in cmake_files:
         process_sdk_files(cmake_file, changes_dict, source_directory)
 
+        print(f"\033[93mRunning build for {cmake_file}.\033[0m")
+
+        run_builds(changes_dict)
+
     # Write all the used info for building to artifact folder.
     write_results_to_file(changes_dict)
-
 
     shutil.copyfile(os.path.join(local_app_data_path, 'databases', 'necto_db.db'), os.path.join(testPath, 'necto_db.db'))
 
