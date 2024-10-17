@@ -1,2 +1,3 @@
+stm32c011x4_x6
 stm32h562ag_i
 stm32h7s3a8_i8
