@@ -699,6 +699,7 @@ def process_sdk_files(cmake_file, changes_dict, source_dir):
         mcuNames = extract_mcu_names(cmake_file, source_dir, source_dir, data['regex'])
         doc_ds_name = get_doc_ds(source_dir, cmake_file)
         for mcu_name in mcuNames[cmake_file]['mcu_names']:
+            changes_dict['mcu_list'].append(mcu_name)
             # Now copy provided mcu definition and reg addresses files
             for folder in sdk_definition_folders:
                 src_folder = os.path.join(sdk_source_folder, 'common/include', folder, 'ai_generated/STM32', mcu_name)
@@ -740,7 +741,6 @@ def process_sdk_files(cmake_file, changes_dict, source_dir):
         # shutil.copyfile(src_file, output_file)
 
         # for mcu_name in mcuNames[cmake_file]['mcu_names']:
-        #     changes_dict['mcu_list'].append(mcu_name)
         #     with open(os.path.join(os.getcwd(), 'resources/queries/mcus', mcu_name, 'LinkerTables.json'), 'r') as file:
         #         linkerTables = json.load(file)
         #     file.close()
