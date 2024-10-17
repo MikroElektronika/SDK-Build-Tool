@@ -735,7 +735,7 @@ def process_sdk_files(cmake_file, changes_dict, source_dir):
 
         # TODO - remove after
         # Copy SDK targets fully
-        shutil.copytree(os.path.join(sdk_source_folder), os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe'))
+        shutil.copytree(os.path.join(sdk_source_folder), os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/targets/arm/mikroe'), dirs_exist_ok=True)
 
         # TODO - remove after
         # Copy common cmake for debugging
