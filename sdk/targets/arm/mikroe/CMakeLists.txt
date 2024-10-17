@@ -13,7 +13,11 @@ endif()
 add_subdirectory(common)
 add_subdirectory(core)
 
+message(INFO " AI_GENERATED_SDK in general cmake is ${AI_GENERATED_SDK}")
+
 set(AI_GENERATED_SDK True)
+
+message(INFO " AI_GENERATED_SDK in general cmake after setting it manually is ${AI_GENERATED_SDK}")
 
 if(AI_GENERATED_SDK)
     add_subdirectory(ai_generated/${vendor_id})
