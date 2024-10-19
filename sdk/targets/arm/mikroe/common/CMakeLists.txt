@@ -3,8 +3,8 @@ set(mcu_regs_path ${MCU_NAME})
 set(mcu_header_path ${MCU_NAME})
 
 set(AI_GENERATED_SDK True)
-# set(_MSDK_PACKAGE_ID_ "{package_id}")
-# set(_MSDK_PACKAGE_PIN_COUNT_ "{package_pin_count}")
+set(_MSDK_PACKAGE_ID_ "{package_id}")
+set(_MSDK_PACKAGE_PIN_COUNT_ "{package_pin_count}")
 
 if(${MCU_NAME} MATCHES "(^STM32(.+)$)")
     set(architecture_macro "STM32")
@@ -40,11 +40,6 @@ endif()
 
 set(header_files "")
 get_files(include/mcu_definitions/${architecture}/${mcu_header_path} header_files h)
-
-message(INFO " mcu_header_path is ${mcu_header_path}")
-message(INFO " _MSDK_PACKAGE_PIN_COUNT_ is ${_MSDK_PACKAGE_PIN_COUNT_}")
-message(INFO " AI_GENERATED_SDK is ${AI_GENERATED_SDK}")
-message(INFO " arcitecture is ${architecture}")
 
 mikrosdk_add_interface_library(lib_hal_ll_common MikroSDK.HalLowLevelCommon
     include/hal_ll_bit_control.h
