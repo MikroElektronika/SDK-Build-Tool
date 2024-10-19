@@ -447,7 +447,7 @@ def get_core_from_def(file_path):
 
             # Check if the "core" key exists in the JSON data
             if 'core' in data:
-                core = data['core']
+                core = data['core'].replace('EF', '').replace('+', '')
             else:
                 print(f'Warning: "core" key not found in {file_path}')
     else:
@@ -491,7 +491,7 @@ def insertIntoTable(db, tableName, values, columns):
     numOfItems = ''
     for itemCount in range(1, len(values) + 1):
         numOfItems += '?,'
-    cur.execute(f'INSERT OR IGNORE INTO {tableName} ({columns}) VALUES ({numOfItems[:-1]})', values)
+    cur.execute(f'INSERT OR REPLACE INTO {tableName} ({columns}) VALUES ({numOfItems[:-1]})', values)
     conn.commit()
     conn.close()
 
