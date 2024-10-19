@@ -829,7 +829,7 @@ def main():
 
     shutil.copyfile(os.path.join(local_app_data_path, 'databases', 'necto_db.db'), os.path.join(testPath, 'necto_db.db'))
 
-    shutil.copytree(os.path.join(local_app_data_path, 'packages', 'sdk', 'mikroSDK_v2'), os.path.join(testPath, 'mikroSDK_v2'))
+    # shutil.copytree(os.path.join(local_app_data_path, 'packages', 'sdk', 'mikroSDK_v2'), os.path.join(testPath, 'mikroSDK_v2'))
 
     if build_failed == True:
         # Red text for failure.
