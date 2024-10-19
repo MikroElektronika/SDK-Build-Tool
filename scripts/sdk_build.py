@@ -764,7 +764,7 @@ def process_sdk_files(cmake_file, changes_dict, source_dir):
             shutil.copyfile(src_file, output_file)
 
             # Copy utils.cmake
-            src_file = os.path.join(os.getcwd(), 'sdk' 'utils.cmake')
+            src_file = os.path.join(os.getcwd(), 'sdk', 'utils.cmake')
             output_file = os.path.join(local_app_data_path, 'packages/sdk/mikroSDK_v2/src/cmake/utils.cmake')
             os.remove(output_file)
             shutil.copyfile(src_file, output_file)
