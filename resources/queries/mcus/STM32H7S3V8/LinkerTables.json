@@ -17,8 +17,8 @@
         {
             "DeviceToPackage": {
                 "package_uid": [
-                    "100/LQFP",
                     "100/TFBGA",
+                    "100/LQFP",
                     "101/WLCSP"
                 ]
             }
