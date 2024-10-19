@@ -668,12 +668,10 @@ def main():
                         package_asset(source_directory, output_directory, arch, entry.name, changes_dict)
         except Exception as e:
             print(f"Failed to process directories in {root_source_directory}: {e}")
+            print(f"Something went wrong while configuring the packages")
 
-    if not e:
-        print(f"\033[93mAll requested core packages have been generated successfully.\033[0m")
-        run_builds(changes_dict)
-    else:
-        print(f"Something went wrong while configuring the packages")
+    print(f"\033[93mAll requested core packages have been generated successfully.\033[0m")
+    run_builds(changes_dict)
 
 
     # Write all the used info for building to artifact folder.
