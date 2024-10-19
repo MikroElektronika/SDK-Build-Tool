@@ -4,7 +4,7 @@ from packaging import version
 
 # Global variable for local_app_data_path
 local_app_data_path = '/home/runner/.MIKROE/NECTOStudio7'
-# local_app_data_path = 'c:/Users/IvanRus/AppData/Local/MIKROE/NECTOStudio7'
+# local_app_data_path = 'c:/Users/footb/AppData/Local/MIKROE/NECTOStudio7'
 
 # Path for storing artifacts.
 testPath = '/home/runner/test_results'
@@ -263,11 +263,11 @@ def extract_mcu_names(file_name, source_dir, output_dir, regex):
                     mcu_name = os.path.splitext(file)[0]
                     if regex_pattern.match(mcu_name):
                         mcus[file_name]['mcu_names'].add(mcu_name)
-                        if 'gcc_clang' in source_dir or 'XC32' in source_dir:
-                            isPresent, readData = read_data_from_db(os.path.join(local_app_data_path, "databases", "necto_db.db"), f'SELECT sdk_config FROM Devices WHERE name IS "{mcu_name}"')
-                            if isPresent:
-                                configJson = json.loads(readData[0][0])
-                                mcus[file_name]['cores'].add(configJson['CORE_NAME'])
+                        # if 'gcc_clang' in source_dir or 'XC32' in source_dir:
+                            # isPresent, readData = read_data_from_db(os.path.join(local_app_data_path, "databases", "necto_db.db"), f'SELECT sdk_config FROM Devices WHERE name IS "{mcu_name}"')
+                            # if isPresent:
+                                # configJson = json.loads(readData[0][0])
+                                # mcus[file_name]['cores'].add(configJson['CORE_NAME'])
 
     return mcus
 
@@ -456,7 +456,6 @@ def get_core_from_def(file_path):
     return core
 
 def configure_queries(mcuNames, package_name, cmake_file, source_dir, changes_dict):
-    package = "128/LQFP"
 
     for mcu_name in mcuNames[cmake_file]['mcu_names']:
         core = get_core_from_def(os.path.join(source_dir, "def", f"{mcu_name}.json"))
@@ -670,9 +669,12 @@ def main():
         except Exception as e:
             print(f"Failed to process directories in {root_source_directory}: {e}")
 
-    print(f"\033[93mAll requested core packages have been generated successfully.\033[0m")
+    if not e:
+        print(f"\033[93mAll requested core packages have been generated successfully.\033[0m")
+        run_builds(changes_dict)
+    else:
+        print(f"Something went wrong while configuring the packages")
 
-    run_builds(changes_dict)
 
     # Write all the used info for building to artifact folder.
     write_results_to_file(changes_dict)
