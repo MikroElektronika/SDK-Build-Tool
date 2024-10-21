@@ -448,6 +448,8 @@ def get_core_from_def(file_path):
             # Check if the "core" key exists in the JSON data
             if 'core' in data:
                 core = data['core'].replace('EF', '').replace('+', '')
+                if core == 'M33':
+                    core = 'M33EF'
             else:
                 print(f'Warning: "core" key not found in {file_path}')
     else:
