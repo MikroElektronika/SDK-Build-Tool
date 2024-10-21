@@ -3,7 +3,8 @@ import os, re, subprocess, shutil, json, sqlite3
 from packaging import version
 
 # Global variable for local_app_data_path
-local_app_data_path = '/home/runner/.MIKROE/NECTOStudio7'
+# local_app_data_path = '/home/runner/.MIKROE/NECTOStudio7'
+local_app_data_path = 'c:/Users/ivan.ruzavin/AppData/Local/MIKROE/NECTOStudio7Dev/'
 
 # Path for storing artifacts.
 testPath = '/home/runner/test_results'
@@ -456,6 +457,7 @@ def get_core_from_def(file_path):
 
             # Check if the "core" key exists in the JSON data
             if 'core' in data:
+                core = data['core']
                 if core == 'M7EF':
                     core = 'M7'
             else:
