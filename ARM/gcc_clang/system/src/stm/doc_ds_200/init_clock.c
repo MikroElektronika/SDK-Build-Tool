@@ -39,9 +39,11 @@
  * @brief Mikroe clock initialization API.
  */
 
+#include "mcu.h"
 #include "core_header.h"
 
-int main() {
+void clockConfig(void) {
     // TODO
-    return 0;
+    /* Set CP10 and CP11 Full Access */
+    SCB->CPACR |= ((3UL << 20U)|(3UL << 22U));
 }
