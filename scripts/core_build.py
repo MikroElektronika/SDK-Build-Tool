@@ -4,7 +4,6 @@ from packaging import version
 
 # Global variable for local_app_data_path
 local_app_data_path = '/home/runner/.MIKROE/NECTOStudio7'
-# local_app_data_path = 'c:/Users/footb/AppData/Local/MIKROE/NECTOStudio7'
 
 # Path for storing artifacts.
 testPath = '/home/runner/test_results'
@@ -154,13 +153,32 @@ def read_data_from_db(db, sql_query):
     ## Return query results
     return len(results), results
 
+def get_changed_files(branch='main'):
+    try:
+        # Run the git diff command to get the list of changed files
+        result = subprocess.run(
+            ['git', 'diff', '--name-only', branch],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True
+        )
+
+        # The output is a string of file paths separated by newlines
+        changed_files = result.stdout.splitlines()
+
+        return changed_files
+    except subprocess.CalledProcessError as e:
+        print(f"Error running git command: {e.stderr}")
+        return []
+
+
 def find_cmake_files(path):
-    """ Return a list of .cmake files in the directory, excluding specific files """
+    files = get_changed_files('main')
     cmake_files = []
-    with open(os.path.join(os.getcwd(), "core_build.txt"), "r") as file:
-        for line in file:
-            # Strip any leading/trailing whitespace (like newlines) and append to the array
-            cmake_files.append(path + '/cmake/stm/' + line.strip() + '.cmake')
+    for file in files:
+        if 'cmake/' in file and 'delays/' not in file and file not in cmake_files:
+            cmake_files.append(file)
     return cmake_files
 
 def parse_files_for_paths(cmake_files, source_dir, isGCC=None):
@@ -263,11 +281,6 @@ def extract_mcu_names(file_name, source_dir, output_dir, regex):
                     mcu_name = os.path.splitext(file)[0]
                     if regex_pattern.match(mcu_name):
                         mcus[file_name]['mcu_names'].add(mcu_name)
-                        # if 'gcc_clang' in source_dir or 'XC32' in source_dir:
-                            # isPresent, readData = read_data_from_db(os.path.join(local_app_data_path, "databases", "necto_db.db"), f'SELECT sdk_config FROM Devices WHERE name IS "{mcu_name}"')
-                            # if isPresent:
-                                # configJson = json.loads(readData[0][0])
-                                # mcus[file_name]['cores'].add(configJson['CORE_NAME'])
 
     return mcus
 
@@ -295,7 +308,8 @@ def extract_regex_from_cmake(cmake_file):
     """ Extract regex patterns from a given .cmake file, supporting complex logical conditions. """
     # Extended regex pattern to capture multiple regex conditions separated by 'OR'
     regex_pattern = re.compile(r'\$\{MCU_NAME\}\s*MATCHES\s*"(.*?)"')
-    regexes = set()  # Use a set to avoid duplicates if the same regex appears more than once
+    # Use a set to avoid duplicates if the same regex appears more than once
+    regexes = set()
 
     with open(cmake_file, 'r') as file:
         content = file.read()
@@ -310,9 +324,6 @@ def extract_regex_from_cmake(cmake_file):
     return list(regexes)
 
 def copy_files_based_on_regex(source_dir, dest_dir, check_string):
-    """
-    Go through all .cmake files in source_dir, extract regex patterns, and copy files where check_string matches any regex.
-    """
     if not check_string:
         return
 
@@ -339,7 +350,6 @@ def copy_files_based_on_regex(source_dir, dest_dir, check_string):
 
 
 def copy_cmake_files(cmake_file, source_dir, output_dir, regex):
-    """ Copy the .cmake file to the output directory maintaining the same folder structure """
     relative_path = os.path.relpath(cmake_file, start=source_dir)
     destination_path = os.path.join(output_dir, relative_path)
     os.makedirs(os.path.dirname(destination_path), exist_ok=True)
@@ -413,7 +423,6 @@ def copy_files_from_dir(mcus, source_dir, output_dir, base_path, subdirectory):
                     shutil.copy(full_source_path, full_dest_path)
 
 def copy_delays(cores, source_dir, output_dir, base_path):
-
     for core in cores:
         delays_dir = os.path.join(source_dir, 'delays', core.lower())
         dest_path = os.path.join(base_path, 'delays', core.lower())
@@ -447,9 +456,8 @@ def get_core_from_def(file_path):
 
             # Check if the "core" key exists in the JSON data
             if 'core' in data:
-                core = data['core'].replace('EF', '').replace('+', '')
-                if core == 'M33':
-                    core = 'M33EF'
+                if core == 'M7EF':
+                    core = 'M7'
             else:
                 print(f'Warning: "core" key not found in {file_path}')
     else:
@@ -457,28 +465,11 @@ def get_core_from_def(file_path):
 
     return core
 
-def configure_queries(mcuNames, package_name, cmake_file, source_dir, changes_dict):
-
+def get_core(mcuNames, package_name, cmake_file, source_dir, changes_dict):
     for mcu_name in mcuNames[cmake_file]['mcu_names']:
         core = get_core_from_def(os.path.join(source_dir, "def", f"{mcu_name}.json"))
         mcuNames[cmake_file]['cores'].add(core)
         changes_dict['mcu_list'].append(mcu_name)
-        # Define the replacements
-        # replacements = {
-        #     '{mcu_name}': mcu_name,
-        #     '{core}': core,
-        #     '{package_name}': package_name,
-            # '{package}': package
-        # }
-
-        # Replace placeholders in the JSON files
-        # json_files = ['Devices.json', 'LinkerTables.json']
-        # for file_name in json_files:
-            # source_file = os.path.join(os.getcwd(),"templates", file_name)
-            # dest_file = os.path.join(os.getcwd(), "resources/queries/mcus", mcu_name, file_name)
-            # replace_placeholders_in_file(source_file, dest_file, replacements)
-
-    # shutil.copytree(os.path.join(os.getcwd(), "resources"), testPath)
 
 def filter_versions(versions):
     # Filter out versions that contain non-numeric characters (e.g., words or suffixes)
@@ -603,7 +594,7 @@ def package_asset(source_dir, output_dir, arch, entry_name, changes_dict):
         # Copy linker scirpts
         copy_files_from_dir(mcuNames[cmake_file]['mcu_names'], source_dir, output_dir, base_output_dir, 'linker_scripts')
 
-        configure_queries(mcuNames, f"{arch.lower()}_{entry_name.lower()}_{cmake_file}", cmake_file, source_dir, changes_dict)
+        get_core(mcuNames, f"{arch.lower()}_{entry_name.lower()}_{cmake_file}", cmake_file, source_dir, changes_dict)
         coreQueriesPath = os.path.join(os.getcwd(), 'resources/queries')
         if os.path.exists(os.path.join(coreQueriesPath, 'mcus')):
             updateDevicesFromCore([f"{local_app_data_path}/databases/necto_db.db"], os.path.join(coreQueriesPath, 'mcus'))
@@ -644,13 +635,20 @@ def write_results_to_file(changes_dict):
     print(f"All the data for build has been written to {testPath}/built_changes.json")
 
 def main():
-    architectures = ["ARM"]
+    files = get_changed_files('main')
+    archs = []
+    architectures = ["ARM", "RISCV", "PIC32", "PIC", "dsPIC", "AVR"]
+    valid_entries = ["gcc_clang", "XC32", "XC16", "XC8"]
+    for file in files:
+        for architecture in architectures:
+            if architecture in file and architecture not in archs:
+                archs.append(architecture)
     changes_dict = {
         'mcu_list': [],
         'build_status': {}
     }
 
-    for arch in architectures:
+    for arch in archs:
         root_source_directory = f"./{arch}"
         root_output_directory = f"./output/{arch}"
         # List directories directly under the root source directory
@@ -658,7 +656,8 @@ def main():
             with os.scandir(root_source_directory) as entries:
                 print(entries)
                 for entry in entries:
-                    if 'mikroC' in entry.name:
+                    # Don't process packaging for the MikroC entries
+                    if entry.name not in valid_entries:
                         continue
                     print(root_source_directory)
                     print(entry)
@@ -670,11 +669,10 @@ def main():
                         package_asset(source_directory, output_directory, arch, entry.name, changes_dict)
         except Exception as e:
             print(f"Failed to process directories in {root_source_directory}: {e}")
-            print(f"Something went wrong while configuring the packages")
+            print("\033[93mSomething went wrong while configuring the packages, chack manually.\033[0m")
 
-    print(f"\033[93mAll requested core packages have been generated successfully.\033[0m")
+    print("\033[93mAll requested core packages have been generated successfully.\033[0m")
     run_builds(changes_dict)
-
 
     # Write all the used info for building to artifact folder.
     write_results_to_file(changes_dict)
