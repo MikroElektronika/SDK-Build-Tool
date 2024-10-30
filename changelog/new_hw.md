@@ -16,10 +16,8 @@
 
 Support added for following hardware:
 
-- STM32L412_X8 MCU Support package for GCC & Clang
-  - STM32L412C8
-  - STM32L412K8
-  - STM32L412R8
-  - STM32L412T8
+- STM32WLE5JB_C MCU Support package for GCC & Clang
+  - STM32WLE5JB
+  - STM32WLE5JC
 
 ---
