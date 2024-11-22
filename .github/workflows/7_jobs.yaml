@@ -5,31 +5,31 @@ on:
     inputs:
       run_job1:
         description: 'Run Job 1'
-        required: false
+        type: boolean
         default: false
       run_job2:
         description: 'Run Job 2'
-        required: false
+        type: boolean
         default: false
       run_job3:
         description: 'Run Job 3'
-        required: false
+        type: boolean
         default: false
       run_job4:
         description: 'Run Job 4'
-        required: false
+        type: boolean
         default: false
       run_job5:
         description: 'Run Job 5'
-        required: false
+        type: boolean
         default: false
       run_job6:
         description: 'Run Job 6'
-        required: false
+        type: boolean
         default: false
       run_job7:
         description: 'Run Job 7'
-        required: false
+        type: boolean
         default: false
 
 jobs:
