@@ -1,0 +1,111 @@
+name: Run 7 Jobs Simultaneously with Checkboxes
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_job1:
+        description: 'Run Job 1'
+        required: false
+        default: false
+      run_job2:
+        description: 'Run Job 2'
+        required: false
+        default: false
+      run_job3:
+        description: 'Run Job 3'
+        required: false
+        default: false
+      run_job4:
+        description: 'Run Job 4'
+        required: false
+        default: false
+      run_job5:
+        description: 'Run Job 5'
+        required: false
+        default: false
+      run_job6:
+        description: 'Run Job 6'
+        required: false
+        default: false
+      run_job7:
+        description: 'Run Job 7'
+        required: false
+        default: false
+
+jobs:
+  job1:
+    if: github.event.inputs.run_job1 == 'true'
+    name: Job 1
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run Task 1
+        run: echo "Running Job 1"
+
+  job2:
+    if: github.event.inputs.run_job2 == 'true'
+    name: Job 2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run Task 2
+        run: echo "Running Job 2"
+
+  job3:
+    if: github.event.inputs.run_job3 == 'true'
+    name: Job 3
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run Task 3
+        run: echo "Running Job 3"
+
+  job4:
+    if: github.event.inputs.run_job4 == 'true'
+    name: Job 4
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run Task 4
+        run: echo "Running Job 4"
+
+  job5:
+    if: github.event.inputs.run_job5 == 'true'
+    name: Job 5
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run Task 5
+        run: echo "Running Job 5"
+
+  job6:
+    if: github.event.inputs.run_job6 == 'true'
+    name: Job 6
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run Task 6
+        run: echo "Running Job 6"
+
+  job7:
+    if: github.event.inputs.run_job7 == 'true'
+    name: Job 7
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run Task 7
+        run: echo "Running Job 7"
