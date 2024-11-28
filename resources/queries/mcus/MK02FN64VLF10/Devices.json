@@ -6,7 +6,7 @@
     "max_speed":"100.000",
     "name":"MK02FN64VLF10",
     "ram":"16384",
-    "sdk_config":"{\"MCU_NAME\":\"MK02FN64VLF10\",\"CORE_NAME\":\"\",\"_MSDK_HAL_LOW_LEVEL_TARGET_\":\"mikroe\",\"_MSDK_ETH_PHY_CHIP_\":\"NULL\"}",
+    "sdk_config":"{\"MCU_NAME\":\"MK02FN64VLF10\",\"CORE_NAME\":\"M4\",\"_MSDK_HAL_LOW_LEVEL_TARGET_\":\"mikroe\",\"_MSDK_ETH_PHY_CHIP_\":\"NULL\"}",
     "necto_config":"",
     "uid":"MK02FN64VLF10",
     "vendor":"NXP",
