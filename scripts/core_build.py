@@ -684,7 +684,7 @@ def main():
 
     shutil.copyfile(os.path.join(local_app_data_path, 'databases', 'necto_db.db'), os.path.join(testPath, 'necto_db.db'))
 
-    if build_failed == True:
+    if build_failed == True or changes_dict['build_status'] == {}:
         # Red text for failure.
         print("\033[91mRecursive Build Failed!\033[0m")
         # Fail the job as well.
