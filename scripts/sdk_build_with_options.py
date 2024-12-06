@@ -42,6 +42,7 @@ def run_cmd(cmd, changes_dict, status_key):
     result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
     if 'Building:' in result.stdout:
         output = result.stdout
+        print(output)
     else:
         output = result.stderr
         print(output)
@@ -214,9 +215,6 @@ def write_results_to_file(changes_dict):
         json.dump(changes_dict, json_file, indent=4)
 
     print(f"All the data for build has been written to {testPath}/built_changes.json")
-
-    for item in changes_dict['unused']:
-        print(f"Couldn't find {item} in the database")
 
 def clear_directory(dir_path):
     """
