@@ -48,6 +48,7 @@ def run_cmd(cmd, changes_dict, status_key):
         output = result.stdout
     else:
         output = result.stderr
+        print(output)
     for line in output.splitlines():
         if line.startswith("Building:"):
             changes_dict['build_status'][status_key] = 'UNDEFINED'
@@ -75,11 +76,18 @@ def run_builds(changes_dict, build_type, build_components):
 
     for compiler in changes_dict['compiler_list']:
         print(f"\033[93mProcessing {compiler} compiler\033[0m")
-        if build_components == 'MCUs only' or build_components == 'Cards only':
+        if build_components == 'MCUs only':
             print(f"\033[93mRunning build for {len(changes_dict[compiler])} Devices\033[0m")
             for mcu in changes_dict[compiler]:
                 cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation {bare_metal_flag} --compiler "{compiler}" --sdk "mikrosdk_v{sdk_version}" --board "{changes_dict['board_list'][0]}" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
                 run_cmd(cmd, changes_dict, mcu + ' ' + compiler)
+
+        elif build_components == 'Cards only':
+            for board in changes_dict[compiler]:
+                print(f"\033[93mRunning build for {len(changes_dict[compiler][board])} Cards with {board}\033[0m")
+                for card in changes_dict[compiler][board]:
+                    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation {bare_metal_flag} --compiler "{compiler}" --sdk "mikrosdk_v{sdk_version}" --board "{board}" --mcu "{card}" --installPrefix "{testPath}/card_build/{compiler}"'
+                    run_cmd(cmd, changes_dict, card + ' ' + compiler)
 
         elif build_components == 'Boards only' or build_components == 'Boards + Displays':
             print(f"\033[93mRunning build for {len(changes_dict[compiler])} Boards\033[0m")
@@ -105,7 +113,7 @@ def get_latest_releases():
         return None, None
 
 # Queries the database to update mcu_card_list, board_list, and mcu_list.
-def query_database(changes_dict, build_components, compilers, build_type):
+def query_database(changes_dict, build_components, build_type):
     # Get the SDK version from the manifest.json file.
     sdk_version = get_sdk_version(os.path.join(sdkPath, 'manifest.json')).replace(".", "")
     if build_type == 'Bare Metal':
@@ -117,9 +125,9 @@ def query_database(changes_dict, build_components, compilers, build_type):
     conn = sqlite3.connect(dbPath)
     cursor = conn.cursor()
 
-    for compiler in compilers:
-        changes_dict[compiler] = []
+    for compiler in changes_dict['compiler_list']:
         if build_components == 'MCUs only':
+            changes_dict[compiler] = []
             cursor.execute(f"""
                 SELECT DISTINCT Devices.uid FROM Devices
                 INNER JOIN CompilerToDevice ON Devices.uid = CompilerToDevice.device_uid
@@ -145,10 +153,13 @@ def query_database(changes_dict, build_components, compilers, build_type):
                 changes_dict['board_list'].append(row[0])
 
         elif build_components == 'Cards only':
+            changes_dict[compiler] = {}
             cursor.execute(f"""
-                SELECT DISTINCT Devices.uid FROM Devices
+                SELECT Devices.uid, Devices.installer_package, BoardToDevice.board_uid
+                FROM Devices
                 INNER JOIN CompilerToDevice ON Devices.uid = CompilerToDevice.device_uid
                 INNER JOIN SDKToDevice ON Devices.uid = SDKToDevice.device_uid
+                INNER JOIN BoardToDevice ON Devices.uid = BoardToDevice.device_uid
                 WHERE SDKToDevice.sdk_uid = 'mikrosdk_v{sdk_version}'
                 AND CompilerToDevice.compiler_uid = '{compiler}'
                 AND SDKToDevice.device_uid LIKE '%\\_%' ESCAPE '\\';
@@ -156,13 +167,19 @@ def query_database(changes_dict, build_components, compilers, build_type):
             rows = cursor.fetchall()
             if rows:
                 for row in rows:
-                    if row[0] not in changes_dict[compiler]:
-                        changes_dict[compiler].append(row[0])
+                    if row[2] not in changes_dict[compiler]:
+                        changes_dict[compiler][row[2]] = []
+                    if row[0] not in changes_dict[compiler][row[2]]:
+                        changes_dict[compiler][row[2]].append([row[0]])
+                    # As tool doesn't install mcu card packages we need to install them manually
+                    if row[1].split('"')[3] not in changes_dict['install_packages']:
+                        changes_dict['install_packages'].append(row[1].split('"')[3])
 
             if 'UNI_DS_V8' not in changes_dict['board_list']: # TODO - should be changed to use appropriate board (v7 board for v7 cards)
                 changes_dict['board_list'].append('UNI_DS_V8')
 
         elif build_components == 'Boards only':
+            changes_dict[compiler] = []
             cursor.execute(f"""
                 SELECT DISTINCT BoardToDevice.board_uid FROM BoardToDevice
                 INNER JOIN SDKToBoard ON BoardToDevice.board_uid = SDKToBoard.board_uid
@@ -177,6 +194,7 @@ def query_database(changes_dict, build_components, compilers, build_type):
                         changes_dict[compiler].append(row[0])
 
         elif build_components == 'Boards + Displays':
+            changes_dict[compiler] = []
             cursor.execute(f"""
                 SELECT DISTINCT BoardToDevice.board_uid FROM BoardToDevice
                 INNER JOIN SDKToBoard ON BoardToDevice.board_uid = SDKToBoard.board_uid
@@ -261,6 +279,18 @@ def clone_repo_and_switch(repo_url, branch_name, clone_dir):
     subprocess.run(['git', '-C', clone_dir, 'checkout', branch_name], check=True)
     print(f"Successfully switched to branch {branch_name}.")
 
+def run_command(command):
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    for line in process.stdout:
+        print(line.strip())
+    process.wait()
+    return process.returncode
+
+def install_packages(install_packages):
+    for package in install_packages:
+        print(f'Installing package: {package}')
+        run_command(f'./NECTOInstaller installer --install-packages {package} /home/runner/MikroElektronika /home/runner/.MIKROE/NECTOStudio7 > /dev/null 2>&1')
+
 def main():
     global build_failed
 
@@ -274,6 +304,7 @@ def main():
     # Initialize the changes dictionary.
     changes_dict = {
         'compiler_list' : [],
+        'install_packages' : [],
         'board_list' : [],
         'build_status': {}
     }
@@ -290,7 +321,9 @@ def main():
     os.makedirs(testPath, exist_ok=True)
 
     # Get the necessary data from the database.
-    query_database(changes_dict, args.mcus_cards_boards, changes_dict['compiler_list'], args.build_type)
+    query_database(changes_dict, args.mcus_cards_boards, args.build_type)
+
+    install_packages(changes_dict['install_packages'])
 
     # Finally, run the SDK build tool.
     run_builds(changes_dict, args.build_type, args.mcus_cards_boards)

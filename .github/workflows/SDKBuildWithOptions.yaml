@@ -13,7 +13,7 @@ on:
         default: "Pick an option"
       build_branch:
         type: string
-        description: Provide the mikrosdk_v2 branch (if SDK from Branch chosen)
+        description: Provide the mikrosdk_v2 branch (if SDK from Branch was chosen)
         default: "main"
       build_components:
         type: choice
@@ -104,13 +104,28 @@ jobs:
           sudo apt-get install $(cat scripts/requirements/recursive_build.txt)
 
       - name: Install NECTO
+        env:
+          NECTO_DOWNLOAD_URL: ${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
         run: |
-          export NECTO_DOWNLOAD_URL=${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
-          python -u scripts/install_necto_sdk.py
+          python -u scripts/install_necto.py
 
       - name: Run Recursive Build
         run: |
-          python -u scripts/sdk_build_with_options.py
+          COMPILERS=""
+          if [ "${{ github.event.inputs.gcc_arm_none_eabi }}" == "true" ]; then
+            COMPILERS="${COMPILERS} gcc_arm_none_eabi"
+          fi
+          if [ "${{ github.event.inputs.clang_llvm }}" == "true" ]; then
+            COMPILERS="${COMPILERS} clang-llvm"
+          fi
+          if [ "${{ github.event.inputs.mikrocarm }}" == "true" ]; then
+            COMPILERS="${COMPILERS} mikrocarm"
+          fi
+          # Remove leading/trailing spaces
+          COMPILERS=$(echo $COMPILERS | xargs)
+          export COMPILERS="$COMPILERS"
+          echo "COMPILERS=$COMPILERS"
+          python -u scripts/sdk_build_with_options.py ${{ github.event.inputs.build_type }} ${{ github.event.inputs.build_branch }} ${{ github.event.inputs.build_components }} "$COMPILERS"
 
       - name: Archive test results
         uses: actions/upload-artifact@v4
@@ -147,13 +162,22 @@ jobs:
           sudo apt-get install $(cat scripts/requirements/recursive_build.txt)
 
       - name: Install NECTO
+        env:
+          NECTO_DOWNLOAD_URL: ${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
         run: |
-          export NECTO_DOWNLOAD_URL=${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
-          python -u scripts/install_necto_sdk.py
+          python -u scripts/install_necto.py
 
       - name: Run Recursive Build
         run: |
-          python -u scripts/sdk_build_with_options.py
+          COMPILERS=""
+          if [ "${{ github.event.inputs.mikrocavr }}" == "true" ]; then
+            COMPILERS="${COMPILERS} mikrocavr"
+          fi
+          # Remove leading/trailing spaces
+          COMPILERS=$(echo $COMPILERS | xargs)
+          export COMPILERS="$COMPILERS"
+          echo "COMPILERS=$COMPILERS"
+          python -u scripts/sdk_build_with_options.py ${{ github.event.inputs.build_type }} ${{ github.event.inputs.build_branch }} ${{ github.event.inputs.build_components }} "$COMPILERS"
 
       - name: Archive test results
         uses: actions/upload-artifact@v4
@@ -191,13 +215,25 @@ jobs:
           sudo apt-get install $(cat scripts/requirements/recursive_build.txt)
 
       - name: Install NECTO
+        env:
+          NECTO_DOWNLOAD_URL: ${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
         run: |
-          export NECTO_DOWNLOAD_URL=${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
-          python -u scripts/install_necto_sdk.py
+          python -u scripts/install_necto.py
 
       - name: Run Recursive Build
         run: |
-          python -u scripts/sdk_build_with_options.py
+          COMPILERS=""
+          if [ "${{ github.event.inputs.mchp_xc16 }}" == "true" ]; then
+            COMPILERS="${COMPILERS} mchp_xc16"
+          fi
+          if [ "${{ github.event.inputs.mikrocdspic }}" == "true" ]; then
+            COMPILERS="${COMPILERS} mikrocdspic"
+          fi
+          # Remove leading/trailing spaces
+          COMPILERS=$(echo $COMPILERS | xargs)
+          export COMPILERS="$COMPILERS"
+          echo "COMPILERS=$COMPILERS"
+          python -u scripts/sdk_build_with_options.py ${{ github.event.inputs.build_type }} ${{ github.event.inputs.build_branch }} ${{ github.event.inputs.build_components }} "$COMPILERS"
 
       - name: Archive test results
         uses: actions/upload-artifact@v4
@@ -235,13 +271,25 @@ jobs:
           sudo apt-get install $(cat scripts/requirements/recursive_build.txt)
 
       - name: Install NECTO
+        env:
+          NECTO_DOWNLOAD_URL: ${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
         run: |
-          export NECTO_DOWNLOAD_URL=${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
-          python -u scripts/install_necto_sdk.py
+          python -u scripts/install_necto.py
 
       - name: Run Recursive Build
         run: |
-          python -u scripts/sdk_build_with_options.py
+          COMPILERS=""
+          if [ "${{ github.event.inputs.mchp_xc32 }}" == "true" ]; then
+            COMPILERS="${COMPILERS} mchp_xc32"
+          fi
+          if [ "${{ github.event.inputs.mikrocpic32 }}" == "true" ]; then
+            COMPILERS="${COMPILERS} mikrocpic32"
+          fi
+          # Remove leading/trailing spaces
+          COMPILERS=$(echo $COMPILERS | xargs)
+          export COMPILERS="$COMPILERS"
+          echo "COMPILERS=$COMPILERS"
+          python -u scripts/sdk_build_with_options.py ${{ github.event.inputs.build_type }} ${{ github.event.inputs.build_branch }} ${{ github.event.inputs.build_components }} "$COMPILERS"
 
       - name: Archive test results
         uses: actions/upload-artifact@v4
@@ -279,13 +327,25 @@ jobs:
           sudo apt-get install $(cat scripts/requirements/recursive_build.txt)
 
       - name: Install NECTO
+        env:
+          NECTO_DOWNLOAD_URL: ${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
         run: |
-          export NECTO_DOWNLOAD_URL=${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
-          python -u scripts/install_necto_sdk.py
+          python -u scripts/install_necto.py
 
       - name: Run Recursive Build
         run: |
-          python -u scripts/sdk_build_with_options.py
+          COMPILERS=""
+          if [ "${{ github.event.inputs.mchp_xc8 }}" == "true" ]; then
+            COMPILERS="${COMPILERS} mchp_xc8"
+          fi
+          if [ "${{ github.event.inputs.mikrocpic }}" == "true" ]; then
+            COMPILERS="${COMPILERS} mikrocpic"
+          fi
+          # Remove leading/trailing spaces
+          COMPILERS=$(echo $COMPILERS | xargs)
+          export COMPILERS="$COMPILERS"
+          echo "COMPILERS=$COMPILERS"
+          python -u scripts/sdk_build_with_options.py ${{ github.event.inputs.build_type }} ${{ github.event.inputs.build_branch }} ${{ github.event.inputs.build_components }} "$COMPILERS"
 
       - name: Archive test results
         uses: actions/upload-artifact@v4
@@ -323,13 +383,25 @@ jobs:
           sudo apt-get install $(cat scripts/requirements/recursive_build.txt)
 
       - name: Install NECTO
+        env:
+          NECTO_DOWNLOAD_URL: ${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
         run: |
-          export NECTO_DOWNLOAD_URL=${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
-          python -u scripts/install_necto_sdk.py
+          python -u scripts/install_necto.py
 
       - name: Run Recursive Build
         run: |
-          python -u scripts/sdk_build_with_options.py
+          COMPILERS=""
+          if [ "${{ github.event.inputs.xpack_riscv_none_embed_gcc }}" == "true" ]; then
+            COMPILERS="${COMPILERS} xpack_riscv_none_embed_gcc"
+          fi
+          if [ "${{ github.event.inputs.clang_llvm_riscv }}" == "true" ]; then
+            COMPILERS="${COMPILERS} clang_llvm_riscv"
+          fi
+          # Remove leading/trailing spaces
+          COMPILERS=$(echo $COMPILERS | xargs)
+          export COMPILERS="$COMPILERS"
+          echo "COMPILERS=$COMPILERS"
+          python -u scripts/sdk_build_with_options.py ${{ github.event.inputs.build_type }} ${{ github.event.inputs.build_branch }} ${{ github.event.inputs.build_components }} "$COMPILERS"
 
       - name: Archive test results
         uses: actions/upload-artifact@v4
