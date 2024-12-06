@@ -1,10 +1,8 @@
 import subprocess, argparse
 import requests
-import re, sys
 import os, shutil
 import sqlite3
 import json
-from pathlib import Path
 
 # Define the repository owner and name
 repo_owner = "MikroElektronika"
@@ -42,46 +40,28 @@ def run_cmd(cmd, changes_dict, status_key):
     # Blue color for build tool command command.
     print(f"\033[94m{cmd}\033[0m")
 
-    try:
-        # Store all the output lines to print only important ones.
-        # output = subprocess.check_output(cmd, shell=True, text=True)
-        # Store all the output lines to print only important ones.
-        result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
-        if 'Building:' in result.stdout:
-            output = result.stdout
-        else:
-            output = result.stderr
-        for line in output.splitlines():
-            if line.startswith("Building:"):
-                changes_dict['build_status'][status_key] = 'UNDEFINED'
-                # White color for the current setup build.
-                print(line)
-            elif "Build success!" in line:
-                changes_dict['build_status'][status_key] = 'SUCCESS'
-                # Green color for success.
-                print("\033[92m{}\033[0m".format(line))
-            elif "Build failed" in line:
-                changes_dict['build_status'][status_key] = 'FAIL'
-                # Red color for failure.
-                print("\033[91m{}\033[0m".format(line))
-                build_failed = True
-
-    # Error handling for failed builds not to fail the job.
-    except subprocess.CalledProcessError as e:
-        for line in e.output.splitlines():
-            if line.startswith("Building:"):
-                changes_dict['build_status'][status_key] = 'UNDEFINED'
-                # White color for the current setup build.
-                print(line)
-            elif "Build success!" in line:
-                changes_dict['build_status'][status_key] = 'SUCCESS'
-                # Green color for success.
-                print(f"\033[92m{line}\033[0m")  # Green color for success
-            elif "Build failed" in line:
-                changes_dict['build_status'][status_key] = 'FAIL'
-                # Red color for failure.
-                print(f"\033[91m{line}\033[0m")  # Red color for failure
-                build_failed = True
+    # Store all the output lines to print only important ones.
+    # output = subprocess.check_output(cmd, shell=True, text=True)
+    # Store all the output lines to print only important ones.
+    result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
+    if 'Building:' in result.stdout:
+        output = result.stdout
+    else:
+        output = result.stderr
+    for line in output.splitlines():
+        if line.startswith("Building:"):
+            changes_dict['build_status'][status_key] = 'UNDEFINED'
+            # White color for the current setup build.
+            print(line)
+        elif "Build success!" in line:
+            changes_dict['build_status'][status_key] = 'SUCCESS'
+            # Green color for success.
+            print("\033[92m{}\033[0m".format(line))
+        elif "Build failed" in line:
+            changes_dict['build_status'][status_key] = 'FAIL'
+            # Red color for failure.
+            print("\033[91m{}\033[0m".format(line))
+            build_failed = True
 
 # Runs the build commands for each member of mcu_list, board_list, and mcu_card_list.
 def run_builds(changes_dict, build_type, build_components):
@@ -129,9 +109,9 @@ def query_database(changes_dict, build_components, compilers, build_type):
     # Get the SDK version from the manifest.json file.
     sdk_version = get_sdk_version(os.path.join(sdkPath, 'manifest.json')).replace(".", "")
     if build_type == 'Bare Metal':
-        sdk_support = 0
+        sdk_support = ''
     else:
-        sdk_support = 1
+        sdk_support = 'AND Devices.sdk_support = "1"'
 
     # Connect to the database.
     conn = sqlite3.connect(dbPath)
@@ -145,17 +125,19 @@ def query_database(changes_dict, build_components, compilers, build_type):
                 INNER JOIN CompilerToDevice ON Devices.uid = CompilerToDevice.device_uid
                 INNER JOIN SDKToDevice ON Devices.uid = SDKToDevice.device_uid
                 WHERE SDKToDevice.sdk_uid = 'mikrosdk_v{sdk_version}'
-                AND Devices.sdk_support = '{sdk_support}'
+                {sdk_support}
                 AND CompilerToDevice.compiler_uid = '{compiler}'
                 AND SDKToDevice.device_uid NOT LIKE '%\\_%' ESCAPE '\\';
             """)
             rows = cursor.fetchall()
             if rows:
-                changes_dict[compiler].append(row[0] for row in rows if row[0] not in changes_dict[compiler])
+                for row in rows:
+                    if row[0] not in changes_dict[compiler]:
+                        changes_dict[compiler].append(row[0])
 
             cursor.execute(f"""
                 SELECT board_uid FROM BoardToDevice
-                WHERE device_uid = '{changes_dict['mcu_list'][0]}'
+                WHERE device_uid = '{changes_dict[compiler][0]}'
                 AND board_uid LIKE '%GENERIC%'
             """)
             row = cursor.fetchone()
@@ -168,19 +150,21 @@ def query_database(changes_dict, build_components, compilers, build_type):
                 INNER JOIN CompilerToDevice ON Devices.uid = CompilerToDevice.device_uid
                 INNER JOIN SDKToDevice ON Devices.uid = SDKToDevice.device_uid
                 WHERE SDKToDevice.sdk_uid = 'mikrosdk_v{sdk_version}'
-                AND Devices.sdk_support = '{sdk_support}'
                 AND CompilerToDevice.compiler_uid = '{compiler}'
                 AND SDKToDevice.device_uid LIKE '%\\_%' ESCAPE '\\';
             """)
             rows = cursor.fetchall()
             if rows:
-                changes_dict[compiler].append(row[0] for row in rows if row[0] not in changes_dict[compiler])
+                for row in rows:
+                    if row[0] not in changes_dict[compiler]:
+                        changes_dict[compiler].append(row[0])
 
-            changes_dict['board_list'].append('UNI_DS_V8')
+            if 'UNI_DS_V8' not in changes_dict['board_list']: # TODO - should be changed to use appropriate board (v7 board for v7 cards)
+                changes_dict['board_list'].append('UNI_DS_V8')
 
         elif build_components == 'Boards only':
             cursor.execute(f"""
-                SELECT DISTINCT board_uid FROM BoardToDevice
+                SELECT DISTINCT BoardToDevice.board_uid FROM BoardToDevice
                 INNER JOIN SDKToBoard ON BoardToDevice.board_uid = SDKToBoard.board_uid
                 INNER JOIN CompilerToDevice ON BoardToDevice.device_uid = CompilerToDevice.device_uid
                 WHERE SDKToBoard.sdk_uid = 'mikrosdk_v{sdk_version}'
@@ -188,20 +172,25 @@ def query_database(changes_dict, build_components, compilers, build_type):
             """)
             rows = cursor.fetchall()
             if rows:
-                changes_dict[compiler].append(row[0] for row in rows if row[0] not in changes_dict[compiler])
+                for row in rows:
+                    if row[0] not in changes_dict[compiler]:
+                        changes_dict[compiler].append(row[0])
 
         elif build_components == 'Boards + Displays':
             cursor.execute(f"""
-                SELECT DISTINCT board_uid FROM BoardToDevice
+                SELECT DISTINCT BoardToDevice.board_uid FROM BoardToDevice
                 INNER JOIN SDKToBoard ON BoardToDevice.board_uid = SDKToBoard.board_uid
                 INNER JOIN CompilerToDevice ON BoardToDevice.device_uid = CompilerToDevice.device_uid
+                INNER JOIN Boards ON BoardToDevice.board_uid = Boards.uid
                 WHERE SDKToBoard.sdk_uid = 'mikrosdk_v{sdk_version}'
                 AND CompilerToDevice.compiler_uid = '{compiler}'
                 AND Boards.display_socket IS NOT 'NO_DISPLAY'
             """)
             rows = cursor.fetchall()
             if rows:
-                changes_dict[compiler].append(row[0] for row in rows if row[0] not in changes_dict[compiler])
+                for row in rows:
+                    if row[0] not in changes_dict[compiler]:
+                        changes_dict[compiler].append(row[0])
 
     conn.close()
 
@@ -248,6 +237,7 @@ def copy_files(src_dir, dest_dir):
                 shutil.copytree(src_path, dest_path)
             else:
                 shutil.copy2(src_path, dest_path)
+            print(f"Successfully copied {src_path} to {dest_path}")
         except Exception as e:
             print(f"Error copying {src_path} to {dest_path}: {e}")
 
@@ -294,7 +284,7 @@ def main():
         clear_directory(sdkPath)
         copy_files(clone_dir, sdkPath)
 
-    changes_dict['compiler_list'] = args.compilers.split('|')
+    changes_dict['compiler_list'] = args.compilers.split(' ')
 
     # Create a folder for job artifacts.
     os.makedirs(testPath, exist_ok=True)
