@@ -68,6 +68,24 @@ jobs:
       matrix:
         compiler: [gcc_arm_none_eabi, clang_llvm, mikrocarm, mikrocavr, mchp_xc16, mikrocdspic, mchp_xc32, mikrocpic32, mchp_xc8, mikrocpic, xpack_riscv_none_embed_gcc, clang_llvm_riscv]
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scripts/requirements/shared.txt
+          pip install -r scripts/requirements/databases.txt
+          pip install colorama
+          pip install enums
+          sudo apt-get update
+          sudo apt-get install $(cat scripts/requirements/recursive_build.txt)
+
       - name: Filter Compilers
         id: filter
         run: |
