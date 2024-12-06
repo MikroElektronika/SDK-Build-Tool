@@ -24,63 +24,13 @@ on:
           - "Boards only"
           - "Boards + Displays"
         default: "Pick an option"
-      gcc_arm_none_eabi:
-        type: boolean
-        description: 'GCC for ARM'
-        default: false
-      clang_llvm:
-        type: boolean
-        description: 'Clang for ARM'
-        default: false
-      mikrocarm:
-        type: boolean
-        description: 'mikroC AI for ARM'
-        default: false
-      mikrocavr:
-        type: boolean
-        description: 'mikroC AI for AVR'
-        default: false
-      mchp_xc16:
-        type: boolean
-        description: 'Microchip XC16'
-        default: false
-      mikrocdspic:
-        type: boolean
-        description: 'mikroC AI for dsPIC'
-        default: false
-      mchp_xc32:
-        type: boolean
-        description: 'Microchip XC32'
-        default: false
-      mikrocpic32:
-        type: boolean
-        description: 'mikroC AI for PIC32'
-        default: false
-      mchp_xc8:
-        type: boolean
-        description: 'Microchip XC8'
-        default: false
-      mikrocpic:
-        type: boolean
-        description: 'mikroC AI for PIC'
-        default: false
-      xpack_riscv_none_embed_gcc:
-        type: boolean
-        description: 'GCC for RISC-V'
-        default: false
-      clang_llvm_riscv:
-        type: boolean
-        description: 'Clang for RISC-V'
-        default: false
+      compilers:
+        type: string
+        description: Choose compiler(s) for building
+        default: "gcc_arm_none_eabi, clang_llvm, mikrocarm, mikrocavr, mchp_xc16, mikrocdspic, mchp_xc32, mikrocpic32, mchp_xc8, mikrocpic, xpack_riscv_none_embed_gcc, clang_llvm_riscv"
 
 jobs:
-  ARM:
-    if: >
-      ${{
-        github.event.inputs.gcc_arm_none_eabi == 'true' ||
-        github.event.inputs.clang_llvm == 'true' ||
-        github.event.inputs.mikrocarm == 'true'
-      }}
+  install_necto:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -109,303 +59,45 @@ jobs:
         run: |
           python -u scripts/install_necto.py
 
-      - name: Run Recursive Build
-        run: |
-          COMPILERS=""
-          if [ "${{ github.event.inputs.gcc_arm_none_eabi }}" == "true" ]; then
-            COMPILERS="${COMPILERS} gcc_arm_none_eabi"
-          fi
-          if [ "${{ github.event.inputs.clang_llvm }}" == "true" ]; then
-            COMPILERS="${COMPILERS} clang-llvm"
-          fi
-          if [ "${{ github.event.inputs.mikrocarm }}" == "true" ]; then
-            COMPILERS="${COMPILERS} mikrocarm"
-          fi
-          # Remove leading/trailing spaces
-          COMPILERS=$(echo $COMPILERS | xargs)
-          export COMPILERS="$COMPILERS"
-          echo "COMPILERS=$COMPILERS"
-          python -u scripts/sdk_build_with_options.py ${{ github.event.inputs.build_type }} ${{ github.event.inputs.build_branch }} ${{ github.event.inputs.build_components }} "$COMPILERS"
-
-      - name: Archive test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: /home/runner/test_results
-
-  AVR:
-    if: >
-      ${{
-        github.event.inputs.mikrocavr == 'true'
-      }}
+  build_sdk:
+    needs: install_necto
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    strategy:
+      matrix:
+        compiler: [gcc_arm_none_eabi, clang_llvm, mikrocarm, mikrocavr, mchp_xc16, mikrocdspic, mchp_xc32, mikrocpic32, mchp_xc8, mikrocpic, xpack_riscv_none_embed_gcc, clang_llvm_riscv]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Install Dependencies
+      - name: Filter Compilers
+        id: filter
         run: |
-          python -m pip install --upgrade pip
-          pip install -r scripts/requirements/shared.txt
-          pip install -r scripts/requirements/databases.txt
-          pip install colorama
-          pip install enums
-          sudo apt-get update
-          sudo apt-get install $(cat scripts/requirements/recursive_build.txt)
-
-      - name: Install NECTO
-        env:
-          NECTO_DOWNLOAD_URL: ${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
-        run: |
-          python -u scripts/install_necto.py
+          selected_compilers="${{ github.event.inputs.compilers }}"
+          IFS=',' read -r -a compilers_array <<< "$selected_compilers"
+          found=false
+          for compiler in "${compilers_array[@]}"; do
+            if [ "$compiler" == "${{ matrix.compiler }}" ]; then
+              found=true
+              break
+            fi
+          done
+          echo "found=$found" >> $GITHUB_ENV
+      - name: Exit if Not Selected
+        if: env.found != 'true'
+        run: echo "Skipping job for compiler ${{ matrix.compiler }}"
 
       - name: Run Recursive Build
+        if: env.found == 'true'
         run: |
-          COMPILERS=""
-          if [ "${{ github.event.inputs.mikrocavr }}" == "true" ]; then
-            COMPILERS="${COMPILERS} mikrocavr"
-          fi
-          # Remove leading/trailing spaces
-          COMPILERS=$(echo $COMPILERS | xargs)
-          export COMPILERS="$COMPILERS"
-          echo "COMPILERS=$COMPILERS"
-          python -u scripts/sdk_build_with_options.py ${{ github.event.inputs.build_type }} ${{ github.event.inputs.build_branch }} ${{ github.event.inputs.build_components }} "$COMPILERS"
+          echo "Building with compiler: ${{ matrix.compiler }}"
+          python -u scripts/sdk_build_with_options.py \
+            "${{ github.event.inputs.build_type }}" \
+            "${{ github.event.inputs.build_branch }}" \
+            "${{ github.event.inputs.build_components }}" \
+            "${{ matrix.compiler }}"
 
       - name: Archive test results
+        if: env.found == 'true'
         uses: actions/upload-artifact@v4
-        if: always()
         with:
-          name: test-results
-          path: /home/runner/test_results
-
-  dsPIC:
-    if: >
-      ${{
-        github.event.inputs.mchp_xc16 == 'true' ||
-        github.event.inputs.mikrocdspic == 'true'
-      }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r scripts/requirements/shared.txt
-          pip install -r scripts/requirements/databases.txt
-          pip install colorama
-          pip install enums
-          sudo apt-get update
-          sudo apt-get install $(cat scripts/requirements/recursive_build.txt)
-
-      - name: Install NECTO
-        env:
-          NECTO_DOWNLOAD_URL: ${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
-        run: |
-          python -u scripts/install_necto.py
-
-      - name: Run Recursive Build
-        run: |
-          COMPILERS=""
-          if [ "${{ github.event.inputs.mchp_xc16 }}" == "true" ]; then
-            COMPILERS="${COMPILERS} mchp_xc16"
-          fi
-          if [ "${{ github.event.inputs.mikrocdspic }}" == "true" ]; then
-            COMPILERS="${COMPILERS} mikrocdspic"
-          fi
-          # Remove leading/trailing spaces
-          COMPILERS=$(echo $COMPILERS | xargs)
-          export COMPILERS="$COMPILERS"
-          echo "COMPILERS=$COMPILERS"
-          python -u scripts/sdk_build_with_options.py ${{ github.event.inputs.build_type }} ${{ github.event.inputs.build_branch }} ${{ github.event.inputs.build_components }} "$COMPILERS"
-
-      - name: Archive test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: /home/runner/test_results
-
-  PIC32:
-    if: >
-      ${{
-        github.event.inputs.mchp_xc32 == 'true' ||
-        github.event.inputs.mikrocpic32 == 'true'
-      }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r scripts/requirements/shared.txt
-          pip install -r scripts/requirements/databases.txt
-          pip install colorama
-          pip install enums
-          sudo apt-get update
-          sudo apt-get install $(cat scripts/requirements/recursive_build.txt)
-
-      - name: Install NECTO
-        env:
-          NECTO_DOWNLOAD_URL: ${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
-        run: |
-          python -u scripts/install_necto.py
-
-      - name: Run Recursive Build
-        run: |
-          COMPILERS=""
-          if [ "${{ github.event.inputs.mchp_xc32 }}" == "true" ]; then
-            COMPILERS="${COMPILERS} mchp_xc32"
-          fi
-          if [ "${{ github.event.inputs.mikrocpic32 }}" == "true" ]; then
-            COMPILERS="${COMPILERS} mikrocpic32"
-          fi
-          # Remove leading/trailing spaces
-          COMPILERS=$(echo $COMPILERS | xargs)
-          export COMPILERS="$COMPILERS"
-          echo "COMPILERS=$COMPILERS"
-          python -u scripts/sdk_build_with_options.py ${{ github.event.inputs.build_type }} ${{ github.event.inputs.build_branch }} ${{ github.event.inputs.build_components }} "$COMPILERS"
-
-      - name: Archive test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: /home/runner/test_results
-
-  PIC:
-    if: >
-      ${{
-        github.event.inputs.mchp_xc8 == 'true' ||
-        github.event.inputs.mikrocpic == 'true'
-      }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r scripts/requirements/shared.txt
-          pip install -r scripts/requirements/databases.txt
-          pip install colorama
-          pip install enums
-          sudo apt-get update
-          sudo apt-get install $(cat scripts/requirements/recursive_build.txt)
-
-      - name: Install NECTO
-        env:
-          NECTO_DOWNLOAD_URL: ${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
-        run: |
-          python -u scripts/install_necto.py
-
-      - name: Run Recursive Build
-        run: |
-          COMPILERS=""
-          if [ "${{ github.event.inputs.mchp_xc8 }}" == "true" ]; then
-            COMPILERS="${COMPILERS} mchp_xc8"
-          fi
-          if [ "${{ github.event.inputs.mikrocpic }}" == "true" ]; then
-            COMPILERS="${COMPILERS} mikrocpic"
-          fi
-          # Remove leading/trailing spaces
-          COMPILERS=$(echo $COMPILERS | xargs)
-          export COMPILERS="$COMPILERS"
-          echo "COMPILERS=$COMPILERS"
-          python -u scripts/sdk_build_with_options.py ${{ github.event.inputs.build_type }} ${{ github.event.inputs.build_branch }} ${{ github.event.inputs.build_components }} "$COMPILERS"
-
-      - name: Archive test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: /home/runner/test_results
-
-  RISC-V:
-    if: >
-      ${{
-        github.event.inputs.xpack_riscv_none_embed_gcc == 'true' ||
-        github.event.inputs.clang_llvm_riscv == 'true'
-      }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r scripts/requirements/shared.txt
-          pip install -r scripts/requirements/databases.txt
-          pip install colorama
-          pip install enums
-          sudo apt-get update
-          sudo apt-get install $(cat scripts/requirements/recursive_build.txt)
-
-      - name: Install NECTO
-        env:
-          NECTO_DOWNLOAD_URL: ${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
-        run: |
-          python -u scripts/install_necto.py
-
-      - name: Run Recursive Build
-        run: |
-          COMPILERS=""
-          if [ "${{ github.event.inputs.xpack_riscv_none_embed_gcc }}" == "true" ]; then
-            COMPILERS="${COMPILERS} xpack_riscv_none_embed_gcc"
-          fi
-          if [ "${{ github.event.inputs.clang_llvm_riscv }}" == "true" ]; then
-            COMPILERS="${COMPILERS} clang_llvm_riscv"
-          fi
-          # Remove leading/trailing spaces
-          COMPILERS=$(echo $COMPILERS | xargs)
-          export COMPILERS="$COMPILERS"
-          echo "COMPILERS=$COMPILERS"
-          python -u scripts/sdk_build_with_options.py ${{ github.event.inputs.build_type }} ${{ github.event.inputs.build_branch }} ${{ github.event.inputs.build_components }} "$COMPILERS"
-
-      - name: Archive test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
+          name: ${{ matrix.compiler }}-test-results
           path: /home/runner/test_results
