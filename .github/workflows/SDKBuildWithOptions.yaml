@@ -133,7 +133,6 @@ jobs:
             "${{ matrix.compiler }}"
 
       - name: Archive test results
-        if: env.found == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.compiler }}-test-results
