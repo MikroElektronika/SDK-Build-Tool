@@ -9,20 +9,16 @@ repo_owner = "MikroElektronika"
 repo_name = "mikrosdk_v2"
 
 # Path to the necto_db.db file.
-dbPath = 'C:/Users/ivan.ruzavin/AppData/Local/MIKROE/NECTOStudio7Dev/databases/necto_db.db'
-# dbPath = '/home/runner/.MIKROE/NECTOStudio7/databases/necto_db.db'
+dbPath = '/home/runner/MikroElektronika/.MIKROE/NECTOStudio7/databases/necto_db.db'
 
 # Path to the released SDK folder.
-sdkPath = 'C:/Users/ivan.ruzavin/AppData/Local/MIKROE/NECTOStudio7Dev/packages/sdk/mikroSDK_v2/src'
-# sdkPath = '/home/runner/.MIKROE/NECTOStudio7/packages/sdk/mikroSDK_v2/src'
+sdkPath = '/home/runner/MikroElektronika/.MIKROE/NECTOStudio7/packages/sdk/mikroSDK_v2/src'
 
 # Path for storing artifacts.
-testPath = 'C:/recursive_test_results'
-# testPath = '/home/runner/recursive_test_results'
+testPath = '/home/runner/recursive_test_results'
 
 # Path to sdk_build_automation tool.
-toolPath = 'C:/MikroElektronikaLive/NECTOStudio/bin'
-# toolPath = '/home/runner/MikroElektronika/NECTOStudio/bin'
+toolPath = '/home/runner/MikroElektronika/NECTOStudio/bin'
 
 # Global variable to trace failed tests.
 build_failed = False

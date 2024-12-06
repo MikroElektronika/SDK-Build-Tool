@@ -53,7 +53,17 @@ jobs:
           sudo apt-get update
           sudo apt-get install $(cat scripts/requirements/recursive_build.txt)
 
-      - name: Install NECTO
+      - name: Cache NECTO Installation
+        uses: actions/cache@v4
+        id: cache-necto
+        with:
+          path: /home/runner/MikroElektronika
+          key: necto-${{ github.run_id }}
+          restore-keys: |
+            necto-
+
+      - name: Install NECTO if Not Cached
+        if: steps.cache-necto.outputs.cache-hit != 'true'
         env:
           NECTO_DOWNLOAD_URL: ${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
         run: |
@@ -86,6 +96,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install $(cat scripts/requirements/recursive_build.txt)
 
+      - name: Restore NECTO Cache
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/MikroElektronika
+          key: necto-${{ github.run_id }}
+          restore-keys: |
+            necto-
+
       - name: Filter Compilers
         id: filter
         run: |
@@ -99,6 +117,7 @@ jobs:
             fi
           done
           echo "found=$found" >> $GITHUB_ENV
+
       - name: Exit if Not Selected
         if: env.found != 'true'
         run: echo "Skipping job for compiler ${{ matrix.compiler }}"
