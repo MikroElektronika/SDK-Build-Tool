@@ -29,6 +29,9 @@ on:
         description: Choose compiler(s) for building
         default: "gcc_arm_none_eabi, clang_llvm, mikrocarm, mikrocavr, mchp_xc16, mikrocdspic, mchp_xc32, mikrocpic32, mchp_xc8, mikrocpic, xpack_riscv_none_embed_gcc, clang_llvm_riscv"
 
+env:
+  NECTO_DOWNLOAD_URL: ${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
+
 jobs:
   install_necto:
     runs-on: ubuntu-latest
@@ -64,8 +67,6 @@ jobs:
 
       - name: Install NECTO if Not Cached
         if: steps.cache-necto.outputs.cache-hit != 'true'
-        env:
-          NECTO_DOWNLOAD_URL: ${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
         run: |
           python -u scripts/install_necto.py
 

@@ -2,7 +2,7 @@ import subprocess, argparse
 import requests
 import os, shutil
 import sqlite3
-import json
+import json, urllib
 
 # Define the repository owner and name
 repo_owner = "MikroElektronika"
@@ -89,7 +89,7 @@ def run_builds(changes_dict, build_type, build_components):
         elif build_components == 'Boards only' or build_components == 'Boards + Displays':
             print(f"\033[93mRunning build for {len(changes_dict[compiler])} Boards\033[0m")
             for board in changes_dict[compiler]:
-                cmd = f'{toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v{sdk_version}" --board "{board}" --installPrefix "{testPath}/board_build/{compiler}"'
+                cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v{sdk_version}" --board "{board}" --installPrefix "{testPath}/board_build/{compiler}"'
                 run_cmd(cmd, changes_dict, board + ' ' + compiler)
 
 # Fetches the two latest releases from the GitHub repository.
@@ -281,6 +281,12 @@ def run_command(command):
     return process.returncode
 
 def install_packages(install_packages):
+    url = os.getenv('NECTO_DOWNLOAD_URL')
+    print("Downloading Development NECTOStudio version")
+    urllib.request.urlretrieve(url, "NECTOInstaller.zip")
+
+    print("Extract installer")
+    run_command("7za x NECTOInstaller.zip")
     for package in install_packages:
         print(f'Installing package: {package}')
         run_command(f'./NECTOInstaller installer --install-packages {package} /home/runner/MikroElektronika /home/runner/.MIKROE/NECTOStudio7 > /dev/null 2>&1')
