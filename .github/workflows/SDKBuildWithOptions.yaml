@@ -32,7 +32,7 @@ on:
 env:
   NECTO_DOWNLOAD_URL: ${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
 
-# jobs:
+jobs:
 #   install_necto:
 #     runs-on: ubuntu-latest
 #     permissions:
