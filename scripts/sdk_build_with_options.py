@@ -41,33 +41,42 @@ def get_sdk_version(manifest_path):
 # Runs the bash command.
 def run_cmd(cmd, changes_dict, status_key):
     global build_failed
+    num_of_retries = 0
     # Blue color for build tool command command.
     print(f"\033[94m{cmd}\033[0m")
 
     # Store all the output lines to print only important ones.
     # output = subprocess.check_output(cmd, shell=True, text=True)
     # Store all the output lines to print only important ones.
-    result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
-    if 'Building:' in result.stdout:
-        output = result.stdout
-        # print(output)
-    else:
-        output = result.stderr
-        # print(output)
-    for line in output.splitlines():
-        if line.startswith("Building:"):
-            changes_dict['build_status'][status_key] = 'UNDEFINED'
-            # White color for the current setup build.
-            print(line)
-        elif "Build success!" in line:
-            changes_dict['build_status'][status_key] = 'SUCCESS'
-            # Green color for success.
-            print("\033[92m{}\033[0m".format(line))
-        elif "Build failed" in line:
-            changes_dict['build_status'][status_key] = 'FAIL'
-            # Red color for failure.
-            print("\033[91m{}\033[0m".format(line))
-            build_failed = True
+    while (1):
+        result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
+        if 'Building:' in result.stdout:
+            output = result.stdout
+            # print(output)
+        else:
+            output = result.stderr
+            # print(output)
+        for line in output.splitlines():
+            if line.startswith("Building:"):
+                changes_dict['build_status'][status_key] = 'UNDEFINED'
+                # White color for the current setup build.
+                print(line)
+                return
+            elif "Build success!" in line:
+                changes_dict['build_status'][status_key] = 'SUCCESS'
+                # Green color for success.
+                print("\033[92m{}\033[0m".format(line))
+                return
+            elif "Build failed" in line:
+                # Red color for failure.
+                print("\033[91m{}\033[0m".format(line))
+                if num_of_retries != 0:
+                    changes_dict['build_status'][status_key] = 'FAIL'
+                    build_failed = True
+                    return
+                print("\033[95m{}\033[0m".format("!!!TRYING TO BUILD AGAIN!!!"))
+                print(f"\033[95m{cmd}\033[0m")
+                num_of_retries += 1
 
 # Runs the build commands for each member of mcu_list, board_list, and mcu_card_list.
 def run_builds(changes_dict, build_type, build_components):
@@ -360,6 +369,7 @@ def install_packages(install_packages):
     download_metadata('mikrosdk_v2', 'metadata_sdk.json')
     download_metadata('core_packages', 'metadata_core.json')
     for package in install_packages:
+        num_of_retries = 0
         install_location = ''
         # Open and load the SDK JSON file
         with open('metadata_core.json', "r") as metadata_core:
@@ -381,13 +391,17 @@ def install_packages(install_packages):
         print(f'Installing package: {package}')
         while (1):
             if linux_build:
-                run_command(f'./NECTOInstaller installer --install-packages {package} {cache_folder} {cache_folder}/.MIKROE/NECTOStudio7 > /dev/null 2>&1')
+                run_command(f'./NECTOInstaller installer --install-packages {package} {cache_folder} {cache_folder}/.MIKROE/NECTOStudio7')
             else:
                 run_command(f'NECTOInstaller.exe installer --install-packages {package} {cache_folder} {cache_folder}/MIKROE/NECTOStudio7 > /dev/null 2>&1')
             print('Checking if package exists')
             if os.path.exists(install_location) or os.path.exists(os.path.join(install_location, 'board/include/mcu_cards', package)):
                 print(f"The {package} package has been downloaded successfully.")
                 break
+            if num_of_retries == 2:
+                print('Package is not installed after 3 retries - exit with error.')
+                exit(1)
+            num_of_retries += 1
 
 def main():
     global build_failed
