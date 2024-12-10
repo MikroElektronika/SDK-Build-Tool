@@ -76,6 +76,7 @@ jobs:
     permissions:
       contents: write
     strategy:
+      fail-fast: false
       matrix:
         compiler: [gcc_arm_none_eabi, clang_llvm, mikrocarm, mikrocavr, mchp_xc16, mikrocdspic, mchp_xc32, mikrocpic32, mchp_xc8, mikrocpic, xpack_riscv_none_embed_gcc, clang_llvm_riscv]
     steps:
