@@ -126,7 +126,7 @@ def query_database(changes_dict, build_components, build_type):
         if build_components == 'MCUs only':
             changes_dict[compiler] = []
             cursor.execute(f"""
-                SELECT DISTINCT Devices.uid FROM Devices
+                SELECT DISTINCT Devices.uid, Devices.installer_package FROM Devices
                 INNER JOIN CompilerToDevice ON Devices.uid = CompilerToDevice.device_uid
                 INNER JOIN SDKToDevice ON Devices.uid = SDKToDevice.device_uid
                 WHERE SDKToDevice.sdk_uid = 'mikrosdk_v{sdk_version}'
@@ -139,6 +139,10 @@ def query_database(changes_dict, build_components, build_type):
                 for row in rows:
                     if row[0] not in changes_dict[compiler]:
                         changes_dict[compiler].append(row[0])
+                    installer_package = json.loads(row[1])
+                    if compiler in installer_package:
+                        changes_dict['install_packages'].append(installer_package[compiler])
+
 
             cursor.execute(f"""
                 SELECT board_uid FROM BoardToDevice
@@ -152,11 +156,12 @@ def query_database(changes_dict, build_components, build_type):
         elif build_components == 'Cards only':
             changes_dict[compiler] = {}
             cursor.execute(f"""
-                SELECT Devices.uid, Devices.installer_package, BoardToDevice.board_uid
+                SELECT Devices.uid, Devices.installer_package, BoardToDevice.board_uid, Boards.installer_package
                 FROM Devices
                 INNER JOIN CompilerToDevice ON Devices.uid = CompilerToDevice.device_uid
                 INNER JOIN SDKToDevice ON Devices.uid = SDKToDevice.device_uid
                 INNER JOIN BoardToDevice ON Devices.uid = BoardToDevice.device_uid
+                INNER JOIN Boards ON BoardToDevice.board_uid = Boards.uid
                 WHERE SDKToDevice.sdk_uid = 'mikrosdk_v{sdk_version}'
                 AND CompilerToDevice.compiler_uid = '{compiler}'
                 AND SDKToDevice.device_uid LIKE '%\\_%' ESCAPE '\\';
@@ -171,14 +176,15 @@ def query_database(changes_dict, build_components, build_type):
                     # As tool doesn't install mcu card packages we need to install them manually
                     if row[1].split('"')[3] not in changes_dict['install_packages']:
                         changes_dict['install_packages'].append(row[1].split('"')[3])
-
-            if 'UNI_DS_V8' not in changes_dict['board_list']: # TODO - should be changed to use appropriate board (v7 board for v7 cards)
-                changes_dict['board_list'].append('UNI_DS_V8')
+                    if row[3].split('"')[3] not in changes_dict['install_packages']:
+                        changes_dict['install_packages'].append(row[3].split('"')[3])
 
         elif build_components == 'Boards only':
             changes_dict[compiler] = []
             cursor.execute(f"""
-                SELECT DISTINCT BoardToDevice.board_uid FROM BoardToDevice
+                SELECT DISTINCT BoardToDevice.board_uid, Boards.installer_package
+                FROM BoardToDevice
+                INNER JOIN Boards ON BoardToDevice.board_uid = Boards.uid
                 INNER JOIN SDKToBoard ON BoardToDevice.board_uid = SDKToBoard.board_uid
                 INNER JOIN CompilerToDevice ON BoardToDevice.device_uid = CompilerToDevice.device_uid
                 WHERE SDKToBoard.sdk_uid = 'mikrosdk_v{sdk_version}'
@@ -189,11 +195,13 @@ def query_database(changes_dict, build_components, build_type):
                 for row in rows:
                     if row[0] not in changes_dict[compiler]:
                         changes_dict[compiler].append(row[0])
+                    if row[1].split('"')[3] not in changes_dict['install_packages']:
+                        changes_dict['install_packages'].append(row[1].split('"')[3])
 
         elif build_components == 'Boards + Displays':
             changes_dict[compiler] = []
             cursor.execute(f"""
-                SELECT DISTINCT BoardToDevice.board_uid FROM BoardToDevice
+                SELECT DISTINCT BoardToDevice.board_uid, Boards.installer_package FROM BoardToDevice
                 INNER JOIN SDKToBoard ON BoardToDevice.board_uid = SDKToBoard.board_uid
                 INNER JOIN CompilerToDevice ON BoardToDevice.device_uid = CompilerToDevice.device_uid
                 INNER JOIN Boards ON BoardToDevice.board_uid = Boards.uid
@@ -206,6 +214,8 @@ def query_database(changes_dict, build_components, build_type):
                 for row in rows:
                     if row[0] not in changes_dict[compiler]:
                         changes_dict[compiler].append(row[0])
+                    if row[1].split('"')[3] not in changes_dict['install_packages']:
+                        changes_dict['install_packages'].append(row[1].split('"')[3])
 
     conn.close()
 
