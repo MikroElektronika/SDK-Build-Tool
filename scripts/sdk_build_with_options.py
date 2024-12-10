@@ -140,7 +140,7 @@ def query_database(changes_dict, build_components, build_type):
                     if row[0] not in changes_dict[compiler]:
                         changes_dict[compiler].append(row[0])
                     installer_package = json.loads(row[1])
-                    if compiler in installer_package:
+                    if compiler in installer_package and installer_package[compiler] not in changes_dict['install_packages']:
                         changes_dict['install_packages'].append(installer_package[compiler])
 
 
