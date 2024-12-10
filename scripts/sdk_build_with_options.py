@@ -41,11 +41,11 @@ def run_cmd(cmd, changes_dict, status_key):
     # Store all the output lines to print only important ones.
     result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
     if 'Building:' in result.stdout:
-        # output = result.stdout
-        print(output)
+        output = result.stdout
+        # print(output)
     else:
-        # output = result.stderr
-        print(output)
+        output = result.stderr
+        # print(output)
     for line in output.splitlines():
         if line.startswith("Building:"):
             changes_dict['build_status'][status_key] = 'UNDEFINED'
