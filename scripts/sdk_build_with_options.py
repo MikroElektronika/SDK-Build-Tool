@@ -14,10 +14,16 @@ else:
     cache_folder = 'c:/MikroElektronikaDev'
 
 # Path to the necto_db.db file.
-dbPath = f'{cache_folder}/.MIKROE/NECTOStudio7/databases/necto_db.db'
+if linux_build:
+    dbPath = f'{cache_folder}/.MIKROE/NECTOStudio7/databases/necto_db.db'
+else:
+    dbPath = f'{cache_folder}/MIKROE/NECTOStudio7/databases/necto_db.db'
 
 # Path to the released SDK folder.
-sdkPath = f'{cache_folder}/.MIKROE/NECTOStudio7/packages/sdk/mikroSDK_v2/src'
+if linux_build:
+    sdkPath = f'{cache_folder}/.MIKROE/NECTOStudio7/packages/sdk/mikroSDK_v2/src'
+else:
+    sdkPath = f'{cache_folder}/MIKROE/NECTOStudio7/packages/sdk/mikroSDK_v2/src'
 
 # Path for storing artifacts.
 if linux_build:
@@ -61,7 +67,6 @@ def run_cmd(cmd, changes_dict, status_key):
                 changes_dict['build_status'][status_key] = 'UNDEFINED'
                 # White color for the current setup build.
                 print(line)
-                return
             elif "Build success!" in line:
                 changes_dict['build_status'][status_key] = 'SUCCESS'
                 # Green color for success.
@@ -363,8 +368,11 @@ def install_packages(install_packages):
     urllib.request.urlretrieve(url, "NECTOInstaller.zip")
 
     print("Extracting installer")
-    with zipfile.ZipFile('NECTOInstaller.zip', 'r') as zip_ref:
-        zip_ref.extractall('.')
+    if linux_build:
+        run_command("7za x NECTOInstaller.zip")
+    else:
+        with zipfile.ZipFile('NECTOInstaller.zip', 'r') as zip_ref:
+            zip_ref.extractall('.')
     # Download metadata_core.json for core_packages and metadata_sdk.json for sdk
     download_metadata('mikrosdk_v2', 'metadata_sdk.json')
     download_metadata('core_packages', 'metadata_core.json')
@@ -393,7 +401,7 @@ def install_packages(install_packages):
             if linux_build:
                 run_command(f'./NECTOInstaller installer --install-packages {package} {cache_folder} {cache_folder}/.MIKROE/NECTOStudio7')
             else:
-                run_command(f'NECTOInstaller.exe installer --install-packages {package} {cache_folder} {cache_folder}/MIKROE/NECTOStudio7 > /dev/null 2>&1')
+                run_command(f'NECTOInstaller.exe installer --install-packages {package} {cache_folder} {cache_folder}/MIKROE/NECTOStudio7')
             print('Checking if package exists')
             if os.path.exists(install_location) or os.path.exists(os.path.join(install_location, 'board/include/mcu_cards', package)):
                 print(f"The {package} package has been downloaded successfully.")
