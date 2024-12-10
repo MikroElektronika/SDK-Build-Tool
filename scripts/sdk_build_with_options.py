@@ -299,7 +299,7 @@ def install_packages(install_packages):
     run_command("7za x NECTOInstaller.zip")
     for package in install_packages:
         print(f'Installing package: {package}')
-        run_command(f'./NECTOInstaller installer --install-packages {package} /home/runner/MikroElektronika /home/runner/.MIKROE/NECTOStudio7 > /dev/null 2>&1')
+        run_command(f'./NECTOInstaller installer --install-packages {package} /home/runner/MikroElektronika /home/runner/MikroElektronika/.MIKROE/NECTOStudio7 > /dev/null 2>&1')
 
 def main():
     global build_failed
