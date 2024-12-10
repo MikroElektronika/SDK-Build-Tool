@@ -3,22 +3,30 @@ import requests
 import os, shutil
 import sqlite3
 import json, urllib
+import zipfile
+import time
 
-# Define the repository owner and name
-repo_owner = "MikroElektronika"
-repo_name = "mikrosdk_v2"
+linux_build = True
+
+if linux_build:
+    cache_folder = '/home/runner/MikroElektronika'
+else:
+    cache_folder = 'c:/MikroElektronikaDev'
 
 # Path to the necto_db.db file.
-dbPath = '/home/runner/MikroElektronika/.MIKROE/NECTOStudio7/databases/necto_db.db'
+dbPath = f'{cache_folder}/.MIKROE/NECTOStudio7/databases/necto_db.db'
 
 # Path to the released SDK folder.
-sdkPath = '/home/runner/MikroElektronika/.MIKROE/NECTOStudio7/packages/sdk/mikroSDK_v2/src'
+sdkPath = f'{cache_folder}/.MIKROE/NECTOStudio7/packages/sdk/mikroSDK_v2/src'
 
 # Path for storing artifacts.
-testPath = '/home/runner/recursive_test_results'
-
+if linux_build:
+    testPath = '/home/runner/recursive_test_results'
+else:
+    testPath = 'D:/recursive_test_results'
+    
 # Path to sdk_build_automation tool.
-toolPath = '/home/runner/MikroElektronika/NECTOStudio/bin'
+toolPath = f'{cache_folder}/NECTOStudio/bin'
 
 # Global variable to trace failed tests.
 build_failed = False
@@ -76,27 +84,42 @@ def run_builds(changes_dict, build_type, build_components):
         if build_components == 'MCUs only':
             print(f"\033[93mRunning build for {len(changes_dict[compiler])} Devices\033[0m")
             for mcu in changes_dict[compiler]:
-                cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation {bare_metal_flag} --compiler "{compiler}" --sdk "mikrosdk_v{sdk_version}" --board "{changes_dict['board_list'][0]}" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
+                if linux_build:
+                    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation {bare_metal_flag} --compiler "{compiler}" --sdk "mikrosdk_v{sdk_version}" --board "{changes_dict['board_list'][0]}" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
+                else:
+                    cmd = f'{toolPath}/sdk_build_automation.exe {bare_metal_flag} --compiler "{compiler}" --sdk "mikrosdk_v{sdk_version}" --board "{changes_dict['board_list'][0]}" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
+                # Delay for 2 seconds
+                time.sleep(2)
                 run_cmd(cmd, changes_dict, mcu + ' ' + compiler)
 
         elif build_components == 'Cards only':
             for board in changes_dict[compiler]:
                 print(f"\033[93mRunning build for {len(changes_dict[compiler][board])} Cards with {board}\033[0m")
                 for card in changes_dict[compiler][board]:
-                    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation {bare_metal_flag} --compiler "{compiler}" --sdk "mikrosdk_v{sdk_version}" --board "{board}" --mcu "{card}" --installPrefix "{testPath}/card_build/{compiler}"'
+                    if linux_build:
+                        cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation {bare_metal_flag} --compiler "{compiler}" --sdk "mikrosdk_v{sdk_version}" --board "{board}" --mcu "{card}" --installPrefix "{testPath}/card_build/{compiler}"'
+                    else:
+                        cmd = f'{toolPath}/sdk_build_automation.exe {bare_metal_flag} --compiler "{compiler}" --sdk "mikrosdk_v{sdk_version}" --board "{board}" --mcu "{card}" --installPrefix "{testPath}/card_build/{compiler}"'
+                    # Delay for 2 seconds
+                    time.sleep(2)
                     run_cmd(cmd, changes_dict, card + ' ' + compiler)
 
         elif build_components == 'Boards only' or build_components == 'Boards + Displays':
             print(f"\033[93mRunning build for {len(changes_dict[compiler])} Boards\033[0m")
             for board in changes_dict[compiler]:
-                cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v{sdk_version}" --board "{board}" --installPrefix "{testPath}/board_build/{compiler}"'
+                if linux_build:
+                    cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath}/sdk_build_automation {bare_metal_flag} --compiler "{compiler}" --sdk "mikrosdk_v{sdk_version}" --board "{board}" --installPrefix "{testPath}/board_build/{compiler}"'
+                else:
+                    cmd = f'{toolPath}/sdk_build_automation.exe --isBareMetal "0" --compiler "{compiler}" --sdk "mikrosdk_v{sdk_version}" --board "{board}" --installPrefix "{testPath}/board_build/{compiler}"'
+                # Delay for 2 seconds
+                time.sleep(2)
                 run_cmd(cmd, changes_dict, board + ' ' + compiler)
 
 # Fetches the two latest releases from the GitHub repository.
 def get_latest_releases():
     try:
         # GitHub API URL to fetch tags
-        tags_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/tags"
+        tags_url = f"https://api.github.com/repos/MikroElektronika/mikrosdk_v2/tags"
 
         # Send request to GitHub API
         response = requests.get(tags_url)
@@ -285,21 +308,86 @@ def clone_repo_and_switch(repo_url, branch_name, clone_dir):
 
 def run_command(command):
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    for line in process.stdout:
-        print(line.strip())
-    process.wait()
+    stdout, stderr = process.communicate()
+    if process.returncode != 0:
+        print("Error:", stderr.strip())
+    else:
+        print(stdout.strip())
     return process.returncode
 
+def download_metadata(repo_name, updated_name):
+    # URL to fetch the latest release
+    latest_release_url = f"https://api.github.com/repos/MikroElektronika/{repo_name}/releases/latest"
+
+    try:
+        # Get the latest release data
+        response = requests.get(latest_release_url)
+        response.raise_for_status()
+        release_data = response.json()
+        
+        # Find the download URL for the specific asset
+        asset_url = None
+        for asset in release_data["assets"]:
+            if asset["name"] == 'metadata.json':
+                asset_url = asset["browser_download_url"]
+                break
+        
+        if asset_url:
+            # Download the asset
+            print(f"Downloading 'metadata.json' from {asset_url}...")
+            asset_response = requests.get(asset_url, stream=True)
+            asset_response.raise_for_status()
+            
+            # Save the file locally
+            with open(updated_name, "wb") as file:
+                for chunk in asset_response.iter_content(chunk_size=8192):
+                    file.write(chunk)
+            print(f"File downloaded successfully and saved as '{updated_name}'")
+        else:
+            print(f"Asset 'metadata.json' not found in the latest release.")
+    except requests.exceptions.RequestException as e:
+        print(f"Failed to fetch the latest release or download the file: {e}")
+
 def install_packages(install_packages):
-    url = os.getenv('NECTO_DOWNLOAD_URL')
+    url = 'https://software-update.mikroe.com/NECTOStudio7/development/necto/win/NECTOInstaller.zip'
     print("Downloading Development NECTOStudio version")
     urllib.request.urlretrieve(url, "NECTOInstaller.zip")
 
-    print("Extract installer")
-    run_command("7za x NECTOInstaller.zip")
+    print("Extracting installer")
+    with zipfile.ZipFile('NECTOInstaller.zip', 'r') as zip_ref:
+        zip_ref.extractall('.')
+    # Download metadata_core.json for core_packages and metadata_sdk.json for sdk
+    download_metadata('mikrosdk_v2', 'metadata_sdk.json')
+    download_metadata('core_packages', 'metadata_core.json')
     for package in install_packages:
+        install_location = ''
+        # Open and load the SDK JSON file
+        with open('metadata_core.json', "r") as metadata_core:
+            packages_core_meta = json.load(metadata_core)
+            for package_core_meta in packages_core_meta:
+                if package_core_meta['name'] == package:
+                    install_location = package_core_meta['install_location'].replace('%APPLICATION_DATA_DIR%', f'{cache_folder}/MIKROE/NECTOStudio7')
+                    break
+        if install_location == '':
+            with open('metadata_sdk.json', "r") as metadata_sdk:
+                packages_sdk_meta = json.load(metadata_sdk)
+                for package_sdk_meta in packages_sdk_meta:
+                    if package_sdk_meta['name'] == package:
+                        install_location = package_core_meta['install_location'].replace('%APPLICATION_DATA_DIR%', f'{cache_folder}/MIKROE/NECTOStudio7')
+                        break
+        if install_location == '':
+            print(f'ERROR! For package {package} there is no info in metadata.')
+            
         print(f'Installing package: {package}')
-        run_command(f'./NECTOInstaller installer --install-packages {package} /home/runner/MikroElektronika /home/runner/MikroElektronika/.MIKROE/NECTOStudio7')
+        while (1):
+            if linux_build:
+                run_command(f'./NECTOInstaller installer --install-packages {package} {cache_folder} {cache_folder}/.MIKROE/NECTOStudio7 > /dev/null 2>&1')
+            else:
+                run_command(f'NECTOInstaller.exe installer --install-packages {package} {cache_folder} {cache_folder}/MIKROE/NECTOStudio7 > /dev/null 2>&1')
+            print('Checking if package exists')
+            if os.path.exists(install_location) or os.path.exists(os.path.join(install_location, 'board/include/mcu_cards', package)):
+                print(f"The {package} package has been downloaded successfully.")
+                break
 
 def main():
     global build_failed
