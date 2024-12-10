@@ -322,11 +322,11 @@ def clone_repo_and_switch(repo_url, branch_name, clone_dir):
 
 def run_command(command):
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    stdout, stderr = process.communicate()
-    if process.returncode != 0:
-        print("Error:", stderr.strip())
-    else:
-        print(stdout.strip())
+    # stdout, stderr = process.communicate()
+    # if process.returncode != 0:
+    #     print("Error:", stderr.strip())
+    # else:
+    #     print(stdout.strip())
     return process.returncode
 
 def download_metadata(repo_name, updated_name):
@@ -387,14 +387,20 @@ def install_packages(install_packages):
             packages_core_meta = json.load(metadata_core)
             for package_core_meta in packages_core_meta:
                 if package_core_meta['name'] == package:
-                    install_location = package_core_meta['install_location'].replace('%APPLICATION_DATA_DIR%', f'{cache_folder}/MIKROE/NECTOStudio7')
+                    if linux_build:
+                        install_location = package_core_meta['install_location'].replace('%APPLICATION_DATA_DIR%', f'{cache_folder}/.MIKROE/NECTOStudio7')
+                    else:
+                        install_location = package_core_meta['install_location'].replace('%APPLICATION_DATA_DIR%', f'{cache_folder}/MIKROE/NECTOStudio7')
                     break
         if install_location == '':
             with open('metadata_sdk.json', "r") as metadata_sdk:
                 packages_sdk_meta = json.load(metadata_sdk)
                 for package_sdk_meta in packages_sdk_meta:
                     if package_sdk_meta['name'] == package:
-                        install_location = package_core_meta['install_location'].replace('%APPLICATION_DATA_DIR%', f'{cache_folder}/MIKROE/NECTOStudio7')
+                        if linux_build:
+                            install_location = package_core_meta['install_location'].replace('%APPLICATION_DATA_DIR%', f'{cache_folder}/.MIKROE/NECTOStudio7')
+                        else:
+                            install_location = package_core_meta['install_location'].replace('%APPLICATION_DATA_DIR%', f'{cache_folder}/MIKROE/NECTOStudio7')
                         break
         if install_location == '':
             print(f'ERROR! For package {package} there is no info in metadata.')
