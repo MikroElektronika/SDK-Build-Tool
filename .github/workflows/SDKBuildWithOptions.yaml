@@ -98,10 +98,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install $(cat scripts/requirements/recursive_build.txt)
 
-      - name: Install NECTO
-        run: |
-          python -u scripts/install_necto.py
-
       - name: Restore NECTO Cache
         uses: actions/cache@v4
         with:
