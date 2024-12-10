@@ -65,6 +65,15 @@ jobs:
           restore-keys: |
             necto-
 
+      - name: Cache .config Folder
+        uses: actions/cache@v4
+        id: cache-another
+        with:
+          path: /home/runner/.config
+          key: config-${{ github.run_id }}
+          restore-keys: |
+            config-
+
       - name: Install NECTO if Not Cached
         if: steps.cache-necto.outputs.cache-hit != 'true'
         run: |
@@ -105,6 +114,14 @@ jobs:
           key: necto-${{ github.run_id }}
           restore-keys: |
             necto-
+
+      - name: Restore .config Cache
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/.config
+          key: config-${{ github.run_id }}
+          restore-keys: |
+            config-
 
       - name: Filter Compilers
         id: filter
