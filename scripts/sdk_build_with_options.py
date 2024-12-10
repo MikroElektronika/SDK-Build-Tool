@@ -365,14 +365,16 @@ def download_metadata(repo_name, updated_name):
 def install_packages(install_packages):
     if linux_build:
         url = 'https://software-update.mikroe.com/NECTOStudio7/development/necto/linux/NECTOInstaller.zip'
+        print("Extracting installer")
+        run_command("7za x NECTOInstaller.zip")
     else:
         url = 'https://software-update.mikroe.com/NECTOStudio7/development/necto/win/NECTOInstaller.zip'
+        print("Extracting installer")
+        with zipfile.ZipFile('NECTOInstaller.zip', 'r') as zip_ref:
+            zip_ref.extractall('.')
     print("Downloading Development NECTOStudio version")
     urllib.request.urlretrieve(url, "NECTOInstaller.zip")
 
-    print("Extracting installer")
-    with zipfile.ZipFile('NECTOInstaller.zip', 'r') as zip_ref:
-        zip_ref.extractall('.')
     # Download metadata_core.json for core_packages and metadata_sdk.json for sdk
     download_metadata('mikrosdk_v2', 'metadata_sdk.json')
     download_metadata('core_packages', 'metadata_core.json')
