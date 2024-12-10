@@ -167,7 +167,7 @@ def query_database(changes_dict, build_components, build_type):
                     if row[2] not in changes_dict[compiler]:
                         changes_dict[compiler][row[2]] = []
                     if row[0] not in changes_dict[compiler][row[2]]:
-                        changes_dict[compiler][row[2]].append([row[0]])
+                        changes_dict[compiler][row[2]].append(row[0])
                     # As tool doesn't install mcu card packages we need to install them manually
                     if row[1].split('"')[3] not in changes_dict['install_packages']:
                         changes_dict['install_packages'].append(row[1].split('"')[3])
