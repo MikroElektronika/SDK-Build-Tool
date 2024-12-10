@@ -80,7 +80,7 @@ jobs:
 #           python -u scripts/install_necto.py
 
   build_sdk:
-    needs: install_necto
+    # needs: install_necto
     runs-on: ubuntu-latest
     permissions:
       contents: write
