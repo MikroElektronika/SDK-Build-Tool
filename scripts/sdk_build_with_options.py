@@ -322,11 +322,11 @@ def clone_repo_and_switch(repo_url, branch_name, clone_dir):
 
 def run_command(command):
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    # stdout, stderr = process.communicate()
-    # if process.returncode != 0:
-    #     print("Error:", stderr.strip())
-    # else:
-    #     print(stdout.strip())
+    stdout, stderr = process.communicate()
+    if process.returncode != 0:
+        print("Error:", stderr.strip())
+    else:
+        print(stdout.strip())
     return process.returncode
 
 def download_metadata(repo_name, updated_name):
@@ -416,7 +416,7 @@ def install_packages(install_packages):
                 print(f"The {package} package has been downloaded successfully.")
                 break
             if num_of_retries == 2:
-                print('Package is not installed after 3 retries - exit with error.')
+                print(f'Package is not installed in {install_location} after 3 retries - exit with error.')
                 exit(1)
             num_of_retries += 1
 
