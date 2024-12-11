@@ -3,13 +3,13 @@ import os, re, subprocess, shutil, json, sqlite3
 from packaging import version
 
 # Global variable for local_app_data_path
-local_app_data_path = '/home/runner/MikroElektronika/.MIKROE/NECTOStudio7'
+local_app_data_path = '/home/software/MikroElektronika/.MIKROE/NECTOStudio7'
 
 # Path for storing artifacts.
-testPath = '/home/runner/test_results'
+testPath = '/home/software/test_results'
 
 # Path to sdk_build_automation tool.
-toolPath = '/home/runner/MikroElektronika/NECTOStudio/bin/sdk_build_automation'
+toolPath = '/home/software/MikroElektronika/NECTOStudio/bin/sdk_build_automation'
 
 # Global variable to trace failed tests.
 build_failed = False
@@ -489,7 +489,7 @@ def insertIntoTable(db, tableName, values, columns):
     numOfItems = ''
     for itemCount in range(1, len(values) + 1):
         numOfItems += '?,'
-    cur.execute(f'INSERT OR IGNORE INTO {tableName} ({columns}) VALUES ({numOfItems[:-1]})', values)
+    cur.execute(f'INSERT OR REPLACE INTO {tableName} ({columns}) VALUES ({numOfItems[:-1]})', values)
     conn.commit()
     conn.close()
 
