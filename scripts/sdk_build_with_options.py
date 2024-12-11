@@ -9,7 +9,7 @@ import time
 linux_build = True
 
 if linux_build:
-    cache_folder = '/home/runner/MikroElektronika'
+    cache_folder = '/home/runner'
 else:
     cache_folder = 'c:/MikroElektronikaDev'
 
@@ -30,9 +30,9 @@ if linux_build:
     testPath = '/home/runner/recursive_test_results'
 else:
     testPath = 'D:/recursive_test_results'
-    
+
 # Path to sdk_build_automation tool.
-toolPath = f'{cache_folder}/NECTOStudio/bin'
+toolPath = f'{cache_folder}/MikroElektronika/NECTOStudio/bin'
 
 # Global variable to trace failed tests.
 build_failed = False
@@ -338,20 +338,20 @@ def download_metadata(repo_name, updated_name):
         response = requests.get(latest_release_url)
         response.raise_for_status()
         release_data = response.json()
-        
+
         # Find the download URL for the specific asset
         asset_url = None
         for asset in release_data["assets"]:
             if asset["name"] == 'metadata.json':
                 asset_url = asset["browser_download_url"]
                 break
-        
+
         if asset_url:
             # Download the asset
             print(f"Downloading 'metadata.json' from {asset_url}...")
             asset_response = requests.get(asset_url, stream=True)
             asset_response.raise_for_status()
-            
+
             # Save the file locally
             with open(updated_name, "wb") as file:
                 for chunk in asset_response.iter_content(chunk_size=8192):
@@ -404,7 +404,7 @@ def install_packages(install_packages):
                         break
         if install_location == '':
             print(f'ERROR! For package {package} there is no info in metadata.')
-            
+
         print(f'Installing package: {package}')
         while (1):
             if linux_build:
