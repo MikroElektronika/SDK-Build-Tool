@@ -75,7 +75,7 @@ def run_cmd(cmd, changes_dict, status_key):
             current_build_failed = True
 
     if current_build_failed:
-        print("\033[95m{}\033[0m".format("!!!TRYING TO BUILD AGAIN!!!"))
+        print("\033[93m{}\033[0m".format("!!!TRYING TO BUILD AGAIN!!!"))
         print(f"\033[95m{cmd}\033[0m")
         result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
         if 'Building:' in result.stdout:
@@ -97,8 +97,6 @@ def run_cmd(cmd, changes_dict, status_key):
                 print("\033[91m{}\033[0m".format(line))
                 build_failed = True
                 changes_dict['build_status'][status_key] = 'FAIL'
-                print("\033[95m{}\033[0m".format("!!!TRYING TO BUILD AGAIN!!!"))
-                print(f"\033[95m{cmd}\033[0m")
 
 # Runs the build commands for each member of mcu_list, board_list, and mcu_card_list.
 def run_builds(changes_dict, build_type, build_components):
