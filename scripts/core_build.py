@@ -78,9 +78,9 @@ def run_cmd(cmd, changes_dict, status_key):
         output = result.stderr
         # print(output)
     for line in output.splitlines():
-        if line.startswith("Building:"):
+        # if line.startswith("Building:"):
             # White color for the current setup build.
-        elif "Build success!" in line:
+        if "Build success!" in line:
             changes_dict['build_status'][status_key] = 'SUCCESS'
             # Green color for success.
             print("\033[92m{}\033[0m".format(line))
