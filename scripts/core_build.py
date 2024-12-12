@@ -63,47 +63,58 @@ def get_sdk_version():
 # Runs the bash command.
 def run_cmd(cmd, changes_dict, status_key):
     global build_failed
+    current_build_failed = False
     # Blue color for build tool command command.
     print(f"\033[94m{cmd}\033[0m")
 
-    try:
-        # Store all the output lines to print only important ones.
+    # Store all the output lines to print only important ones.
+    # output = subprocess.check_output(cmd, shell=True, text=True)
+    # Store all the output lines to print only important ones.
+    result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
+    if 'Building:' in result.stdout:
+        output = result.stdout
+        # print(output)
+    else:
+        output = result.stderr
+        # print(output)
+    for line in output.splitlines():
+        if line.startswith("Building:"):
+            changes_dict['build_status'][status_key] = 'UNDEFINED'
+            # White color for the current setup build.
+        elif "Build success!" in line:
+            changes_dict['build_status'][status_key] = 'SUCCESS'
+            # Green color for success.
+            print("\033[92m{}\033[0m".format(line))
+        elif "Build failed" in line:
+            # Red color for failure.
+            print("\033[91m{}\033[0m".format(line))
+            current_build_failed = True
+
+    if current_build_failed:
+        print("\033[95m{}\033[0m".format("!!!TRYING TO BUILD AGAIN!!!"))
+        print(f"\033[95m{cmd}\033[0m")
         result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
         if 'Building:' in result.stdout:
             output = result.stdout
+            # print(output)
         else:
             output = result.stderr
+            # print(output)
         for line in output.splitlines():
             if line.startswith("Building:"):
                 changes_dict['build_status'][status_key] = 'UNDEFINED'
                 # White color for the current setup build.
-                print(line)
             elif "Build success!" in line:
                 changes_dict['build_status'][status_key] = 'SUCCESS'
                 # Green color for success.
                 print("\033[92m{}\033[0m".format(line))
             elif "Build failed" in line:
-                changes_dict['build_status'][status_key] = 'FAIL'
                 # Red color for failure.
                 print("\033[91m{}\033[0m".format(line))
                 build_failed = True
-
-    # Error handling for failed builds not to fail the job.
-    except subprocess.CalledProcessError as e:
-        for line in e.output.splitlines():
-            if line.startswith("Building:"):
-                changes_dict['build_status'][status_key] = 'UNDEFINED'
-                # White color for the current setup build.
-                print(line)
-            elif "Build success!" in line:
-                changes_dict['build_status'][status_key] = 'SUCCESS'
-                # Green color for success.
-                print(f"\033[92m{line}\033[0m")  # Green color for success
-            elif "Build failed" in line:
                 changes_dict['build_status'][status_key] = 'FAIL'
-                # Red color for failure.
-                print(f"\033[91m{line}\033[0m")  # Red color for failure
-                build_failed = True
+                print("\033[95m{}\033[0m".format("!!!TRYING TO BUILD AGAIN!!!"))
+                print(f"\033[95m{cmd}\033[0m")
 
 # Runs the build commands for each member of mcu_list, board_list, and mcu_card_list.
 def run_builds(changes_dict):
