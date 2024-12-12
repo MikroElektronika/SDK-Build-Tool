@@ -3,7 +3,7 @@ import os, re, subprocess, shutil, json, sqlite3
 from packaging import version
 
 # Global variable for local_app_data_path
-local_app_data_path = '/home/runner/MikroElektronika/.MIKROE/NECTOStudio7'
+local_app_data_path = '/home/runner/.MIKROE/NECTOStudio7'
 
 # Path for storing artifacts.
 testPath = '/home/runner/test_results'
