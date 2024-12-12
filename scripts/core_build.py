@@ -63,7 +63,6 @@ def get_sdk_version():
 # Runs the bash command.
 def run_cmd(cmd, changes_dict, status_key):
     global build_failed
-    current_build_failed = False
     # Blue color for build tool command command.
     print(f"\033[94m{cmd}\033[0m")
 
@@ -73,10 +72,10 @@ def run_cmd(cmd, changes_dict, status_key):
     result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
     if 'Building:' in result.stdout:
         output = result.stdout
-        print(output)
+        # print(output)
     else:
         output = result.stderr
-        print(output)
+        # print(output)
     for line in output.splitlines():
         if line.startswith("Building:"):
             changes_dict['build_status'][status_key] = 'UNDEFINED'
