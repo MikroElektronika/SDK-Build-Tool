@@ -6,7 +6,7 @@ import json, urllib
 import zipfile
 import time, re
 
-linux_build = True
+linux_build = False
 
 if linux_build:
     cache_folder = '/home/runner'
@@ -167,13 +167,13 @@ def query_database(changes_dict, build_components, build_type):
     cursor = conn.cursor()
 
     for compiler in changes_dict['compiler_list']:
-        # cursor.execute(f"""
-        #     SELECT installer_package
-        #     FROM Compilers
-        #     WHERE uid = '{compiler}'
-        # """)
-        # row = cursor.fetchone()
-        # changes_dict['install_packages'].append(row[0])
+        cursor.execute(f"""
+            SELECT installer_package
+            FROM Compilers
+            WHERE uid = '{compiler}'
+        """)
+        row = cursor.fetchone()
+        changes_dict['install_packages'].append(row[0])
         if build_components == 'MCUs only':
             changes_dict[compiler] = []
             cursor.execute(f"""
@@ -378,7 +378,7 @@ def download_metadata(repo_name, updated_name):
 
 def install_packages(install_packages):
     print("Downloading Development NECTOStudio version")
-    url = os.getenv('NECTO_DOWNLOAD_URL')
+    url = 'https://software-update.mikroe.com/NECTOStudio7/development/necto/win/NECTOInstaller.zip'
     urllib.request.urlretrieve(url, "NECTOInstaller.zip")
     print("Extracting installer")
     if linux_build:
