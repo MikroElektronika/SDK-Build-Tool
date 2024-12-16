@@ -84,6 +84,7 @@ def run_cmd(cmd, changes_dict, status_key):
         print(f'Build attempt number {num_of_retries} failed. Trying again.')
         num_of_retries += 1
 
+    build_failed = True
     print(total_ouput)
 
 # Runs the build commands for each member of mcu_list, board_list, and mcu_card_list.
