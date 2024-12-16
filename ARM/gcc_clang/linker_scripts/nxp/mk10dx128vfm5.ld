@@ -14,9 +14,11 @@ MEMORY
     INTERRUPTS (rx)       : ORIGIN = 0x00000000, LENGTH = 0x00000400
     FLASH_CONFIG (rx)     : ORIGIN = 0x400, LENGTH = 0x00000010
     FLASH (rx)            : ORIGIN = 0x410, LENGTH = 0x8000
+    RAM (rwx)             : ORIGIN = 0x1fffe000, LENGTH = 0x2000
+    RAM2 (rwx)             : ORIGIN = 0x20000000, LENGTH = 0x2000
 }
 
-_estack = ORIGIN(RAM0) + LENGTH(RAM0);    /* end of SRAM */
+_estack = ORIGIN(RAM2) + LENGTH(RAM2);    /* end of SRAM */
 
 SECTIONS
 {
@@ -168,12 +170,12 @@ SECTIONS
         __HeapBase = .;
         . += HEAP_SIZE;
         __HeapLimit = .;
-    } > RAM0
+    } > RAM2
 
     .stack : ALIGN(0x8) {
         . = ALIGN(8);
         . += STACK_SIZE;
-    } > RAM0
+    } > RAM2
 
     /* Remove information from the standard libraries */
     /DISCARD/ :
@@ -184,7 +186,7 @@ SECTIONS
     }
 
     /* Initializes stack on the end of block */
-    __StackTop   = ORIGIN(RAM0) + LENGTH(RAM0);
+    __StackTop   = ORIGIN(RAM2) + LENGTH(RAM2);
     __StackLimit = __StackTop - STACK_SIZE;
     PROVIDE(__stack = __StackTop);
 
