@@ -32,7 +32,10 @@ else:
     testPath = 'D:/recursive_test_results'
 
 # Path to sdk_build_automation tool.
-toolPath = f'{cache_folder}/MikroElektronika/NECTOStudio/bin'
+if linux_build:
+    toolPath = f'{cache_folder}/MikroElektronika/NECTOStudio/bin'
+else:
+    toolPath = f'{cache_folder}/NECTOStudio/bin'
 
 # Global variable to trace failed tests.
 build_failed = False
@@ -461,7 +464,7 @@ def main():
         'build_status': {}
     }
 
-    if args.build_type == 'SDK from branch':
+    if args.build_type == 'SDK from Branch':
         clone_dir = "test-sdk-dir2"
         clone_repo_and_switch("https://github.com/MikroElektronika/mikrosdk_v2.git", args.branch_name, clone_dir)
         clear_directory(sdkPath)
