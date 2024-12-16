@@ -294,7 +294,7 @@ def copy_files(src_dir, dest_dir):
     if not os.path.exists(dest_dir):
         os.makedirs(dest_dir)  # Create the destination directory if it doesn't exist
     for filename in os.listdir(src_dir):
-        if filename == 'bsp' or filename == 'thirdparty':
+        if filename == 'bsp' or filename == 'thirdparty' or filename == '.git' or filename == '.gitignore':
             continue
         src_path = os.path.join(src_dir, filename)
         dest_path = os.path.join(dest_dir, filename)
@@ -457,11 +457,6 @@ def main():
         'build_status': {}
     }
 
-    # if args.build_type == 'SDK from Branch':
-        # clone_dir = "test-sdk-dir2"
-        # clone_repo_and_switch("https://github.com/MikroElektronika/mikrosdk_v2.git", args.branch_name, clone_dir)
-        # clear_directory(sdkPath)
-        # copy_files(clone_dir, sdkPath)
 
     changes_dict['compiler_list'] = args.compilers.split(' ')
 
@@ -473,6 +468,12 @@ def main():
 
     # Get the necessary data from the database.
     query_database(changes_dict, args.mcus_cards_boards, args.build_type)
+
+    if args.build_type == 'SDK from Branch':
+        clone_dir = "test-sdk-dir2"
+        clone_repo_and_switch("https://github.com/MikroElektronika/mikrosdk_v2.git", args.branch_name, clone_dir)
+        clear_directory(sdkPath)
+        copy_files(clone_dir, sdkPath)
 
     install_packages(changes_dict['install_packages'])
 
