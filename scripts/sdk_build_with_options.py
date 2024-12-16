@@ -380,15 +380,12 @@ def download_metadata(repo_name, updated_name):
 
 def install_packages(install_packages):
     print("Downloading Development NECTOStudio version")
+    url = os.getenv('NECTO_DOWNLOAD_URL')
+    urllib.request.urlretrieve(url, "NECTOInstaller.zip")
+    print("Extracting installer")
     if linux_build:
-        url = 'https://software-update.mikroe.com/NECTOStudio7/development/necto/linux/NECTOInstaller.zip'
-        urllib.request.urlretrieve(url, "NECTOInstaller.zip")
-        print("Extracting installer")
         run_command("7za x NECTOInstaller.zip")
     else:
-        url = 'https://software-update.mikroe.com/NECTOStudio7/development/necto/win/NECTOInstaller.zip'
-        urllib.request.urlretrieve(url, "NECTOInstaller.zip")
-        print("Extracting installer")
         with zipfile.ZipFile('NECTOInstaller.zip', 'r') as zip_ref:
             zip_ref.extractall('.')
 
