@@ -167,13 +167,6 @@ def query_database(changes_dict, build_components, build_type):
     cursor = conn.cursor()
 
     for compiler in changes_dict['compiler_list']:
-        # cursor.execute(f"""
-        #     SELECT installer_package
-        #     FROM Compilers
-        #     WHERE uid = '{compiler}'
-        # """)
-        # row = cursor.fetchone()
-        # changes_dict['install_packages'].append(row[0])
         if build_components == 'MCUs only':
             changes_dict[compiler] = []
             cursor.execute(f"""
@@ -464,11 +457,11 @@ def main():
         'build_status': {}
     }
 
-    if args.build_type == 'SDK from Branch':
-        clone_dir = "test-sdk-dir2"
-        clone_repo_and_switch("https://github.com/MikroElektronika/mikrosdk_v2.git", args.branch_name, clone_dir)
-        clear_directory(sdkPath)
-        copy_files(clone_dir, sdkPath)
+    # if args.build_type == 'SDK from Branch':
+        # clone_dir = "test-sdk-dir2"
+        # clone_repo_and_switch("https://github.com/MikroElektronika/mikrosdk_v2.git", args.branch_name, clone_dir)
+        # clear_directory(sdkPath)
+        # copy_files(clone_dir, sdkPath)
 
     changes_dict['compiler_list'] = args.compilers.split(' ')
 
