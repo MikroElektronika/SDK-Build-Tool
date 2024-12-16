@@ -4,7 +4,7 @@ import os, shutil
 import sqlite3
 import json, urllib
 import zipfile
-import time
+import time, re
 
 linux_build = True
 
@@ -427,6 +427,21 @@ def install_packages(install_packages):
                 exit(1)
             num_of_retries += 1
 
+def functionRegex(value, pattern):
+    reg = re.compile(value)
+    return reg.search(pattern) is not None
+
+def add_sam_support_to_db():
+    ## Create the REGEXP function to be used in DB
+    conn.create_function("REGEXP", 2, functionRegex)
+    conn = sqlite3.connect(dbPath)
+    cursor = conn.cursor()
+    cursor.execute(f'UPDATE Devices SET sdk_support = "1" WHERE uid REGEXP "ATSAM[EVS]7"')
+    conn.commit()
+    cursor.execute(f'UPDATE Devices SET sdk_support = "0" WHERE uid REGEXP NOT "ATSAM[EVS]7"')
+    conn.commit()
+    conn.close()
+
 def main():
     global build_failed
 
@@ -455,6 +470,9 @@ def main():
 
     # Create a folder for job artifacts.
     os.makedirs(testPath, exist_ok=True)
+
+    #TODO - temporary for checking ATSAM packages
+    add_sam_support_to_db()
 
     # Get the necessary data from the database.
     query_database(changes_dict, args.mcus_cards_boards, args.build_type)
