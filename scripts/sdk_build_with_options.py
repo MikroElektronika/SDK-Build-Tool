@@ -433,8 +433,8 @@ def functionRegex(value, pattern):
 
 def add_sam_support_to_db():
     ## Create the REGEXP function to be used in DB
-    conn.create_function("REGEXP", 2, functionRegex)
     conn = sqlite3.connect(dbPath)
+    conn.create_function("REGEXP", 2, functionRegex)
     cursor = conn.cursor()
     cursor.execute(f'UPDATE Devices SET sdk_support = "1" WHERE uid REGEXP "ATSAM[EVS]7"')
     conn.commit()
