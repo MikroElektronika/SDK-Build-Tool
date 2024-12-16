@@ -438,7 +438,7 @@ def add_sam_support_to_db():
     cursor = conn.cursor()
     cursor.execute(f'UPDATE Devices SET sdk_support = "1" WHERE uid REGEXP "ATSAM[EVS]7"')
     conn.commit()
-    cursor.execute(f'UPDATE Devices SET sdk_support = "0" WHERE uid REGEXP NOT "ATSAM[EVS]7"')
+    cursor.execute(f'UPDATE Devices SET sdk_support = "0" WHERE uid NOT REGEXP "ATSAM[EVS]7"')
     conn.commit()
     conn.close()
 
