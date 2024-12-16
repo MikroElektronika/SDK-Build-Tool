@@ -68,15 +68,15 @@ def run_cmd(cmd, changes_dict, status_key):
         for line in output.splitlines():
             if line.startswith("Building:"):
                 # White color for the current setup build.
-                total_ouput += line
+                total_ouput += line + '\n'
             elif "Build success!" in line:
                 changes_dict['build_status'][status_key] = 'SUCCESS'
                 # Green color for success.
-                total_ouput += "\033[92m{}\033[0m".format(line)
+                total_ouput += "\033[92m{}\n\033[0m".format(line)
             elif "Build failed" in line:
                 # Red color for failure.
                 changes_dict['build_status'][status_key] = 'FAIL'
-                total_ouput += "\033[91m{}\033[0m".format(line)
+                total_ouput += "\033[91m{}\n\033[0m".format(line)
                 current_build_failed = True
         if current_build_failed == False:
             print(total_ouput)
@@ -163,6 +163,13 @@ def query_database(changes_dict, build_components, build_type):
     cursor = conn.cursor()
 
     for compiler in changes_dict['compiler_list']:
+        cursor.execute(f"""
+            SELECT installer_package
+            FROM Compilers
+            WHERE uid = '{compiler}'
+        """)
+        row = cursor.fetchone()
+        changes_dict['install_packages'].append(row[0])
         if build_components == 'MCUs only':
             changes_dict[compiler] = []
             cursor.execute(f"""
@@ -413,10 +420,10 @@ def install_packages(install_packages):
                 run_command(f'NECTOInstaller.exe installer --install-packages {package} {cache_folder} {cache_folder}/MIKROE/NECTOStudio7 > /dev/null 2>&1')
             print('Checking if package exists')
             if os.path.exists(install_location) or os.path.exists(os.path.join(install_location, 'board/include/mcu_cards', package)):
-                print(f"The {package} package has been downloaded successfully.")
+                print(f"The {package} package was downloaded successfully.")
                 break
             if num_of_retries == 2:
-                print(f'Package is not installed in {install_location} after 3 retries - exit with error.')
+                print(f'Package is not installed in {install_location} after 3 retries - exiting with error.')
                 exit(1)
             num_of_retries += 1
 
