@@ -80,8 +80,9 @@ jobs:
           sudo apt-get install $(cat scripts/requirements/recursive_build.txt)
 
       - name: Install NECTO
-        env: COMPILER: ${{ matrix.compiler }}
         if: env.found == 'true'
+        env:
+          COMPILER: ${{ matrix.compiler }}
         run: |
           python -u scripts/install_necto.py
 
