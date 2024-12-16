@@ -82,8 +82,6 @@ jobs:
 
       - name: Install NECTO
         if: env.found == 'true'
-        env:
-          COMPILER: ${{ matrix.compiler }}
         run: |
           python -u scripts/install_necto.py
 
