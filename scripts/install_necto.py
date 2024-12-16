@@ -31,8 +31,9 @@ def main():
     print("Step 2: Extract installer")
     run_command("7za x NECTOInstaller.zip")
 
-    print("Step 3: Install NECTO")
-    run_command("./NECTOInstaller installer --install-packages necto_installer necto_application database mikroe_utils_common preinit unit_test_lib mikrosdk /home/runner/MikroElektronika /home/runner/.MIKROE/NECTOStudio7 > /dev/null 2>&1")
+    compiler = os.getenv('COMPILER')
+    print(f"Step 3: Install NECTO with {compiler} package")
+    run_command(f"./NECTOInstaller installer --install-packages necto_installer necto_application database mikroe_utils_common preinit unit_test_lib mikrosdk {compiler} /home/runner/MikroElektronika /home/runner/.MIKROE/NECTOStudio7 > /dev/null 2>&1")
 
     print("Step 4: Move installer to MIKROE if it's generated in root")
     if os.path.isfile("/home/runner/MikroElektronika/installer_tmp"):
