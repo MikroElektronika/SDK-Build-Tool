@@ -47,7 +47,7 @@ def get_sdk_version(manifest_path):
 # Runs the bash command.
 def run_cmd(cmd, changes_dict, status_key):
     global build_failed
-    current_build_failed = False
+    num_of_retries = 1
     # Blue color for build tool command command.
     print(f"\033[94m{cmd}\033[0m")
 
@@ -62,42 +62,29 @@ def run_cmd(cmd, changes_dict, status_key):
     else:
         output = result.stderr
         # print(output)
-    for line in output.splitlines():
-        if line.startswith("Building:"):
-            # White color for the current setup build.
-            print(line)
-        elif "Build success!" in line:
-            changes_dict['build_status'][status_key] = 'SUCCESS'
-            # Green color for success.
-            print("\033[92m{}\033[0m".format(line))
-        elif "Build failed" in line:
-            # Red color for failure.
-            print("\033[91m{}\033[0m".format(line))
-            current_build_failed = True
-
-    if current_build_failed:
-        print("\033[93m{}\033[0m".format("!!!TRYING TO BUILD AGAIN!!!"))
-        print(f"\033[95m{cmd}\033[0m")
-        result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
-        if 'Building:' in result.stdout:
-            output = result.stdout
-            # print(output)
-        else:
-            output = result.stderr
-            # print(output)
+    while num_of_retries <= 5:
+        current_build_failed = False
+        total_ouput = ''
         for line in output.splitlines():
             if line.startswith("Building:"):
-                changes_dict['build_status'][status_key] = 'UNDEFINED'
                 # White color for the current setup build.
+                total_ouput += line
             elif "Build success!" in line:
                 changes_dict['build_status'][status_key] = 'SUCCESS'
                 # Green color for success.
-                print("\033[92m{}\033[0m".format(line))
+                total_ouput += "\033[92m{}\033[0m".format(line)
             elif "Build failed" in line:
                 # Red color for failure.
-                print("\033[91m{}\033[0m".format(line))
-                build_failed = True
                 changes_dict['build_status'][status_key] = 'FAIL'
+                total_ouput += "\033[91m{}\033[0m".format(line)
+                current_build_failed = True
+        if current_build_failed == False:
+            print(total_ouput)
+            return
+        print(f'Build attempt number {num_of_retries} failed. Trying again.')
+        num_of_retries += 1
+
+    print(total_ouput)
 
 # Runs the build commands for each member of mcu_list, board_list, and mcu_card_list.
 def run_builds(changes_dict, build_type, build_components):
