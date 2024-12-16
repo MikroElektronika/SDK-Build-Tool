@@ -163,13 +163,13 @@ def query_database(changes_dict, build_components, build_type):
     cursor = conn.cursor()
 
     for compiler in changes_dict['compiler_list']:
-        cursor.execute(f"""
-            SELECT installer_package
-            FROM Compilers
-            WHERE uid = '{compiler}'
-        """)
-        row = cursor.fetchone()
-        changes_dict['install_packages'].append(row[0])
+        # cursor.execute(f"""
+        #     SELECT installer_package
+        #     FROM Compilers
+        #     WHERE uid = '{compiler}'
+        # """)
+        # row = cursor.fetchone()
+        # changes_dict['install_packages'].append(row[0])
         if build_components == 'MCUs only':
             changes_dict[compiler] = []
             cursor.execute(f"""
