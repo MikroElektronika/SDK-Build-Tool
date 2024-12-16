@@ -57,7 +57,8 @@ jobs:
           IFS=',' read -r -a compilers_array <<< "$selected_compilers"
           found=false
           for compiler in "${compilers_array[@]}"; do
-            if [ "$compiler" == "${{ matrix.compiler }}" ]; then
+            trimmed_compiler=$(echo "$compiler" | xargs)
+            if [ "$trimmed_compiler" == "${{ matrix.compiler }}" ]; then
               found=true
               break
             fi
