@@ -306,7 +306,7 @@ def copy_files(src_dir, dest_dir):
     if not os.path.exists(dest_dir):
         os.makedirs(dest_dir)
     # Recursively search for folders and rename - workaround as build tool doesn't use pin_name for packages
-    for root, dirs in os.walk(os.path.join(src_dir, target_directory)):
+    for root, dirs, files in os.walk(os.path.join(src_dir, target_directory)):
         for dir_name in dirs:
             for prefix in prefixes:
                 if dir_name.startswith(prefix):
