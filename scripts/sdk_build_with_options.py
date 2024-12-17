@@ -285,6 +285,18 @@ def clear_directory(dir_path):
                     continue
             except Exception as e:
                 print(f"Error deleting {file_path}: {e}")
+                
+# Define the target directory
+target_directory = "targets/arm/mikroe/common/include"
+
+# Define the prefixes to search for
+prefixes = [
+    "TQFP", "SOT-23", "DFN", "PDIP", "SOIJ", "DFN-S", "SOIC", "MSOP", "UDFN", "SPDIP",
+    "SSOP", "MQFP", "PLCC", "TSSOP", "QFN", "UQFN", "LQFP", "VQFN", "QFN-S", "CSP",
+    "NFBGA", "LFBGA", "VFBGA", "VFQFN", "QFM", "WLCSP", "UFQFPN", "UFBGA", "TFBGA",
+    "VFQFPN", "EWLCSP", "WLCSP", "VTLA", "SQFN", "LBGA", "TLLGA", "XFLGA", "WFBGA",
+    "SO", "BGA", "HVQFN", "XFBGA", "HUQFN", "VDFN", "WQFN", "QFP"
+]
 
 def copy_files(src_dir, dest_dir):
     """
@@ -292,7 +304,18 @@ def copy_files(src_dir, dest_dir):
     overwriting existing files.
     """
     if not os.path.exists(dest_dir):
-        os.makedirs(dest_dir)  # Create the destination directory if it doesn't exist
+        os.makedirs(dest_dir)
+    # Recursively search for folders and rename - workaround as build tool doesn't use pin_name for packages
+    for root, dirs in os.walk(os.path.join(src_dir, target_directory)):
+        for dir_name in dirs:
+            for prefix in prefixes:
+                if dir_name.startswith(prefix):
+                    # If a match is found, add the full folder path
+                    full_path_orig = os.path.join(root, dir_name)
+                    full_path_new = os.path.join(root, prefix)
+                    os.rename(full_path_orig, full_path_new)
+                    print(f"Changed the name from {full_path_orig} to {full_path_new}")
+                    break
     for filename in os.listdir(src_dir):
         if filename == 'bsp' or filename == 'thirdparty' or filename == '.git' or filename == '.gitignore' or filename == 'manifest.json':
             continue
@@ -434,8 +457,6 @@ def add_sam_support_to_db():
     conn.create_function("REGEXP", 2, functionRegex)
     cursor = conn.cursor()
     cursor.execute(f'UPDATE Devices SET sdk_support = "1" WHERE uid REGEXP "ATSAM[EVS]7"')
-    conn.commit()
-    cursor.execute(f'UPDATE Devices SET sdk_support = "0" WHERE uid NOT REGEXP "ATSAM[EVS]7"')
     conn.commit()
     conn.close()
 
