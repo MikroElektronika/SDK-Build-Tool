@@ -27,7 +27,7 @@ on:
       compilers:
         type: string
         description: Choose compiler(s) for building
-        default: "gcc_arm_none_eabi, clang-llvm, mikrocarm, mikrocavr, mchp_xc16, mikrocdspic, mchp_xc32, mikrocpic32, mchp_xc8, mikrocpic, xpack_riscv_none_embed_gcc, clang_llvm_riscv"
+        default: "gcc_arm_none_eabi, clang-llvm, mikrocarm, mikrocavr, mchp_xc16, mikrocdspic, mchp_xc32, mikrocpic32, mchp_xc8, mikrocpic, xpack-riscv-none-embed-gcc, clang-llvm-riscv"
 
 env:
   NECTO_DOWNLOAD_URL: ${{ secrets.NECTO_LIVE_DOWNLOAD_URL }}
@@ -40,7 +40,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: [gcc_arm_none_eabi, clang-llvm, mikrocarm, mikrocavr, mchp_xc16, mikrocdspic, mchp_xc32, mikrocpic32, mchp_xc8, mikrocpic, xpack_riscv_none_embed_gcc, clang_llvm_riscv]
+        compiler: [gcc_arm_none_eabi, clang-llvm, mikrocarm, mikrocavr, mchp_xc16, mikrocdspic, mchp_xc32, mikrocpic32, mchp_xc8, mikrocpic, xpack-riscv-none-embed-gcc, clang-llvm-riscv]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
