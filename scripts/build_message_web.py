@@ -120,7 +120,7 @@ if __name__ == '__main__':
     todays_update = '\n\n<h4>Updated:</h4>\n\n<ul>\n</ul>'
 
     for event in data["NECTO DAILY UPDATE"]["events"]:
-        if event['end_dt'].startswith(current_date):
+        if event['end_dt'].startswith(current_date) and event['released']:
             release_spreadsheet_data += event['notes']
 
     # Add newly added click packages to the release message
@@ -184,5 +184,10 @@ if __name__ == '__main__':
 
     with open(os.path.join(os.getcwd(), 'message.txt'), 'w') as file:
         file.write(todays_release)
+
+    # MCU Packages/SDK Packages should have "Released" keyword in Status column
+    # In addition to this, they should be added to the Release Calendar
+    if '' == mcu_lines and '' == board_lines and '' == card_lines:
+        todays_release = 'Check Release Spreadsheet or update the Calendar'
 
     print(todays_release)
