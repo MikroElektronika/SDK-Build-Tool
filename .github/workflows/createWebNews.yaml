@@ -57,7 +57,8 @@ jobs:
           MIKROE_NECTO_AWS: ${{ secrets.MIKROE_NECTO_AWS }}
           RELEASES_SPREADSHEET: ${{ secrets.RELEASES_SPREADSHEET }}
         run: |
-          python -u scripts/build_message_web.py "NECTO DAILY UPDATE" "$RELEASES_SPREADSHEET" ${{ secrets.ES_INDEX_LIVE }} ${{ secrets.ES_CLICKS_INDEX_LIVE }} >> $BUILD_STATUS
+          python -u scripts/build_message_web.py "NECTO DAILY UPDATE" "$RELEASES_SPREADSHEET" ${{ secrets.ES_INDEX_LIVE }} ${{ secrets.ES_CLICKS_INDEX_LIVE }}
+          BUILD_STATUS=$?
         continue-on-error: true
 
       - name: Notify Message Failure
