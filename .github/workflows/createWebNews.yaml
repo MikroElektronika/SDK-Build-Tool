@@ -84,6 +84,16 @@ jobs:
           MESSAGE=$(cat message.txt)
           echo $MESSAGE
 
+      - name: Notify Mattermost - Web News Ready
+        env:
+          MATTERMOST_WEBHOOK_URL_SDK: "https://chat.mikroe.com/hooks/89pyqc1ohtr4mge493168zytrh"
+        run: |
+          CURRENT_DATE=$(date +'%Y-%m-%d')  # Get current date in YYYY-MM-DD format
+          MESSAGE="**Beta Web News ready to test for $CURRENT_DATE.**\n> Take a look at [Beta Website](https://beta.mikroe.com/)\n"
+          curl -X POST -H 'Content-Type: application/json' \
+          --data "{\"text\": \"$MESSAGE\"}" \
+          $MATTERMOST_WEBHOOK_URL_SDK
+
   post_official:
     needs: prepare_news
     if: >
