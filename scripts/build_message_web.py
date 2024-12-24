@@ -182,12 +182,13 @@ if __name__ == '__main__':
     if update_present:
         todays_release += todays_update
 
-    with open(os.path.join(os.getcwd(), 'message.txt'), 'w') as file:
-        file.write(todays_release)
-
     # MCU Packages/SDK Packages should have "Released" keyword in Status column
     # In addition to this, they should be added to the Release Calendar
     if '' == mcu_lines and '' == board_lines and '' == card_lines:
         todays_release = 'Check Release Spreadsheet or update the Calendar'
+        exit(1)
+
+    with open(os.path.join(os.getcwd(), 'message.txt'), 'w') as file:
+        file.write(todays_release)
 
     print(todays_release)
