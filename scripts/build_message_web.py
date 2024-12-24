@@ -186,7 +186,7 @@ if __name__ == '__main__':
     # In addition to this, they should be added to the Release Calendar
     if '' == mcu_lines and '' == board_lines and '' == card_lines:
         print('Check Release Spreadsheet or update the Calendar')
-        os.getenv['BUILD_STATUS'] = 'Check Release Spreadsheet or update the Calendar'
+        os.environ['BUILD_STATUS'] = 'Check Release Spreadsheet or update the Calendar'
         exit(1)
 
     with open(os.path.join(os.getcwd(), 'message.txt'), 'w') as file:
