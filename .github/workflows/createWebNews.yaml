@@ -112,3 +112,13 @@ jobs:
         run: |
           MESSAGE=$(cat message.txt)
           echo $MESSAGE
+
+      - name: Notify Mattermost - Web News Ready
+        env:
+          MATTERMOST_WEBHOOK_URL_SDK: ${{ secrets.MATTERMOST_WEBHOOK_URL_SDK }}
+        run: |
+          CURRENT_DATE=$(date +'%Y-%m-%d')  # Get current date in YYYY-MM-DD format
+          MESSAGE="**Official Web News posted for $CURRENT_DATE.**\n> Take a look at [MIKROE Website](https://www.mikroe.com/)\n"
+          curl -X POST -H 'Content-Type: application/json' \
+          --data "{\"text\": \"$MESSAGE\"}" \
+          $MATTERMOST_WEBHOOK_URL_SDK
