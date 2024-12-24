@@ -59,6 +59,7 @@ jobs:
         run: |
           python -u scripts/build_message_web.py "NECTO DAILY UPDATE" "$RELEASES_SPREADSHEET" ${{ secrets.ES_INDEX_LIVE }} ${{ secrets.ES_CLICKS_INDEX_LIVE }}
           BUILD_STATUS=$?
+          echo $BUILD_STATUS
         continue-on-error: true
 
       - name: Notify Message Failure
