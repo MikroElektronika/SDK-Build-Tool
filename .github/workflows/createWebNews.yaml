@@ -70,6 +70,7 @@ jobs:
             curl -X POST -H 'Content-Type: application/json' \
             --data "{\"text\": \"$MESSAGE\"}" \
             $MATTERMOST_WEBHOOK_URL_SDK
+          fi
 
       - name: Upload News File
         uses: actions/upload-artifact@v3
