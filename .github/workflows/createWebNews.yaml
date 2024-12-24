@@ -65,6 +65,7 @@ jobs:
         env:
           MATTERMOST_WEBHOOK_URL_SDK: "https://chat.mikroe.com/hooks/89pyqc1ohtr4mge493168zytrh"
         run: |
+          echo $BUILD_STATUS
           if [ $BUILD_STATUS == "Check Release Spreadsheet or update the Calendar" ]; then
             MESSAGE="**Check Release Spreadsheet or update the Calendar - there is no SDK Packages for today's Necto Daily Update.**"
             curl -X POST -H 'Content-Type: application/json' \
