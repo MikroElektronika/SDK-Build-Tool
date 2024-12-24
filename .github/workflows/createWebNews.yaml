@@ -15,7 +15,7 @@ on:
     # Schedule for posting to Beta Website at 10:00 AM
     - cron: "0 9 * * 1-5"
     # Schedule for posting to Official Website at 11:00 AM
-    - cron: "20 10 * * 1-5"
+    - cron: "25 11 * * 1-5"
 
 jobs:
   prepare_news:
