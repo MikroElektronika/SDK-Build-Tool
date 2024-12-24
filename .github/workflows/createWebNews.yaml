@@ -60,19 +60,16 @@ jobs:
           python -u scripts/build_message_web.py "NECTO DAILY UPDATE" "$RELEASES_SPREADSHEET" ${{ secrets.ES_INDEX_LIVE }} ${{ secrets.ES_CLICKS_INDEX_LIVE }}
           BUILD_STATUS=$?
           echo $BUILD_STATUS
-        continue-on-error: true
 
       - name: Notify Message Failure
+        if: failure()
         env:
           MATTERMOST_WEBHOOK_URL_SDK: "https://chat.mikroe.com/hooks/89pyqc1ohtr4mge493168zytrh"
         run: |
-          echo $BUILD_STATUS
-          if [ $BUILD_STATUS == "Check Release Spreadsheet or update the Calendar" ]; then
-            MESSAGE="**Check Release Spreadsheet or update the Calendar - there is no SDK Packages for today's Necto Daily Update.**"
-            curl -X POST -H 'Content-Type: application/json' \
-            --data "{\"text\": \"$MESSAGE\"}" \
-            $MATTERMOST_WEBHOOK_URL_SDK
-          fi
+          MESSAGE="**Check Release Spreadsheet or update the Calendar - there is no SDK Packages for today's Necto Daily Update.**"
+          curl -X POST -H 'Content-Type: application/json' \
+          --data "{\"text\": \"$MESSAGE\"}" \
+          $MATTERMOST_WEBHOOK_URL_SDK
 
       - name: Upload News File
         uses: actions/upload-artifact@v3
