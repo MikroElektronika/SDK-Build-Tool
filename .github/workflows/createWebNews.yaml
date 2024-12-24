@@ -90,7 +90,6 @@ jobs:
   post_beta:
     needs: prepare_news
     if: >
-      env.build-status == 'success' &&
       ((github.event_name == 'schedule' && github.event.schedule == '0 9 * * 1-5') ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.select_web == 'Beta'))
     runs-on: ubuntu-latest
@@ -120,7 +119,6 @@ jobs:
   post_official:
     needs: prepare_news
     if: >
-      env.build-status == 'success' &&
       ((github.event_name == 'schedule' && github.event.schedule == '20 10 * * 1-5') ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.select_web == 'Official'))
     runs-on: ubuntu-latest
