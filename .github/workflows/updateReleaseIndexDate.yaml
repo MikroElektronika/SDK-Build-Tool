@@ -16,8 +16,8 @@ on:
         description: Which Date should it be indexed to? (only if first option is not selected)
         default: "2023-12-31"
 
-  schedule:
-    - cron: "40 8 * * 1-5"  # 8:00 AM, Monday through Friday
+  # schedule:
+    # - cron: "40 8 * * 1-5"  # 8:00 AM, Monday through Friday
 
 jobs:
   update_index_date:
