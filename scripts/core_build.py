@@ -1,6 +1,7 @@
 import os, re, subprocess, shutil, json, sqlite3
 
 from packaging import version
+from clocks import GenerateClocks
 
 # Global variable for local_app_data_path
 local_app_data_path = '/home/runner/.MIKROE/NECTOStudio7'
@@ -626,6 +627,22 @@ def write_results_to_file(changes_dict):
     print(f"All the data for build has been written to {testPath}/built_changes.json")
 
 def main():
+    # Generate clocks.json
+    input_directory = "./"
+    output_dir = "./output/docs"
+    output_file = os.path.join(output_dir, 'clocks.json')
+    clocksGenerator = GenerateClocks(input_directory, output_file)
+    clocksGenerator.generate()
+
+    # Remove the existing clocks.json file if it exists
+    clocks_path = os.path.join(local_app_data_path, 'clocks.json')
+    if os.path.exists(clocks_path):
+        os.remove(clocks_path)
+        shutil.copy(output_file, local_app_data_path)
+        print(f"\033[93mReplaced {clocks_path} with: {output_file}\033[0m")
+    else:
+        print(f"\033[91mFile not found: {clocks_path}\033[0m")
+
     files = get_changed_files('main')
     archs = []
     architectures = ["ARM", "RISCV", "PIC32", "PIC", "dsPIC", "AVR"]
