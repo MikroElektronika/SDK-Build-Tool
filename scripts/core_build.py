@@ -72,12 +72,13 @@ def run_cmd(cmd, changes_dict, status_key):
     # Store all the output lines to print only important ones.
     result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
     changes_dict['build_status'][status_key] = 'UNDEFINED'
+    print(result)
     if 'Building:' in result.stdout:
         output = result.stdout
-        print(output)
+        # print(output)
     else:
         output = result.stderr
-        print(output)
+        # print(output)
     for line in output.splitlines():
         if line.startswith("Building:"):
             # White color for the current setup build.
