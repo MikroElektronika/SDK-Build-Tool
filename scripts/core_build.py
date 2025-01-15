@@ -74,10 +74,10 @@ def run_cmd(cmd, changes_dict, status_key):
     changes_dict['build_status'][status_key] = 'UNDEFINED'
     if 'Building:' in result.stdout:
         output = result.stdout
-        # print(output)
+        print(output)
     else:
         output = result.stderr
-        # print(output)
+        print(output)
     for line in output.splitlines():
         if line.startswith("Building:"):
             # White color for the current setup build.
