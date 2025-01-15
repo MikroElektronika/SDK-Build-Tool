@@ -503,6 +503,12 @@ def updateDevicesFromCore(dbs, queries):
                         values,
                         ','.join(collumns)
                     )
+                    insertIntoTable(
+                        eachDb,
+                        'ProgrammerToDevice',
+                        ['gdb_general', values[5], ''],
+                        'programer_uid,device_uid,device_support_package'
+                    )
 
                 if 'LinkerTables.json' in currentDeviceFiles:
                     with open(os.path.join(currentDeviceDir, 'LinkerTables.json'), 'r') as file:
