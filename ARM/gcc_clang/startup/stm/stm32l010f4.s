@@ -52,7 +52,7 @@ Reset_Handler:
    mov   sp, r0          /* set stack pointer */
    
 /* Call the clock system initialization function.*/
-  bl systemInit /* Changed to call MikroE system init API. */
+  // bl  SystemInit /* Removed call for Mikroe implementation. */
 
 /*Check if boot space corresponds to system memory*/
 
@@ -108,6 +108,7 @@ LoopFillZerobss:
 /* Call static constructors */
     bl __libc_init_array
 /* Call the application's entry point.*/
+  bl  clockConfig /* Added to call MikroE system clock configuration API. */
   bl  main
 
 LoopForever:

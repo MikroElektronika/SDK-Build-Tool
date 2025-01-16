@@ -3,7 +3,7 @@
     "family_uid":"STM32",
     "flash":"64",
     "icon":"images/mcu/stm32.png",
-    "max_speed":"600.000",
+    "max_speed":"550.000",
     "name":"STM32H7S7Z8",
     "ram":"634880",
     "sdk_config":"{\"MCU_NAME\":\"STM32H7S7Z8\",\"CORE_NAME\":\"M7\",\"_MSDK_HAL_LOW_LEVEL_TARGET_\":\"mikroe\",\"_MSDK_ETH_PHY_CHIP_\":\"NULL\"}",
