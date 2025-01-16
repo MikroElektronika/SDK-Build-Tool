@@ -36,8 +36,6 @@ jobs:
           pip install enums
           sudo apt-get update
           sudo apt-get install $(cat scripts/requirements/recursive_build.txt)
-          sudo updatedb
-          locate libtiff.so.5
 
       - name: Install NECTO
         run: |
