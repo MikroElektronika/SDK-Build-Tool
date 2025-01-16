@@ -285,7 +285,7 @@ def clear_directory(dir_path):
                     continue
             except Exception as e:
                 print(f"Error deleting {file_path}: {e}")
-                
+
 # Define the target directory
 target_directory = "targets/arm/mikroe/common/include"
 
@@ -479,7 +479,7 @@ def main():
     }
 
     changes_dict['compiler_list'] = args.compilers.split(' ')
-    
+
     if args.build_type == 'SDK from Branch':
         clone_dir = "test-sdk-dir2"
         clone_repo_and_switch("https://github.com/MikroElektronika/mikrosdk_v2.git", args.branch_name, clone_dir)
