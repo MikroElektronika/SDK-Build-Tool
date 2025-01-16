@@ -1,7 +1,6 @@
 p7zip-full
 libopus-dev
 libevent-dev
-libtiff5-dev
 freeglut3-dev
 libminizip-dev
 libxcb-shape0-dev
