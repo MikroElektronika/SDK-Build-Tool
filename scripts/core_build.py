@@ -599,10 +599,10 @@ def package_asset(source_dir, output_dir, arch, entry_name, changes_dict):
         copy_interrupts(mcuNames[cmake_file]['mcu_names'], source_dir, output_dir, base_output_dir)
         # Copy defs
         copy_files_from_dir(mcuNames[cmake_file]['mcu_names'], source_dir, output_dir, base_output_dir, 'def')
-        # Copy startups
-        copy_files_from_dir(mcuNames[cmake_file]['mcu_names'], source_dir, output_dir, base_output_dir, 'startup')
-        # Copy linker scirpts
-        copy_files_from_dir(mcuNames[cmake_file]['mcu_names'], source_dir, output_dir, base_output_dir, 'linker_scripts')
+        # # Copy startups
+        # copy_files_from_dir(mcuNames[cmake_file]['mcu_names'], source_dir, output_dir, base_output_dir, 'startup')
+        # # Copy linker scirpts
+        # copy_files_from_dir(mcuNames[cmake_file]['mcu_names'], source_dir, output_dir, base_output_dir, 'linker_scripts')
 
         get_core(mcuNames, f"{arch.lower()}_{entry_name.lower()}_{cmake_file}", cmake_file, source_dir, changes_dict)
         coreQueriesPath = os.path.join(os.getcwd(), 'resources/queries')
