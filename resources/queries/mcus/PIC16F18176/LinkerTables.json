@@ -3,14 +3,13 @@
     "tables": [
         {
             "BoardToDevice": {
-                "board_uid": ["GENERIC_ARM_BOARD"]
+                "board_uid": ["GENERIC_PIC_BOARD"]
             }
         },
         {
             "CompilerToDevice": {
                 "compiler_uid": [
-                    "clang-llvm",
-                    "gcc_arm_none_eabi"
+                    "mchp_xc8"
                 ]
             }
         },
