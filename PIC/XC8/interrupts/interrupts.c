@@ -23,8 +23,6 @@
 
 /* ---------------------PRIVATE FUNCTION DECLARATIONS------------------------ */
 
-static const int INTERRUPTS_TMR2 = 13;
-
 // Interrupt table
 #define INTERRUPTS_INT (0)
 #define INTERRUPTS_IOC (1)
@@ -39,7 +37,7 @@ static const int INTERRUPTS_TMR2 = 13;
 #define INTERRUPTS_TMR1G (10)
 #define INTERRUPTS_TMR3 (11)
 #define INTERRUPTS_TMR3G (12)
-// #define INTERRUPTS_TMR2 (13)
+#define INTERRUPTS_TMR2 (13)
 #define INTERRUPTS_TMR4 (14)
 #define INTERRUPTS_CCP1 (15)
 #define INTERRUPTS_CCP2 (16)
@@ -95,7 +93,7 @@ void interrupt_enable( int interrupt )
 {
     switch ( interrupt ) {
         #if defined(INTERRUPT_TMR2_REGISTER) && defined(INTERRUPT_TMR2_BIT)
-        case INTERRUPTS_TMR2:
+        case: (INTERRUPTS_TMR2)
             interrupt_bit_set( INTERRUPT_TMR2_REGISTER, INTERRUPT_TMR2_BIT );
             break;
         #endif
