@@ -657,6 +657,7 @@ def main():
     if os.path.exists(clocks_path):
         os.remove(clocks_path)
         shutil.copy(output_file, local_app_data_path)
+        shutil.copy(output_file, testPath)
         print(f"\033[93mReplaced {clocks_path} with: {output_file}\033[0m")
     else:
         print(f"\033[91mFile not found: {clocks_path}\033[0m")
