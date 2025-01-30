@@ -4,13 +4,22 @@ from packaging import version
 from clocks import GenerateClocks
 
 # Global variable for local_app_data_path
-local_app_data_path = '/home/runner/.MIKROE/NECTOStudio7'
+if os.name == 'linux':
+    local_app_data_path = '/home/runner/.MIKROE/NECTOStudio7'
+else:
+    local_app_data_path = 'c:/Users/ivan.ruzavin/AppData/Local/MIKROE/NECTOStudio7Live'
 
 # Path for storing artifacts.
-testPath = '/home/runner/test_results'
+if os.name == 'linux':
+    testPath = '/home/runner/test_results'
+else:
+    testPath = 'D:/runner/test_results'
 
 # Path to sdk_build_automation tool.
-toolPath = '/home/runner/MikroElektronika/NECTOStudio/bin/sdk_build_automation'
+if os.name == 'linux':
+    toolPath = 'xvfb-run --auto-servernum --server-num=1 /home/runner/MikroElektronika/NECTOStudio/bin/sdk_build_automation'
+else:
+    toolPath = 'c:/MikroElektronikaLive/NECTOStudio/bin/sdk_build_automation.exe'
 
 # Global variable to trace failed tests.
 build_failed = False
@@ -115,7 +124,7 @@ def run_builds(changes_dict):
         # Get the necessary compiler for the current MCU build.
         compilers = get_compilers(mcu, is_mcu=True)
         for compiler in compilers:
-            cmd = f'xvfb-run --auto-servernum --server-num=1 {toolPath} --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_ARM_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
+            cmd = f'{toolPath} --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_ARM_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
             run_cmd(cmd, changes_dict, mcu + ' ' + compiler)
 
 # Returns the list of compilers based on the given name and type.
