@@ -4,19 +4,19 @@ from packaging import version
 from clocks import GenerateClocks
 
 # Global variable for local_app_data_path
-if os.name == 'linux':
+if os.name == 'posix':
     local_app_data_path = '/home/runner/.MIKROE/NECTOStudio7'
 else:
     local_app_data_path = 'c:/Users/ivan.ruzavin/AppData/Local/MIKROE/NECTOStudio7Live'
 
 # Path for storing artifacts.
-if os.name == 'linux':
+if os.name == 'posix':
     testPath = '/home/runner/test_results'
 else:
     testPath = 'D:/runner/test_results'
 
 # Path to sdk_build_automation tool.
-if os.name == 'linux':
+if os.name == 'posix':
     toolPath = 'xvfb-run --auto-servernum --server-num=1 /home/runner/MikroElektronika/NECTOStudio/bin/sdk_build_automation'
 else:
     toolPath = 'c:/MikroElektronikaLive/NECTOStudio/bin/sdk_build_automation.exe'
@@ -655,7 +655,7 @@ def write_results_to_file(changes_dict):
 
 def main():
     os.makedirs(testPath, exist_ok = True)
-    if os.name == 'linux':
+    if os.name == 'posix':
         # Generate clocks.json
         input_directory = "./"
         output_dir = "./output/docs"
