@@ -654,7 +654,7 @@ def write_results_to_file(changes_dict):
     print(f"All the data for build has been written to {testPath}/built_changes.json")
 
 def main():
-    os.makedirs(testPath, exists_ok = True)
+    os.makedirs(testPath, exist_ok = True)
     if os.name == 'linux':
         # Generate clocks.json
         input_directory = "./"
