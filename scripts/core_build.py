@@ -722,7 +722,7 @@ def main():
     shutil.copyfile(os.path.join(local_app_data_path, 'databases', 'necto_db.db'), os.path.join(testPath, 'necto_db.db'))
 
     for item in changes_dict['build_status']:
-        if changes_dict['build_status'][item] == 'UNDEFINED':
+        if 'UNDEFINED' in changes_dict['build_status'][item] or 'FAIL' in changes_dict['build_status'][item]:
             build_failed = True
 
     if build_failed == True:
