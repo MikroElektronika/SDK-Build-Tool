@@ -9,7 +9,7 @@ from clocks import GenerateClocks
 if os.name == 'posix':
     local_app_data_path = '/home/runner/.MIKROE/NECTOStudio7'
 else:
-    local_app_data_path = 'c:/Users/ivan.ruzavin/AppData/Local/MIKROE/NECTOStudio7Live'
+    local_app_data_path = 'c:/Users/ivan.ruzavin/AppData/Local/MIKROE/NECTOStudio7Dev'
 
 # Path for storing artifacts.
 if os.name == 'posix':
@@ -600,9 +600,12 @@ def updateDevicesFromCore(dbs, queries):
     return
 
 def index_package(package_name, mcus_to_index, es_instance, indexed_packages):
+    mcus = []
+    for mcu in mcus_to_index:
+        mcus.append(mcu)
     body = {
         "name": package_name,
-        "display_name": f"{package_name.split('_')[-1].upper()} MCU Support package for GCC & Clang",
+        "display_name": f"{package_name.replace('arm_gcc_clang_', '').upper()} MCU Support package for GCC & Clang",
         "author": "MikroElektronika",
         "hidden": False,
         "type": "mcu",
@@ -618,7 +621,7 @@ def index_package(package_name, mcus_to_index, es_instance, indexed_packages):
             "unit_test_lib",
             "mikroe_utils_common"
         ],
-        "mcus": mcus_to_index,
+        "mcus": mcus,
         "_type" : '_doc'
     }
     es_instance.update(doc_type=None, doc_id=package_name, doc_body=body)
