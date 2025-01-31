@@ -1,4 +1,6 @@
-import os, re, subprocess, shutil, json, sqlite3
+import os, re, subprocess, shutil, json, sqlite3, argparse
+
+import classes.class_es as es
 
 from packaging import version
 from clocks import GenerateClocks
@@ -597,7 +599,32 @@ def updateDevicesFromCore(dbs, queries):
 
     return
 
-def package_asset(source_dir, output_dir, arch, entry_name, changes_dict):
+def index_package(package_name, mcus_to_index, es_instance, indexed_packages):
+    body = {
+        "name": package_name,
+        "display_name": f"{package_name.split('_')[-1].upper()} MCU Support package for GCC & Clang",
+        "author": "MikroElektronika",
+        "hidden": False,
+        "type": "mcu",
+        "version": '0.0.1',
+        "package_version": '0.0.1',
+        "published_at": '2024-10-16T09:16:18Z',
+        "category": "MCU Package",
+        "download_link": '',
+        "package_changed": True,
+        "install_location": f"%APPLICATION_DATA_DIR%/packages/core/ARM/gcc_clang/{package_name}",
+        "dependencies": [
+            "preinit",
+            "unit_test_lib",
+            "mikroe_utils_common"
+        ],
+        "mcus": mcus_to_index,
+        "_type" : '_doc'
+    }
+    es_instance.update(doc_type=None, doc_id=package_name, doc_body=body)
+    indexed_packages.append(package_name)
+
+def package_asset(source_dir, output_dir, arch, entry_name, changes_dict, es_instance, indexed_packages):
     cmake_files = find_cmake_files(source_dir)
     file_paths = parse_files_for_paths(cmake_files, source_dir, True)
     for cmake_file, data in file_paths.items():
@@ -650,6 +677,8 @@ def package_asset(source_dir, output_dir, arch, entry_name, changes_dict):
         # Copy packages to artifacts as well
         shutil.copytree(base_output_dir, os.path.join(testPath, "packages", f"{arch.lower()}_{entry_name.lower()}_{cmake_file}"))
 
+        index_package(f"{arch.lower()}_{entry_name.lower()}_{cmake_file}", mcuNames[cmake_file]['mcu_names'], es_instance, indexed_packages)
+
 # Writes the result dictionary to a JSON file and ensures testPath exists.
 def write_results_to_file(changes_dict):
     os.makedirs(testPath, exist_ok=True)
@@ -660,6 +689,16 @@ def write_results_to_file(changes_dict):
     print(f"All the data for build has been written to {testPath}/built_changes.json")
 
 def main():
+    global build_failed
+
+    parser = argparse.ArgumentParser(description="Provide arguments for recursive build.")
+    parser.add_argument("token", help="GitHub Token")
+    parser.add_argument("index", help="Provided index name")
+    parser.add_argument("es_host", help="Elasticsearch host value", default="")
+    parser.add_argument("es_user", help="Elasticsearch username value", default="")
+    parser.add_argument("es_password", help="Elasticsearch password value", default="")
+    args = parser.parse_args()
+
     os.makedirs(testPath, exist_ok = True)
     if os.name == 'posix':
         # Generate clocks.json
@@ -678,6 +717,18 @@ def main():
             print(f"\033[93mReplaced {clocks_path} with: {output_file}\033[0m")
         else:
             print(f"\033[91mFile not found: {clocks_path}\033[0m")
+
+    index_name = args.index
+    if 'test' not in index_name:
+        print('\033[92mAborting as you are abusing LIVE index\033[0m')
+        exit(1)
+
+    es_instance = es.index(
+        es_host=args.es_host, es_user=args.es_user, es_password=args.es_password,
+        index=index_name, token=args.token
+    )
+
+    indexed_packages = []
 
     files = get_changed_files('main')
     archs = []
@@ -710,7 +761,7 @@ def main():
                         output_directory = os.path.join(root_output_directory, entry.name)
 
                         print(f"Processing {source_directory} to {output_directory}")
-                        package_asset(source_directory, output_directory, arch, entry.name, changes_dict)
+                        package_asset(source_directory, output_directory, arch, entry.name, changes_dict, es_instance, indexed_packages)
         except Exception as e:
             print(f"Failed to process directories in {root_source_directory}: {e}")
             print("\033[93mSomething went wrong while configuring the packages, chack manually.\033[0m")
@@ -722,6 +773,8 @@ def main():
     # Write all the used info for building to artifact folder.
     write_results_to_file(changes_dict)
 
+    for indexed_item in indexed_packages:
+        es_instance.delete(doc_type='_doc', doc_id=indexed_item)
 
     for item in changes_dict['build_status']:
         if 'UNDEFINED' in changes_dict['build_status'][item] or 'FAIL' in changes_dict['build_status'][item]:
