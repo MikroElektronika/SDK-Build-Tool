@@ -76,6 +76,8 @@ def run_cmd(cmd, changes_dict, status_key):
     num_of_retries = 1
     # Blue color for build tool command command.
     print(f"\033[94m{cmd}\033[0m")
+    shutil.copyfile(os.path.join(testPath, 'necto_db.db'), os.path.join(local_app_data_path, 'databases', 'necto_db.db'))
+    shutil.copy(os.path.join(testPath, 'clocks.json'), os.path.join(local_app_data_path, 'clocks.json'))
 
     # Store all the output lines to print only important ones.
     # output = subprocess.check_output(cmd, shell=True, text=True)
@@ -714,12 +716,12 @@ def main():
             print("\033[93mSomething went wrong while configuring the packages, chack manually.\033[0m")
 
     print("\033[93mAll requested core packages have been generated successfully.\033[0m")
+    shutil.copyfile(os.path.join(local_app_data_path, 'databases', 'necto_db.db'), os.path.join(testPath, 'necto_db.db'))
     run_builds(changes_dict)
 
     # Write all the used info for building to artifact folder.
     write_results_to_file(changes_dict)
 
-    shutil.copyfile(os.path.join(local_app_data_path, 'databases', 'necto_db.db'), os.path.join(testPath, 'necto_db.db'))
 
     for item in changes_dict['build_status']:
         if 'UNDEFINED' in changes_dict['build_status'][item] or 'FAIL' in changes_dict['build_status'][item]:
