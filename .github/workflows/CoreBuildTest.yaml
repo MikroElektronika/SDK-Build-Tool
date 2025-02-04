@@ -36,6 +36,7 @@ jobs:
           pip install enums
           sudo apt-get update
           sudo apt-get install $(cat scripts/requirements/recursive_build.txt)
+          pip install elasticsearch==7.13.4
 
       - name: Install NECTO
         run: |
