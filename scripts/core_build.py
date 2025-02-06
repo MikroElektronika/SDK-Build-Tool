@@ -511,8 +511,6 @@ def filter_versions(versions):
     return filtered_versions
 
 def insertIntoTable(db, tableName, values, columns):
-    import sqlite3
-
     conn = sqlite3.connect(db)
     cur = conn.cursor()
     numOfItems = ''
@@ -523,6 +521,7 @@ def insertIntoTable(db, tableName, values, columns):
     conn.close()
 
 def updateDevicesFromCore(dbs, queries):
+    sdk_version = get_sdk_version()
     allDevicesDirs = os.listdir(queries)
     for eachDeviceDir in allDevicesDirs:
         currentDeviceDir = os.path.join(queries, eachDeviceDir)
@@ -609,6 +608,13 @@ def updateDevicesFromCore(dbs, queries):
                                 values,
                                 ','.join(collumns)
                             )
+
+    # Set sdk installed for latest mikrosdk
+    conn = sqlite3.connect(eachDb)
+    cur = conn.cursor()
+    cur.execute(f'UPDATE SDKs SET installed = 1 WHERE uid = "{sdk_version}"')
+    conn.commit()
+    conn.close()
 
     return
 
