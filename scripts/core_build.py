@@ -486,9 +486,19 @@ def get_core_from_def(file_path):
 
     return core
 
+def get_core_from_queries(file_path):
+    with open(file_path, 'r') as devices_json:
+        json_data = json.load(devices_json)
+    core = json.loads(json_data['sdk_config'])['CORE_NAME']
+
+    return core
+
 def get_core(mcuNames, package_name, cmake_file, source_dir, changes_dict):
     for mcu_name in mcuNames[cmake_file]['mcu_names']:
-        core = get_core_from_def(os.path.join(source_dir, "def", f"{mcu_name}.json"))
+        if 'gcc_clang' in package_name:
+            core = get_core_from_def(os.path.join(source_dir, "def", f"{mcu_name}.json"))
+        else:
+            core = get_core_from_queries(os.path.join(os.getcwd(), "resources/queries/mcus", mcu_name, 'Devices.json'))
         mcuNames[cmake_file]['cores'].add(core)
         changes_dict['mcu_list'].append(mcu_name)
 
@@ -680,7 +690,7 @@ def package_asset(source_dir, output_dir, arch, entry_name, changes_dict, es_ins
         # Copy packages to artifacts as well
         shutil.copytree(base_output_dir, os.path.join(testPath, "packages", f"{arch.lower()}_{entry_name.lower()}_{cmake_file}"))
 
-        index_package(f"{arch.lower()}_{entry_name.lower()}_{cmake_file}", mcuNames[cmake_file]['mcu_names'], es_instance, indexed_packages)
+        # index_package(f"{arch.lower()}_{entry_name.lower()}_{cmake_file}", mcuNames[cmake_file]['mcu_names'], es_instance, indexed_packages)
 
 # Writes the result dictionary to a JSON file and ensures testPath exists.
 def write_results_to_file(changes_dict):
@@ -776,8 +786,8 @@ def main():
     # Write all the used info for building to artifact folder.
     write_results_to_file(changes_dict)
 
-    for indexed_item in indexed_packages:
-        es_instance.delete(doc_type='_doc', doc_id=indexed_item)
+    # for indexed_item in indexed_packages:
+        # es_instance.delete(doc_type='_doc', doc_id=indexed_item)
 
     for item in changes_dict['build_status']:
         if 'UNDEFINED' in changes_dict['build_status'][item] or 'FAIL' in changes_dict['build_status'][item]:
