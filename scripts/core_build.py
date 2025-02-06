@@ -132,7 +132,10 @@ def run_builds(changes_dict):
         # Get the necessary compiler for the current MCU build.
         compilers = get_compilers(mcu, is_mcu=True)
         for compiler in compilers:
-            cmd = f'{toolPath} --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_ARM_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
+            if 'xc' not in compiler:
+                cmd = f'{toolPath} --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_ARM_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
+            else:
+                cmd = f'{toolPath} --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_PIC_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
             run_cmd(cmd, changes_dict, mcu + ' ' + compiler)
 
 # Returns the list of compilers based on the given name and type.
@@ -777,7 +780,7 @@ def main():
                         package_asset(source_directory, output_directory, arch, entry.name, changes_dict, es_instance, indexed_packages)
         except Exception as e:
             print(f"Failed to process directories in {root_source_directory}: {e}")
-            print("\033[93mSomething went wrong while configuring the packages, chack manually.\033[0m")
+            print("\033[93mSomething went wrong while configuring the packages, check manually.\033[0m")
 
     print("\033[93mAll requested core packages have been generated successfully.\033[0m")
     shutil.copyfile(os.path.join(local_app_data_path, 'databases', 'necto_db.db'), os.path.join(testPath, 'necto_db.db'))
