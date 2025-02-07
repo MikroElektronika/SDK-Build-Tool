@@ -21,7 +21,7 @@ else:
 if os.name == 'posix':
     toolPath = 'xvfb-run --auto-servernum --server-num=1 /home/runner/MikroElektronika/NECTOStudio/bin/sdk_build_automation'
 else:
-    toolPath = 'c:/MikroElektronikaLive/NECTOStudio/bin/sdk_build_automation.exe'
+    toolPath = 'c:/MikroElektronikaDev/NECTOStudio/bin/sdk_build_automation.exe'
 
 # Global variable to trace failed tests.
 build_failed = False
@@ -118,11 +118,11 @@ def run_cmd(cmd, changes_dict, status_key):
             print(total_ouput)
             return
         print(f'Build attempt number {num_of_retries} failed. Trying again.')
-        result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
-        shutil.copyfile(os.path.join(testPath, 'necto_db.db'), os.path.join(local_app_data_path, 'databases', 'necto_db.db'))
-        shutil.copytree(os.path.join(testPath, 'packages'), os.path.join(local_app_data_path, 'packages'), dirs_exist_ok=True)
-        shutil.copyfile(os.path.join(testPath, 'mikroeUtilsCommon.cmake'), os.path.join(local_app_data_path, 'cmake', 'mikroeUtilsCommon.cmake'))
-        shutil.copy(os.path.join(testPath, 'clocks.json'), os.path.join(local_app_data_path, 'clocks.json'))
+        # result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
+        # shutil.copyfile(os.path.join(testPath, 'necto_db.db'), os.path.join(local_app_data_path, 'databases', 'necto_db.db'))
+        # shutil.copytree(os.path.join(testPath, 'packages'), os.path.join(local_app_data_path, 'packages'), dirs_exist_ok=True)
+        # shutil.copyfile(os.path.join(testPath, 'mikroeUtilsCommon.cmake'), os.path.join(local_app_data_path, 'cmake', 'mikroeUtilsCommon.cmake'))
+        # shutil.copy(os.path.join(testPath, 'clocks.json'), os.path.join(local_app_data_path, 'clocks.json'))
         num_of_retries += 1
 
     build_failed = True
