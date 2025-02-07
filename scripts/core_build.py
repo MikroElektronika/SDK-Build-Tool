@@ -706,7 +706,7 @@ def package_asset(source_dir, output_dir, arch, entry_name, changes_dict, es_ins
         # Copy packages to artifacts as well
         shutil.copytree(base_output_dir, os.path.join(testPath, "packages", f"{arch.lower()}_{entry_name.lower()}_{cmake_file}"))
 
-        # index_package(f"{arch.lower()}_{entry_name.lower()}_{cmake_file}", mcuNames[cmake_file]['mcu_names'], es_instance, indexed_packages)
+        index_package(f"{arch.lower()}_{entry_name.lower()}_{cmake_file}", mcuNames[cmake_file]['mcu_names'], es_instance, indexed_packages)
 
 # Writes the result dictionary to a JSON file and ensures testPath exists.
 def write_results_to_file(changes_dict):
@@ -811,8 +811,8 @@ def main():
     # Write all the used info for building to artifact folder.
     write_results_to_file(changes_dict)
 
-    # for indexed_item in indexed_packages:
-        # es_instance.delete(doc_type='_doc', doc_id=indexed_item)
+    for indexed_item in indexed_packages:
+        es_instance.delete(doc_type='_doc', doc_id=indexed_item)
 
     for item in changes_dict['build_status']:
         if 'UNDEFINED' in changes_dict['build_status'][item] or 'FAIL' in changes_dict['build_status'][item]:
