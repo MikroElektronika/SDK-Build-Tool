@@ -79,7 +79,9 @@ def run_cmd(cmd, changes_dict, status_key):
     # Blue color for build tool command command.
     print(f"\033[94m{cmd}\033[0m")
     shutil.copyfile(os.path.join(testPath, 'necto_db.db'), os.path.join(local_app_data_path, 'databases', 'necto_db.db'))
-    # shutil.copy(os.path.join(testPath, 'clocks.json'), os.path.join(local_app_data_path, 'clocks.json'))
+    shutil.copytree(os.path.join(testPath, 'packages'), os.path.join(local_app_data_path, 'packages'), dirs_exist_ok=True)
+    shutil.copyfile(os.path.join(testPath, 'mikroeUtilsCommon.cmake'), os.path.join(local_app_data_path, 'cmake'))
+    shutil.copy(os.path.join(testPath, 'clocks.json'), os.path.join(local_app_data_path, 'clocks.json'))
 
     # Store all the output lines to print only important ones.
     # output = subprocess.check_output(cmd, shell=True, text=True)
@@ -116,6 +118,11 @@ def run_cmd(cmd, changes_dict, status_key):
             print(total_ouput)
             return
         print(f'Build attempt number {num_of_retries} failed. Trying again.')
+        result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
+        shutil.copyfile(os.path.join(testPath, 'necto_db.db'), os.path.join(local_app_data_path, 'databases', 'necto_db.db'))
+        shutil.copytree(os.path.join(testPath, 'packages'), local_app_data_path, dirs_exist_ok=True)
+        shutil.copyfile(os.path.join(testPath, 'mikroeUtilsCommon.cmake'), os.path.join(local_app_data_path, 'cmake'))
+        shutil.copy(os.path.join(testPath, 'clocks.json'), os.path.join(local_app_data_path, 'clocks.json'))
         num_of_retries += 1
 
     build_failed = True
@@ -721,6 +728,15 @@ def main():
     parser.add_argument("es_password", help="Elasticsearch password value", default="")
     args = parser.parse_args()
 
+    output_folder = os.path.join(local_app_data_path, 'packages/preinit')
+    shutil.copytree(output_folder, os.path.join(testPath, 'packages/preinit'), dirs_exist_ok=True)
+    print(f"\033[93mCopied {output_folder} to the artifacts folder\033[0m")
+    output_folder = os.path.join(local_app_data_path, 'packages/unit_test_lib')
+    shutil.copytree(output_folder, os.path.join(testPath, 'packages/unit_test_lib'), dirs_exist_ok=True)
+    print(f"\033[93mCopied {output_folder} to the artifacts folder\033[0m")
+    output_file = os.path.join(local_app_data_path, 'cmake/mikroeUtilsCommon.cmake')
+    shutil.copyfile(output_file, os.path.join(testPath, 'mikroeUtilsCommon.cmake'))
+    print(f"\033[93mCopied {output_file} to the artifacts folder\033[0m")
     os.makedirs(testPath, exist_ok = True)
     if os.name == 'posix':
         # Generate clocks.json
@@ -734,9 +750,9 @@ def main():
         clocks_path = os.path.join(local_app_data_path, 'clocks.json')
         if os.path.exists(clocks_path):
             os.remove(clocks_path)
-            # shutil.copy(output_file, local_app_data_path)
+            shutil.copy(output_file, local_app_data_path)
             shutil.copy(output_file, testPath)
-            # print(f"\033[93mReplaced {clocks_path} with: {output_file}\033[0m")
+            print(f"\033[93mReplaced {clocks_path} with: {output_file}\033[0m")
         else:
             print(f"\033[91mFile not found: {clocks_path}\033[0m")
 
