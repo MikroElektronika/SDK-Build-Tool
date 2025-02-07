@@ -80,7 +80,7 @@ def run_cmd(cmd, changes_dict, status_key):
     print(f"\033[94m{cmd}\033[0m")
     shutil.copyfile(os.path.join(testPath, 'necto_db.db'), os.path.join(local_app_data_path, 'databases', 'necto_db.db'))
     shutil.copytree(os.path.join(testPath, 'packages'), os.path.join(local_app_data_path, 'packages'), dirs_exist_ok=True)
-    shutil.copyfile(os.path.join(testPath, 'mikroeUtilsCommon.cmake'), os.path.join(local_app_data_path, 'cmake'))
+    shutil.copyfile(os.path.join(testPath, 'mikroeUtilsCommon.cmake'), os.path.join(local_app_data_path, 'cmake', 'mikroeUtilsCommon.cmake'))
     shutil.copy(os.path.join(testPath, 'clocks.json'), os.path.join(local_app_data_path, 'clocks.json'))
 
     # Store all the output lines to print only important ones.
@@ -120,8 +120,8 @@ def run_cmd(cmd, changes_dict, status_key):
         print(f'Build attempt number {num_of_retries} failed. Trying again.')
         result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
         shutil.copyfile(os.path.join(testPath, 'necto_db.db'), os.path.join(local_app_data_path, 'databases', 'necto_db.db'))
-        shutil.copytree(os.path.join(testPath, 'packages'), local_app_data_path, dirs_exist_ok=True)
-        shutil.copyfile(os.path.join(testPath, 'mikroeUtilsCommon.cmake'), os.path.join(local_app_data_path, 'cmake'))
+        shutil.copytree(os.path.join(testPath, 'packages'), os.path.join(local_app_data_path, 'packages'), dirs_exist_ok=True)
+        shutil.copyfile(os.path.join(testPath, 'mikroeUtilsCommon.cmake'), os.path.join(local_app_data_path, 'cmake', 'mikroeUtilsCommon.cmake'))
         shutil.copy(os.path.join(testPath, 'clocks.json'), os.path.join(local_app_data_path, 'clocks.json'))
         num_of_retries += 1
 
