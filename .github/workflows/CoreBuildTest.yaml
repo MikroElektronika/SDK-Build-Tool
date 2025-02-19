@@ -40,7 +40,7 @@ jobs:
 
       - name: Install NECTO
         run: |
-          export NECTO_DOWNLOAD_URL=${{ secrets.NECTO_DEV_DOWNLOAD_URL }}
+          export NECTO_DOWNLOAD_URL=${{ secrets.NECTO_EXPERIMENTAL_DOWNLOAD_URL }}
           python -u scripts/install_necto.py
 
       - name: Run Core Files Build

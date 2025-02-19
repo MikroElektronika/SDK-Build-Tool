@@ -78,10 +78,10 @@ def run_cmd(cmd, changes_dict, status_key):
     num_of_retries = 1
     # Blue color for build tool command command.
     print(f"\033[94m{cmd}\033[0m")
-    shutil.copyfile(os.path.join(testPath, 'necto_db.db'), os.path.join(local_app_data_path, 'databases', 'necto_db.db'))
-    shutil.copytree(os.path.join(testPath, 'packages'), os.path.join(local_app_data_path, 'packages'), dirs_exist_ok=True)
-    shutil.copyfile(os.path.join(testPath, 'mikroeUtilsCommon.cmake'), os.path.join(local_app_data_path, 'cmake', 'mikroeUtilsCommon.cmake'))
-    shutil.copy(os.path.join(testPath, 'clocks.json'), os.path.join(local_app_data_path, 'clocks.json'))
+    # shutil.copyfile(os.path.join(testPath, 'necto_db.db'), os.path.join(local_app_data_path, 'databases', 'necto_db.db'))
+    # shutil.copytree(os.path.join(testPath, 'packages'), os.path.join(local_app_data_path, 'packages'), dirs_exist_ok=True)
+    # shutil.copyfile(os.path.join(testPath, 'mikroeUtilsCommon.cmake'), os.path.join(local_app_data_path, 'cmake', 'mikroeUtilsCommon.cmake'))
+    # shutil.copy(os.path.join(testPath, 'clocks.json'), os.path.join(local_app_data_path, 'clocks.json'))
 
     # Store all the output lines to print only important ones.
     # output = subprocess.check_output(cmd, shell=True, text=True)
@@ -132,6 +132,11 @@ def run_cmd(cmd, changes_dict, status_key):
 def run_builds(changes_dict):
     # Get the SDK version from manifest.json file.
     sdk_version = get_sdk_version()
+
+    shutil.copyfile(os.path.join(testPath, 'necto_db.db'), os.path.join(local_app_data_path, 'databases', 'necto_db.db'))
+    # shutil.copytree(os.path.join(testPath, 'packages'), os.path.join(local_app_data_path, 'packages'), dirs_exist_ok=True)
+    # shutil.copyfile(os.path.join(testPath, 'mikroeUtilsCommon.cmake'), os.path.join(local_app_data_path, 'cmake', 'mikroeUtilsCommon.cmake'))
+    shutil.copy(os.path.join(testPath, 'clocks.json'), os.path.join(local_app_data_path, 'clocks.json'))
 
     # Run build for all MCUs from mcu_list.
     print(f"\033[93mRunning build for {len(changes_dict['mcu_list'])} MCUs\033[0m")
@@ -706,7 +711,7 @@ def package_asset(source_dir, output_dir, arch, entry_name, changes_dict, es_ins
         # Copy packages to artifacts as well
         shutil.copytree(base_output_dir, os.path.join(testPath, "packages", f"{arch.lower()}_{entry_name.lower()}_{cmake_file}"))
 
-        index_package(f"{arch.lower()}_{entry_name.lower()}_{cmake_file}", mcuNames[cmake_file]['mcu_names'], es_instance, indexed_packages)
+        # index_package(f"{arch.lower()}_{entry_name.lower()}_{cmake_file}", mcuNames[cmake_file]['mcu_names'], es_instance, indexed_packages)
 
 # Writes the result dictionary to a JSON file and ensures testPath exists.
 def write_results_to_file(changes_dict):
@@ -728,15 +733,15 @@ def main():
     parser.add_argument("es_password", help="Elasticsearch password value", default="")
     args = parser.parse_args()
 
-    output_folder = os.path.join(local_app_data_path, 'packages/preinit')
-    shutil.copytree(output_folder, os.path.join(testPath, 'packages/preinit'), dirs_exist_ok=True)
-    print(f"\033[93mCopied {output_folder} to the artifacts folder\033[0m")
-    output_folder = os.path.join(local_app_data_path, 'packages/unit_test_lib')
-    shutil.copytree(output_folder, os.path.join(testPath, 'packages/unit_test_lib'), dirs_exist_ok=True)
-    print(f"\033[93mCopied {output_folder} to the artifacts folder\033[0m")
-    output_file = os.path.join(local_app_data_path, 'cmake/mikroeUtilsCommon.cmake')
-    shutil.copyfile(output_file, os.path.join(testPath, 'mikroeUtilsCommon.cmake'))
-    print(f"\033[93mCopied {output_file} to the artifacts folder\033[0m")
+    # output_folder = os.path.join(local_app_data_path, 'packages/preinit')
+    # shutil.copytree(output_folder, os.path.join(testPath, 'packages/preinit'), dirs_exist_ok=True)
+    # print(f"\033[93mCopied {output_folder} to the artifacts folder\033[0m")
+    # output_folder = os.path.join(local_app_data_path, 'packages/unit_test_lib')
+    # shutil.copytree(output_folder, os.path.join(testPath, 'packages/unit_test_lib'), dirs_exist_ok=True)
+    # print(f"\033[93mCopied {output_folder} to the artifacts folder\033[0m")
+    # output_file = os.path.join(local_app_data_path, 'cmake/mikroeUtilsCommon.cmake')
+    # shutil.copyfile(output_file, os.path.join(testPath, 'mikroeUtilsCommon.cmake'))
+    # print(f"\033[93mCopied {output_file} to the artifacts folder\033[0m")
     os.makedirs(testPath, exist_ok = True)
     if os.name == 'posix':
         # Generate clocks.json
@@ -781,6 +786,19 @@ def main():
         'build_status': {}
     }
 
+    # First let's disable clocks and database reinstallation on every build run
+    with open(os.path.join(local_app_data_path, 'NECTOStudio.ini'), 'r') as ini_file:
+        ini_data = ini_file.readlines()
+
+    ini_data_write = ''
+    for line in ini_data:
+        if 'download=true' in line:
+            line = line.replace('true', 'false')
+        ini_data_write += line
+
+    with open(os.path.join(local_app_data_path, 'NECTOStudio.ini'), 'w') as ini_file:
+        ini_file.write(ini_data_write)
+
     for arch in archs:
         root_source_directory = f"./{arch}"
         root_output_directory = f"./output/{arch}"
@@ -811,8 +829,8 @@ def main():
     # Write all the used info for building to artifact folder.
     write_results_to_file(changes_dict)
 
-    for indexed_item in indexed_packages:
-        es_instance.delete(doc_type='_doc', doc_id=indexed_item)
+    # for indexed_item in indexed_packages:
+    #     es_instance.delete(doc_type='_doc', doc_id=indexed_item)
 
     for item in changes_dict['build_status']:
         if 'UNDEFINED' in changes_dict['build_status'][item] or 'FAIL' in changes_dict['build_status'][item]:
