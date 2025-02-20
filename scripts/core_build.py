@@ -779,7 +779,7 @@ def main():
     valid_entries = ["gcc_clang", "XC32", "XC16", "XC8"]
     for file in files:
         for architecture in architectures:
-            if architecture in file and architecture not in archs:
+            if architecture == file.split('/')[0] and architecture not in archs:
                 archs.append(architecture)
     changes_dict = {
         'mcu_list': [],
