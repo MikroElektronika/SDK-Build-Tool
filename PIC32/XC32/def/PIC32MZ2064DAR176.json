@@ -1743,29 +1743,7 @@
                 }
             ]
         },
-        {
-            "init": "POSCAGCDLY1",
-            "key": "POSCAGCDLY",
-            "label": "Short name for DEVCFG0_POSCAGCDLY",
-            "settings": [
-                {
-                    "label": "25 ms times POSCAGCRNG x",
-                    "value": "POSCAGCDLY1"
-                },
-                {
-                    "label": "6.25 ms times POSCAGCRNG x",
-                    "value": "POSCAGCDLY2"
-                },
-                {
-                    "label": "400 ms times POSCAGCRNG x",
-                    "value": "POSCAGCDLY3"
-                },
-                {
-                    "label": "100 ms times POSCAGCRNG x",
-                    "value": "POSCAGCDLY4"
-                }
-            ]
-        },
+
         {
             "init": "OFF",
             "key": "CP",
