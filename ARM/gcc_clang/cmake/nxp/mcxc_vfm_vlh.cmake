@@ -1,0 +1,5 @@
+if(${MCU_NAME} MATCHES "^MCXC141VFM$|^MCXC142VFM$|^MCXC242VFM$|^MCXC141VLH$|^MCXC242VLH$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.s PARENT_SCOPE)
+    list(APPEND local_list_include system/src/nxp/doc_ds_43/init_clock.c)
+endif()
