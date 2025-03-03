@@ -490,33 +490,6 @@ g_pfnVectors:
     .weak      Reserved9_Handler
     .thumb_set Reserved9_Handler,Default_Handler
 
-    .weak      TSI__Handler
-    .thumb_set TSI__Handler,Default_Handler
-
-    .weak      MCG__Handler
-    .thumb_set MCG__Handler,Default_Handler
-
-    .weak      LowPowerTimer__Handler
-    .thumb_set LowPowerTimer__Handler,Default_Handler
-
-    .weak      Portcontrol_PindetectPortA_Handler
-    .thumb_set Portcontrol_PindetectPortA_Handler,Default_Handler
-
-    .weak      Portcontrol_PindetectPortB_Handler
-    .thumb_set Portcontrol_PindetectPortB_Handler,Default_Handler
-
-    .weak      Portcontrol_PindetectPortC_Handler
-    .thumb_set Portcontrol_PindetectPortC_Handler,Default_Handler
-
-    .weak      Portcontrol_PindetectPortD_Handler
-    .thumb_set Portcontrol_PindetectPortD_Handler,Default_Handler
-
-    .weak      Portcontrol_PindetectPortE_Handler
-    .thumb_set Portcontrol_PindetectPortE_Handler,Default_Handler
-
-    .weak      Softwareinitiated__Handler
-    .thumb_set Softwareinitiated__Handler,Default_Handler
-
     .weak      Reserved10_Handler
     .thumb_set Reserved10_Handler,Default_Handler
 
@@ -537,33 +510,6 @@ g_pfnVectors:
 
     .weak      Reserved16_Handler
     .thumb_set Reserved16_Handler,Default_Handler
-
-    .weak      TSI__Handler
-    .thumb_set TSI__Handler,Default_Handler
-
-    .weak      MCG__Handler
-    .thumb_set MCG__Handler,Default_Handler
-
-    .weak      LowPowerTimer__Handler
-    .thumb_set LowPowerTimer__Handler,Default_Handler
-
-    .weak      Portcontrol_PindetectPortA_Handler
-    .thumb_set Portcontrol_PindetectPortA_Handler,Default_Handler
-
-    .weak      Portcontrol_PindetectPortB_Handler
-    .thumb_set Portcontrol_PindetectPortB_Handler,Default_Handler
-
-    .weak      Portcontrol_PindetectPortC_Handler
-    .thumb_set Portcontrol_PindetectPortC_Handler,Default_Handler
-
-    .weak      Portcontrol_PindetectPortD_Handler
-    .thumb_set Portcontrol_PindetectPortD_Handler,Default_Handler
-
-    .weak      Portcontrol_PindetectPortE_Handler
-    .thumb_set Portcontrol_PindetectPortE_Handler,Default_Handler
-
-    .weak      Softwareinitiated__Handler
-    .thumb_set Softwareinitiated__Handler,Default_Handler
 
     .weak      Reserved17_Handler
     .thumb_set Reserved17_Handler,Default_Handler
