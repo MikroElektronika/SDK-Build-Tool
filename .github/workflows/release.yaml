@@ -77,8 +77,8 @@ jobs:
         env:
           MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL_TEST }}
         run: |
-          MCU_STRING=${{ github.event.inputs.mcu_regex }}
-          NECTO_VERSION=${{ github.event.inputs.necto_type }} NECTO
+          MCU_STRING="${{ github.event.inputs.mcu_regex }}"
+          NECTO_VERSION="${{ github.event.inputs.necto_type }} NECTO"
           MESSAGE="SDK Support adding was triggered for MCUs in $NECTO_VERSION\n$(echo "$MCU_STRING" | tr '|' '\n' | sed 's/^/- /')"
           curl -X POST -H 'Content-Type: application/json' \
           --data "{\"text\": \"$MESSAGE\"}" \
