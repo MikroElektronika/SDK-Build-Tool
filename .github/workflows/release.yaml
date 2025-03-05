@@ -5,13 +5,20 @@ on:
     types: [published]
   workflow_dispatch:
     inputs:
-      sdk_support_add:
+      mcu_regex:
         type: string
-        description: Provide MCU regex for adding SDK support
+        description: Provide regex for which MCUs SDK support is being released
         default: "PIC18F97J94|PIC32MZ2048EFH144|STM32F429ZI"
+      necto_type:
+        type: choice
+        description: Release to Test or Live NECTO?
+        options:
+          - Test
+          - Live
 
 jobs:
   upload-release-asset:
+    if: ${{ github.event_name == 'release' }}
     runs-on: ubuntu-latest
     steps:
       - name: Authorize Mikroe Actions App
@@ -61,3 +68,17 @@ jobs:
         with:
           name: result-compare
           path: result_compare.txt
+
+  release-sdk-support:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send notification to Mattermost
+        env:
+          MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL_TEST }}
+        run: |
+          MCU_STRING=${{ github.event.inputs.mcu_regex }}
+          MESSAGE="SDK Support adding was triggered for MCUs\n$(echo "$MCU_STRING" | tr '|' '\n' | sed 's/^/- /')"
+          curl -X POST -H 'Content-Type: application/json' \
+          --data "{\"text\": \"$MESSAGE\"}" \
+          $MATTERMOST_WEBHOOK_URL
