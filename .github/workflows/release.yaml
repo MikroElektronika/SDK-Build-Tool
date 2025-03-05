@@ -11,9 +11,9 @@ on:
         default: "PIC18F97J94|PIC32MZ2048EFH144|STM32F429ZI"
       necto_type:
         type: choice
-        description: Release to Test or Live NECTO?
+        description: Release to Dev or Live NECTO?
         options:
-          - Test
+          - Dev
           - Live
 
 jobs:
@@ -78,7 +78,8 @@ jobs:
           MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL_TEST }}
         run: |
           MCU_STRING=${{ github.event.inputs.mcu_regex }}
-          MESSAGE="SDK Support adding was triggered for MCUs\n$(echo "$MCU_STRING" | tr '|' '\n' | sed 's/^/- /')"
+          NECTO_VERSION=${{ github.event.inputs.necto_type }} NECTO
+          MESSAGE="SDK Support adding was triggered for MCUs in $NECTO_VERSION\n$(echo "$MCU_STRING" | tr '|' '\n' | sed 's/^/- /')"
           curl -X POST -H 'Content-Type: application/json' \
           --data "{\"text\": \"$MESSAGE\"}" \
           $MATTERMOST_WEBHOOK_URL
