@@ -496,7 +496,7 @@ def main():
     # Get the necessary data from the database.
     query_database(changes_dict, args.mcus_cards_boards, args.build_type)
 
-    # install_packages(changes_dict['install_packages'])
+    install_packages(changes_dict['install_packages'])
 
     # Finally, run the SDK build tool.
     run_builds(changes_dict, args.build_type, args.mcus_cards_boards)
