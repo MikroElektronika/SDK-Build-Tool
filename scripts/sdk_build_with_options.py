@@ -15,13 +15,13 @@ else:
 
 # Path to the necto_db.db file.
 if linux_build:
-    dbPath = f'{cache_folder}/.MIKROE/NECTOStudio7/databases/necto_db.db'
+    dbPath = f'{cache_folder}/.MIKROE/NECTOStudio7_Experimental/databases/necto_db.db'
 else:
     dbPath = f'{cache_folder}/MIKROE/NECTOStudio7/databases/necto_db.db'
 
 # Path to the released SDK folder.
 if linux_build:
-    sdkPath = f'{cache_folder}/.MIKROE/NECTOStudio7/packages/sdk/mikroSDK_v2/src'
+    sdkPath = f'{cache_folder}/.MIKROE/NECTOStudio7_Experimental/packages/sdk/mikroSDK_v2/src'
 else:
     sdkPath = f'{cache_folder}/MIKROE/NECTOStudio7/packages/sdk/mikroSDK_v2/src'
 
@@ -451,15 +451,6 @@ def functionRegex(value, pattern):
     reg = re.compile(value)
     return reg.search(pattern) is not None
 
-def add_sam_support_to_db():
-    ## Create the REGEXP function to be used in DB
-    conn = sqlite3.connect(dbPath)
-    conn.create_function("REGEXP", 2, functionRegex)
-    cursor = conn.cursor()
-    cursor.execute(f'UPDATE Devices SET sdk_support = "1" WHERE uid REGEXP "ATSAM[EVS]7"')
-    conn.commit()
-    conn.close()
-
 def main():
     global build_failed
 
@@ -488,9 +479,6 @@ def main():
 
     # Create a folder for job artifacts.
     os.makedirs(testPath, exist_ok=True)
-
-    #TODO - temporary for checking ATSAM packages
-    add_sam_support_to_db()
 
     # Get the necessary data from the database.
     query_database(changes_dict, args.mcus_cards_boards, args.build_type)
