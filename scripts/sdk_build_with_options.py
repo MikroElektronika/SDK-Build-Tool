@@ -53,12 +53,20 @@ def run_cmd(cmd, changes_dict, status_key):
     num_of_retries = 1
     # Blue color for build tool command command.
     print(f"\033[94m{cmd}\033[0m")
+    # shutil.copyfile(os.path.join(testPath, 'necto_db.db'), os.path.join(local_app_data_path, 'databases', 'necto_db.db'))
+    # shutil.copytree(os.path.join(testPath, 'packages'), os.path.join(local_app_data_path, 'packages'), dirs_exist_ok=True)
+    # shutil.copyfile(os.path.join(testPath, 'mikroeUtilsCommon.cmake'), os.path.join(local_app_data_path, 'cmake', 'mikroeUtilsCommon.cmake'))
+    # shutil.copy(os.path.join(testPath, 'clocks.json'), os.path.join(local_app_data_path, 'clocks.json'))
 
     # Store all the output lines to print only important ones.
     # output = subprocess.check_output(cmd, shell=True, text=True)
     # Store all the output lines to print only important ones.
     result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
     changes_dict['build_status'][status_key] = 'UNDEFINED'
+    changes_dict['build_status'][status_key] += result.stdout
+    # print(output)
+    changes_dict['build_status'][status_key] += result.stderr
+    # print(output)
     if 'Building:' in result.stdout:
         output = result.stdout
         # print(output)
@@ -85,6 +93,11 @@ def run_cmd(cmd, changes_dict, status_key):
             print(total_ouput)
             return
         print(f'Build attempt number {num_of_retries} failed. Trying again.')
+        # result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
+        # shutil.copyfile(os.path.join(testPath, 'necto_db.db'), os.path.join(local_app_data_path, 'databases', 'necto_db.db'))
+        # shutil.copytree(os.path.join(testPath, 'packages'), os.path.join(local_app_data_path, 'packages'), dirs_exist_ok=True)
+        # shutil.copyfile(os.path.join(testPath, 'mikroeUtilsCommon.cmake'), os.path.join(local_app_data_path, 'cmake', 'mikroeUtilsCommon.cmake'))
+        # shutil.copy(os.path.join(testPath, 'clocks.json'), os.path.join(local_app_data_path, 'clocks.json'))
         num_of_retries += 1
 
     build_failed = True
@@ -491,7 +504,11 @@ def main():
     # Write all the used info for building to artifact folder.
     write_results_to_file(changes_dict)
 
-    if build_failed == True or changes_dict['build_status'] == {}:
+    for item in changes_dict['build_status']:
+        if 'UNDEFINED' in changes_dict['build_status'][item] or 'FAIL' in changes_dict['build_status'][item]:
+            build_failed = True
+
+    if build_failed == True:
         # Red text for failure.
         print("\033[91mRecursive Build Failed!\033[0m")
         # Fail the job as well.
