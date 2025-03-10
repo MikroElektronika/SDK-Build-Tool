@@ -361,7 +361,7 @@ def run_command(command):
 
 def download_metadata(repo_name, updated_name):
     # URL to fetch the latest release
-    latest_release_url = f"https://api.github.com/repos/MikroElektronika/{repo_name}/releases/tag/mikroSDK-2.14.0"
+    latest_release_url = f"https://api.github.com/repos/MikroElektronika/{repo_name}/releases/latest"
 
     try:
         # Get the latest release data
