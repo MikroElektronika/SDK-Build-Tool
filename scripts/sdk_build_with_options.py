@@ -15,13 +15,13 @@ else:
 
 # Path to the necto_db.db file.
 if linux_build:
-    dbPath = f'{cache_folder}/.MIKROE/NECTOStudio7_Experimental/databases/necto_db.db'
+    dbPath = f'{cache_folder}/.MIKROE/NECTOStudio7_Development/databases/necto_db.db'
 else:
     dbPath = f'{cache_folder}/MIKROE/NECTOStudio7/databases/necto_db.db'
 
 # Path to the released SDK folder.
 if linux_build:
-    sdkPath = f'{cache_folder}/.MIKROE/NECTOStudio7_Experimental/packages/sdk/mikroSDK_v2/src'
+    sdkPath = f'{cache_folder}/.MIKROE/NECTOStudio7_Development/packages/sdk/mikroSDK_v2/src'
 else:
     sdkPath = f'{cache_folder}/MIKROE/NECTOStudio7/packages/sdk/mikroSDK_v2/src'
 
@@ -428,7 +428,7 @@ def install_packages(install_packages):
             for package_core_meta in packages_core_meta:
                 if package_core_meta['name'] == package:
                     if linux_build:
-                        install_location = package_core_meta['install_location'].replace('%APPLICATION_DATA_DIR%', f'{cache_folder}/.MIKROE/NECTOStudio7_Experimental')
+                        install_location = package_core_meta['install_location'].replace('%APPLICATION_DATA_DIR%', f'{cache_folder}/.MIKROE/NECTOStudio7_Development')
                     else:
                         install_location = package_core_meta['install_location'].replace('%APPLICATION_DATA_DIR%', f'{cache_folder}/MIKROE/NECTOStudio7')
                     break
@@ -438,7 +438,7 @@ def install_packages(install_packages):
                 for package_sdk_meta in packages_sdk_meta:
                     if package_sdk_meta['name'] == package:
                         if linux_build:
-                            install_location = package_core_meta['install_location'].replace('%APPLICATION_DATA_DIR%', f'{cache_folder}/.MIKROE/NECTOStudio7_Experimental')
+                            install_location = package_core_meta['install_location'].replace('%APPLICATION_DATA_DIR%', f'{cache_folder}/.MIKROE/NECTOStudio7_Development')
                         else:
                             install_location = package_core_meta['install_location'].replace('%APPLICATION_DATA_DIR%', f'{cache_folder}/MIKROE/NECTOStudio7')
                         break
@@ -448,7 +448,7 @@ def install_packages(install_packages):
         print(f'Installing package: {package}')
         while (1):
             if linux_build:
-                run_command(f'./NECTOInstaller installer --install-packages {package} {cache_folder} {cache_folder}/.MIKROE/NECTOStudio7_Experimental > /dev/null 2>&1')
+                run_command(f'./NECTOInstaller installer --install-packages {package} {cache_folder} {cache_folder}/.MIKROE/NECTOStudio7_Development > /dev/null 2>&1')
             else:
                 run_command(f'NECTOInstaller.exe installer --install-packages {package} {cache_folder} {cache_folder}/MIKROE/NECTOStudio7 > /dev/null 2>&1')
             print('Checking if package exists')

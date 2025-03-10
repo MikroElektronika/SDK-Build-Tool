@@ -7,7 +7,7 @@ from clocks import GenerateClocks
 
 # Global variable for local_app_data_path
 if os.name == 'posix':
-    local_app_data_path = '/home/runner/.MIKROE/NECTOStudio7_Experimental'
+    local_app_data_path = '/home/runner/.MIKROE/NECTOStudio7_Development'
 else:
     local_app_data_path = 'c:/Users/ivan.ruzavin/AppData/Local/MIKROE/NECTOStudio7Dev'
 
