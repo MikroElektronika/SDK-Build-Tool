@@ -415,7 +415,7 @@ def install_packages(install_packages):
             for package_core_meta in packages_core_meta:
                 if package_core_meta['name'] == package:
                     if linux_build:
-                        install_location = package_core_meta['install_location'].replace('%APPLICATION_DATA_DIR%', f'{cache_folder}/.MIKROE/NECTOStudio7')
+                        install_location = package_core_meta['install_location'].replace('%APPLICATION_DATA_DIR%', f'{cache_folder}/.MIKROE/NECTOStudio7_Experimental')
                     else:
                         install_location = package_core_meta['install_location'].replace('%APPLICATION_DATA_DIR%', f'{cache_folder}/MIKROE/NECTOStudio7')
                     break
@@ -425,7 +425,7 @@ def install_packages(install_packages):
                 for package_sdk_meta in packages_sdk_meta:
                     if package_sdk_meta['name'] == package:
                         if linux_build:
-                            install_location = package_core_meta['install_location'].replace('%APPLICATION_DATA_DIR%', f'{cache_folder}/.MIKROE/NECTOStudio7')
+                            install_location = package_core_meta['install_location'].replace('%APPLICATION_DATA_DIR%', f'{cache_folder}/.MIKROE/NECTOStudio7_Experimental')
                         else:
                             install_location = package_core_meta['install_location'].replace('%APPLICATION_DATA_DIR%', f'{cache_folder}/MIKROE/NECTOStudio7')
                         break
@@ -435,7 +435,7 @@ def install_packages(install_packages):
         print(f'Installing package: {package}')
         while (1):
             if linux_build:
-                run_command(f'./NECTOInstaller installer --install-packages {package} {cache_folder} {cache_folder}/.MIKROE/NECTOStudio7 > /dev/null 2>&1')
+                run_command(f'./NECTOInstaller installer --install-packages {package} {cache_folder} {cache_folder}/.MIKROE/NECTOStudio7_Experimental > /dev/null 2>&1')
             else:
                 run_command(f'NECTOInstaller.exe installer --install-packages {package} {cache_folder} {cache_folder}/MIKROE/NECTOStudio7 > /dev/null 2>&1')
             print('Checking if package exists')
