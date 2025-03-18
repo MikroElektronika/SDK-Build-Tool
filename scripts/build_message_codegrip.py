@@ -30,51 +30,15 @@ def fetch_current_indexed_cg_packs(es : Elasticsearch, index_name):
     for eachHit in response['hits']['hits']:
         if not 'name' in eachHit['_source']:
             continue
-        if '_doc' == eachHit['_type'] and 'codegrip_pack' in eachHit['_source']['name']:
-            if False == eachHit['_source']['hidden']:
-                all_packages.append(eachHit['_source'])
+        if '_type' in eachHit:
+            if '_doc' == eachHit['_type'] and 'codegrip_pack' in eachHit['_source']['name']:
+                if False == eachHit['_source']['hidden']:
+                    all_packages.append(eachHit['_source'])
 
     # Sort all_packages alphabetically by the 'name' field
     all_packages.sort(key=lambda x: x['name'])
 
     return all_packages
-
-def fetch_current_indexed_click_boards(es : Elasticsearch, index_name):
-    # Search query to use
-    query_search = {
-        "size": 5000,
-        "query": {
-            "match_all": {}
-        }
-    }
-
-    # Search the base with provided query
-    num_of_retries = 1
-    while num_of_retries <= 10:
-        try:
-            response = es.search(index=index_name, body=query_search)
-            if not response['timed_out']:
-                break
-        except:
-            print("Executing search query - retry number %i" % num_of_retries)
-        num_of_retries += 1
-
-    all_packages = []
-    for eachHit in response['hits']['hits']:
-        if not 'name' in eachHit['_source']:
-            continue
-        if '_doc' == eachHit['_type']:
-            if 'mikroe.click' in eachHit['_source']['name']:
-                all_packages.append(eachHit['_source'])
-
-    return all_packages
-
-def create_message(date, mcu_package, mcu_models):
-    message = f"MCU packages Release for {date}:\n\n+ {mcu_package}\n"
-    for model in mcu_models:
-        message += f"  + {model}\n"
-    message += "\n---"
-    return message
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Create the release post message for Web.")
@@ -137,10 +101,16 @@ if __name__ == "__main__":
                 if cg_file['display_name'] in release_spreadsheet_data:
                     # Separate Codegrip Packs to display them at the beginning of the list
                     todays_release += f'  + {cg_file['display_name']}\n'
+                    for mcu in cg_file['mcus']:
+                        todays_release += f'    + {mcu}\n'
                 # If it is not newly released package - add it to UPDATED section
                 else:
                     todays_update += f'  + {cg_file['display_name']}\n'
                     update_present = 1
+
+    # Case for the days when we only updated existing Codegrip Packs, but don't release new
+    if todays_release == '+ New\n':
+        todays_release = ''
 
     # If there were any updates today - add them
     if update_present:
