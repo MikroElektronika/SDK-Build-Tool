@@ -585,8 +585,8 @@
             "unused": "FFFFFF00"
         }
     ],
-    "core": "",
-    "delay_src_path": "delays//__lib_delays.c",
+    "core": "M4",
+    "delay_src_path": "delays/m4/__lib_delays.c",
     "mcu": "MK21FN1M0AVLQ12",
     "clock": "1"
 }

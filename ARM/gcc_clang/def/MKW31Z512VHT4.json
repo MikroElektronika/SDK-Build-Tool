@@ -333,8 +333,8 @@
             "unused": "FFFFFF00"
         }
     ],
-    "core": "",
-    "delay_src_path": "delays//__lib_delays.c",
+    "core": "M0+",
+    "delay_src_path": "delays/m0+/__lib_delays.c",
     "mcu": "MKW31Z512VHT4",
     "clock": "1"
 }
