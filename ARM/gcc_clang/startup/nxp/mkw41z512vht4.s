@@ -360,26 +360,12 @@ Reset_Handler:
     ldr    r2, =__data_start__
     ldr    r3, =__data_end__
 
-#ifdef __PERFORMANCE_IMPLEMENTATION
-/* Here are two copies of loop implementations. First one favors performance
- * and the second one favors code size. Default uses the second one.
- * Define macro "__PERFORMANCE_IMPLEMENTATION" in project to use the first one */
-    subs    r3, r2
-    ble    .LC1
-.LC0:
-    subs    r3, #4
-    ldr    r0, [r1, r3]
-    str    r0, [r2, r3]
-    bgt    .LC0
-.LC1:
-#else  /* code size implemenation */
 .LC0:
     cmp     r2, r3
     ittt    lt
     ldrlt   r0, [r1], #4
     strlt   r0, [r2], #4
     blt    .LC0
-#endif
 
 #ifdef __STARTUP_CLEAR_BSS
 /*     This part of work usually is done in C library startup code. Otherwise,

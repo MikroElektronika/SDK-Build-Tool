@@ -6,7 +6,7 @@
     "max_speed": "120.000",
     "name": "MK21FX512AVMD12",
     "ram": "131072",
-    "sdk_config": "{\"MCU_NAME\":\"MK21FX512AVMD12\",\"CORE_NAME\":\"\",\"_MSDK_HAL_LOW_LEVEL_TARGET_\":\"mikroe\",\"_MSDK_ETH_PHY_CHIP_\":\"NULL\"}",
+    "sdk_config": "{\"MCU_NAME\":\"MK21FX512AVMD12\",\"CORE_NAME\":\"M4\",\"_MSDK_HAL_LOW_LEVEL_TARGET_\":\"mikroe\",\"_MSDK_ETH_PHY_CHIP_\":\"NULL\"}",
     "necto_config": "",
     "uid": "MK21FX512AVMD12",
     "vendor": "NXP",

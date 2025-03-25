@@ -6,7 +6,7 @@
     "max_speed": "48.000",
     "name": "MKL46Z256VMC4",
     "ram": "32768",
-    "sdk_config": "{\"MCU_NAME\":\"MKL46Z256VMC4\",\"CORE_NAME\":\"\",\"_MSDK_HAL_LOW_LEVEL_TARGET_\":\"mikroe\",\"_MSDK_ETH_PHY_CHIP_\":\"NULL\"}",
+    "sdk_config": "{\"MCU_NAME\":\"MKL46Z256VMC4\",\"CORE_NAME\":\"M0+\",\"_MSDK_HAL_LOW_LEVEL_TARGET_\":\"mikroe\",\"_MSDK_ETH_PHY_CHIP_\":\"NULL\"}",
     "necto_config": "",
     "uid": "MKL46Z256VMC4",
     "vendor": "NXP",

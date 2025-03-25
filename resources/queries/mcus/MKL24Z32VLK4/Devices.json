@@ -6,7 +6,7 @@
     "max_speed": "48.000",
     "name": "MKL24Z32VLK4",
     "ram": "4096",
-    "sdk_config": "{\"MCU_NAME\":\"MKL24Z32VLK4\",\"CORE_NAME\":\"\",\"_MSDK_HAL_LOW_LEVEL_TARGET_\":\"mikroe\",\"_MSDK_ETH_PHY_CHIP_\":\"NULL\"}",
+    "sdk_config": "{\"MCU_NAME\":\"MKL24Z32VLK4\",\"CORE_NAME\":\"M0+\",\"_MSDK_HAL_LOW_LEVEL_TARGET_\":\"mikroe\",\"_MSDK_ETH_PHY_CHIP_\":\"NULL\"}",
     "necto_config": "",
     "uid": "MKL24Z32VLK4",
     "vendor": "NXP",
