@@ -1,5 +1,5 @@
 if(${MCU_NAME} MATCHES "^MKL03Z8VFG4$|^MKL03Z16VFG4$|^MKL03Z32VFG4$|^MKL03Z32CAF4$|^MKL03Z32CBF4$|^MKL03Z8VFK4$|^MKL03Z16VFK4$|^MKL03Z32VFK4$")
     set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
     set(${startupFile} startup/${vendor}/${mcu_match}.s PARENT_SCOPE)
-    list(APPEND local_list_include system/src/mk21dx_avmc_vmc_vlk_5/init_clock.c)
+    list(APPEND local_list_include system/src/nxp/mk21dx_avmc_vmc_vlk_5/init_clock.c)
 endif()
