@@ -3,7 +3,7 @@
     "family_uid": "KINETIS_K_SERIES",
     "flash": "65536",
     "icon": "images/mcu/nxp.png",
-    "max_speed": "50.000.000",
+    "max_speed": "50.000",
     "name": "MK20DN64VFT5",
     "ram": "16777216",
     "sdk_config": "{\"MCU_NAME\":\"MK20DN64VFT5\",\"CORE_NAME\":\"M4\",\"_MSDK_HAL_LOW_LEVEL_TARGET_\":\"mikroe\",\"_MSDK_ETH_PHY_CHIP_\":\"NULL\"}",

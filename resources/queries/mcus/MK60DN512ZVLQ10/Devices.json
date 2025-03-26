@@ -3,7 +3,7 @@
     "family_uid": "KINETIS_K_SERIES",
     "flash": "524288",
     "icon": "images/mcu/nxp.png",
-    "max_speed": "100.000.000",
+    "max_speed": "100.000",
     "name": "MK60DN512ZVLQ10",
     "ram": "131072",
     "sdk_config": "{\"MCU_NAME\":\"MK60DN512ZVLQ10\",\"CORE_NAME\":\"M4\",\"_MSDK_HAL_LOW_LEVEL_TARGET_\":\"mikroe\",\"_MSDK_ETH_PHY_CHIP_\":\"NULL\"}",
