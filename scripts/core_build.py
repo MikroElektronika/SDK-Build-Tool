@@ -158,7 +158,7 @@ def run_builds(changes_dict):
 # Returns the list of compilers based on the given name and type.
 def get_compilers(name, is_mcu=True):
     if is_mcu:
-        if any(substring in name for substring in ["SAM", "STM", "TM4C", "MK", "MC"]):
+        if any(substring in name for substring in ["SAM", "STM", "TM4C", "MK", "MC", "R7FA"]):
             return compiler_list["ARM"]
         elif any(substring in name for substring in ["GD32", "RISC"]):
             return compiler_list["RISCV"]
