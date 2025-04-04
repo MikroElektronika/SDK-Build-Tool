@@ -1,0 +1,5 @@
+if(${MCU_NAME} MATCHES "^R7FA6M3AH3CFC$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.c PARENT_SCOPE)
+    list(APPEND local_list_include system/src/renesas/r7fa6m3ah3cfc/init_clock.c)
+endif()
