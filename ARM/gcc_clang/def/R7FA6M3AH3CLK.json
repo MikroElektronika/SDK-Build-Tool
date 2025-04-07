@@ -3220,6 +3220,6 @@
     ],
     "core": "M4EF",
     "delay_src_path": "delays/m4ef/__lib_delays.c",
-    "mcu": "R7FA6M3AH3CFC",
+    "mcu": "R7FA6M3AH3CLK",
     "clock": "1"
 }
