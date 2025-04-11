@@ -16,9 +16,14 @@
 
 Support added for following hardware:
 
-+ MKW41Z MCU Support package for GCC & Clang
-  + MKW41Z256VHT4
-  + MKW41Z512CAT4
-  + MKW41Z512VHT4
++ MKL02Z MCU Support package for GCC & Clang
+  + MKL02Z16VFK4
+  + MKL02Z16VFG4
+  + MKL02Z16VFM4
+  + MKL02Z32VFG4
+  + MKL02Z32VFK4
+  + MKL02Z32CAF4
+  + MKL02Z32VFM4
+  + MKL02Z8VFG4
 
 ---
