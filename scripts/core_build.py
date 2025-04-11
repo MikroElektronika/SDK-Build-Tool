@@ -756,6 +756,7 @@ def main():
         input_directory = "./"
         output_dir = "./output/docs"
         output_file = os.path.join(output_dir, 'clocks.json')
+        output_file_uncompressed = os.path.join(output_dir, 'clocks_uncompressed.json')
         clocksGenerator = GenerateClocks(input_directory, output_file)
         clocksGenerator.generate()
 
@@ -765,6 +766,7 @@ def main():
             os.remove(clocks_path)
             shutil.copy(output_file, local_app_data_path)
             shutil.copy(output_file, testPath)
+            shutil.copy(output_file_uncompressed, testPath)
             print(f"\033[93mReplaced {clocks_path} with: {output_file}\033[0m")
         else:
             print(f"\033[91mFile not found: {clocks_path}\033[0m")
