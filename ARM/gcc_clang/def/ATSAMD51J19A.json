@@ -1,23 +1,7 @@
 {
-    "config_words": [
-        {
-            "init": "SET",
-            "key": "BOD33_DIS",
-            "label": "Short name for USER_WORD_0_BOD33_DIS",
-            "settings": [
-                {
-                    "label": "SET",
-                    "value": "SET"
-                },
-                {
-                    "label": "CLEAR",
-                    "value": "CLEAR"
-                }
-            ]
-        }
-    ],
     "mcu": "ATSAMD51J19A",
     "clock": "1",
     "core": "M4EF",
-    "delay_src_path": "delays/m4ef/__lib_delays.c"
+    "delay_src_path": "delays/m4ef/__lib_delays.c",
+    "config_registers": []
 }

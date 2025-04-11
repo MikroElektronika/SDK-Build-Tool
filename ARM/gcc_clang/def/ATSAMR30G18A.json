@@ -1,9 +1,7 @@
 {
-    "config_words": [
-        {}
-    ],
     "mcu": "ATSAMR30G18A",
     "clock": "1",
     "core": "M0+",
-    "delay_src_path": "delays/m0+/__lib_delays.c"
+    "delay_src_path": "delays/m0+/__lib_delays.c",
+    "config_registers": []
 }
