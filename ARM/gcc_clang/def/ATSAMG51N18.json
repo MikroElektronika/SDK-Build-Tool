@@ -1,0 +1,518 @@
+{
+    "config_words": [
+        {
+            "init": "SET",
+            "key": "SECURITY_BIT",
+            "label": "Short name for GPNVMBITS_SECURITY_BIT",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "BOOT_MODE",
+            "label": "Short name for GPNVMBITS_BOOT_MODE",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_0",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_0",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_1",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_1",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_2",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_2",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_3",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_3",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_4",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_4",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_5",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_5",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_6",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_6",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_7",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_7",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_8",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_8",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_9",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_9",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_10",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_10",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_11",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_11",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_12",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_12",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_13",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_13",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_14",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_14",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_15",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_15",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_16",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_16",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_17",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_17",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_18",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_18",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_19",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_19",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_20",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_20",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_21",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_21",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_22",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_22",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_23",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_23",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_24",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_24",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_25",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_25",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_26",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_26",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_27",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_27",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_28",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_28",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_29",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_29",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_30",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_30",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_31",
+            "label": "Short name for LOCKBIT_WORD0_LOCK_REGION_31",
+            "settings": [
+                {
+                    "label": "SET",
+                    "value": "SET"
+                },
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                }
+            ]
+        }
+    ],
+    "mcu": "ATSAMG51N18",
+    "clock": "1",
+    "core": "M4EF",
+    "delay_src_path": "delays/m4ef/__lib_delays.c"
+}

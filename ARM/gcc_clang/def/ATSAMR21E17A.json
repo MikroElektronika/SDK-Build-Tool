@@ -1,0 +1,86 @@
+{
+    "config_words": [
+        {
+            "init": "SIZE_0BYTES",
+            "key": "NVMCTRL_BOOTPROT",
+            "label": "Short name for USER_WORD_0_NVMCTRL_BOOTPROT",
+            "settings": [
+                {
+                    "label": "0 Bytes",
+                    "value": "SIZE_0BYTES"
+                },
+                {
+                    "label": "512 Bytes",
+                    "value": "SIZE_512BYTES"
+                },
+                {
+                    "label": "1024 Bytes",
+                    "value": "SIZE_1024BYTES"
+                },
+                {
+                    "label": "2048 Bytes",
+                    "value": "SIZE_2048BYTES"
+                },
+                {
+                    "label": "4096 Bytes",
+                    "value": "SIZE_4096BYTES"
+                },
+                {
+                    "label": "8192 Bytes",
+                    "value": "SIZE_8192BYTES"
+                },
+                {
+                    "label": "16384 Bytes",
+                    "value": "SIZE_16384BYTES"
+                },
+                {
+                    "label": "32768 Bytes",
+                    "value": "SIZE_32768BYTES"
+                }
+            ]
+        },
+        {
+            "init": "SIZE_0BYTES",
+            "key": "NVMCTRL_EEPROM_SIZE",
+            "label": "Short name for USER_WORD_0_NVMCTRL_EEPROM_SIZE",
+            "settings": [
+                {
+                    "label": "0 Bytes",
+                    "value": "SIZE_0BYTES"
+                },
+                {
+                    "label": "256 Bytes",
+                    "value": "SIZE_256BYTES"
+                },
+                {
+                    "label": "512 Bytes",
+                    "value": "SIZE_512BYTES"
+                },
+                {
+                    "label": "1024 Bytes",
+                    "value": "SIZE_1024BYTES"
+                },
+                {
+                    "label": "2048 Bytes",
+                    "value": "SIZE_2048BYTES"
+                },
+                {
+                    "label": "4096 Bytes",
+                    "value": "SIZE_4096BYTES"
+                },
+                {
+                    "label": "8192 Bytes",
+                    "value": "SIZE_8192BYTES"
+                },
+                {
+                    "label": "16384 Bytes",
+                    "value": "SIZE_16384BYTES"
+                }
+            ]
+        }
+    ],
+    "mcu": "ATSAMR21E17A",
+    "clock": "1",
+    "core": "M0+",
+    "delay_src_path": "delays/m0+/__lib_delays.c"
+}

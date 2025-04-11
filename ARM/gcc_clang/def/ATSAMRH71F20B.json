@@ -1,0 +1,503 @@
+{
+    "config_words": [
+        {
+            "init": "SWD",
+            "key": "DEBUG_INTF",
+            "label": "Debug interface Selection",
+            "settings": [
+                {
+                    "label": "JTAG",
+                    "value": "JTAG"
+                },
+                {
+                    "label": "SWD",
+                    "value": "SWD"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_0",
+            "label": "Lock Region 0",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_1",
+            "label": "Lock Region 1",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_2",
+            "label": "Lock Region 2",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_3",
+            "label": "Lock Region 3",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_4",
+            "label": "Lock Region 4",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_5",
+            "label": "Lock Region 5",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_6",
+            "label": "Lock Region 6",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_7",
+            "label": "Lock Region 7",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_8",
+            "label": "Lock Region 8",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_9",
+            "label": "Lock Region 9",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_10",
+            "label": "Lock Region 10",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_11",
+            "label": "Lock Region 11",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_12",
+            "label": "Lock Region 12",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_13",
+            "label": "Lock Region 13",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_14",
+            "label": "Lock Region 14",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_15",
+            "label": "Lock Region 15",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_16",
+            "label": "Lock Region 16",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_17",
+            "label": "Lock Region 17",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_18",
+            "label": "Lock Region 18",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_19",
+            "label": "Lock Region 19",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_20",
+            "label": "Lock Region 20",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_21",
+            "label": "Lock Region 21",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_22",
+            "label": "Lock Region 22",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_23",
+            "label": "Lock Region 23",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_24",
+            "label": "Lock Region 24",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_25",
+            "label": "Lock Region 25",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_26",
+            "label": "Lock Region 26",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_27",
+            "label": "Lock Region 27",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_28",
+            "label": "Lock Region 28",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_29",
+            "label": "Lock Region 29",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_30",
+            "label": "Lock Region 30",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        },
+        {
+            "init": "SET",
+            "key": "LOCK_REGION_31",
+            "label": "Lock Region 31",
+            "settings": [
+                {
+                    "label": "CLEAR",
+                    "value": "CLEAR"
+                },
+                {
+                    "label": "SET",
+                    "value": "SET"
+                }
+            ]
+        }
+    ],
+    "mcu": "ATSAMRH71F20B",
+    "clock": "1",
+    "core": "M7",
+    "delay_src_path": "delays/m7/__lib_delays.c"
+}

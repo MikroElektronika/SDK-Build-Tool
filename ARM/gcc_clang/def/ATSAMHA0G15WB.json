@@ -1,0 +1,86 @@
+{
+    "config_words": [
+        {
+            "init": "SIZE_0BYTES",
+            "key": "NVMCTRL_BOOTPROT",
+            "label": "Bootloader Size",
+            "settings": [
+                {
+                    "label": "32768 Bytes",
+                    "value": "SIZE_32768BYTES"
+                },
+                {
+                    "label": "16384 Bytes",
+                    "value": "SIZE_16384BYTES"
+                },
+                {
+                    "label": "8192 Bytes",
+                    "value": "SIZE_8192BYTES"
+                },
+                {
+                    "label": "4096 Bytes",
+                    "value": "SIZE_4096BYTES"
+                },
+                {
+                    "label": "2048 Bytes",
+                    "value": "SIZE_2048BYTES"
+                },
+                {
+                    "label": "1024 Bytes",
+                    "value": "SIZE_1024BYTES"
+                },
+                {
+                    "label": "512 Bytes",
+                    "value": "SIZE_512BYTES"
+                },
+                {
+                    "label": "0 Bytes",
+                    "value": "SIZE_0BYTES"
+                }
+            ]
+        },
+        {
+            "init": "SIZE_0BYTES",
+            "key": "NVMCTRL_EEPROM_SIZE",
+            "label": "EEPROM Size",
+            "settings": [
+                {
+                    "label": "16384 Bytes",
+                    "value": "SIZE_16384BYTES"
+                },
+                {
+                    "label": "8192 Bytes",
+                    "value": "SIZE_8192BYTES"
+                },
+                {
+                    "label": "4096 Bytes",
+                    "value": "SIZE_4096BYTES"
+                },
+                {
+                    "label": "2048 Bytes",
+                    "value": "SIZE_2048BYTES"
+                },
+                {
+                    "label": "1024 Bytes",
+                    "value": "SIZE_1024BYTES"
+                },
+                {
+                    "label": "512 Bytes",
+                    "value": "SIZE_512BYTES"
+                },
+                {
+                    "label": "256 Bytes",
+                    "value": "SIZE_256BYTES"
+                },
+                {
+                    "label": "0 Bytes",
+                    "value": "SIZE_0BYTES"
+                }
+            ]
+        }
+    ],
+    "mcu": "ATSAMHA0G15WB",
+    "clock": "1",
+    "core": "M0+",
+    "delay_src_path": "delays/m0+/__lib_delays.c"
+}
