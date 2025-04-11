@@ -163,7 +163,7 @@ extern uint32_t _dinit_addr;
 extern int main(int, char **);
 /** \endcond */
 
-extern void __attribute__((long_call)) __libc_init_array(void);
+//extern void __attribute__((long_call)) __libc_init_array(void);// Note: Changed for MikroE implementation.
 
 /* Default empty handler */
 void __attribute__((weak, used, optimize("-O1"), long_call, externally_visible)) Dummy_Handler(void);
@@ -773,7 +773,7 @@ Reset_Handler(void)
 #endif
  
     /* Initialize the C library */
-    __libc_init_array();
+//    __libc_init_array();// Note: Changed for MikroE implementation.
 
 //    /* Call the optional application-provided _on_bootstrap() function. */// Note: Changed for MikroE implementation.
 //    if (_on_bootstrap)// Note: Changed for MikroE implementation.
