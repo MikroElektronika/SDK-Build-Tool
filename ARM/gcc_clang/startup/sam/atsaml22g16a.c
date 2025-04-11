@@ -34,7 +34,7 @@
 #endif
 
 
-#include "mcu.h" // Note: Changed for MikroE implementation.
+#include "mcu.h" // Note: Added for MikroE implementation.
 
 extern void SystemInit(); // Note: Added for MikroE implementation.
 // Note: Changed for MikroE implementation.
@@ -198,12 +198,12 @@ const DeviceVectors exception_table=
 
  
 /* Optional application-provided functions */
-extern void __attribute__((weak,long_call)) _on_reset(void);
-extern void __attribute__((weak,long_call)) _on_bootstrap(void);
+//extern void __attribute__((weak,long_call)) _on_reset(void);// Note: Changed for MikroE implementation.
+//extern void __attribute__((weak,long_call)) _on_bootstrap(void);// Note: Changed for MikroE implementation.
 
 /* Reserved for use by the MPLAB XC32 Compiler */
-extern void __attribute__((weak,long_call)) __xc32_on_reset(void);
-extern void __attribute__((weak,long_call)) __xc32_on_bootstrap(void);
+//extern void __attribute__((weak,long_call)) __xc32_on_reset(void);// Note: Changed for MikroE implementation.
+//extern void __attribute__((weak,long_call)) __xc32_on_bootstrap(void);// Note: Changed for MikroE implementation.
 
 
 /**
@@ -233,13 +233,13 @@ Reset_Handler(void)
     __asm__ volatile ("add r7, sp, #0" : : : "r7");
 #endif
 
-    /* Call the optional application-provided _on_reset() function. */
-    if (_on_reset)
-      _on_reset();
+//    /* Call the optional application-provided _on_reset() function. */// Note: Changed for MikroE implementation.
+//    if (_on_reset)// Note: Changed for MikroE implementation.
+//      _on_reset();// Note: Changed for MikroE implementation.
 
     /* Reserved for use by MPLAB XC32. */
-    if (__xc32_on_reset)
-      __xc32_on_reset();
+//    if (__xc32_on_reset)// Note: Changed for MikroE implementation.
+//      __xc32_on_reset();// Note: Changed for MikroE implementation.
 
  
 
@@ -250,7 +250,7 @@ Reset_Handler(void)
 
 
     /* Data initialization from the XC32 .dinit template */
-    __pic32c_data_initialization();
+//    __pic32c_data_initialization();// Note: Changed for MikroE implementation.
  
 #ifdef SCB_VTOR_TBLOFF_Msk
     /*  Set the vector-table base address. This may be in flash or TCM.
@@ -263,13 +263,13 @@ Reset_Handler(void)
     /* Initialize the C library */
     __libc_init_array();
 
-    /* Call the optional application-provided _on_bootstrap() function. */
-    if (_on_bootstrap)
-      _on_bootstrap();
+//    /* Call the optional application-provided _on_bootstrap() function. */// Note: Changed for MikroE implementation.
+//    if (_on_bootstrap)// Note: Changed for MikroE implementation.
+//      _on_bootstrap();// Note: Changed for MikroE implementation.
 
     /* Reserved for use by MPLAB XC32. */
-    if (__xc32_on_bootstrap)
-      __xc32_on_bootstrap();
+//    if (__xc32_on_bootstrap)// Note: Changed for MikroE implementation.
+//      __xc32_on_bootstrap();// Note: Changed for MikroE implementation.
 
 	/* Initialize system clock settings */
 	SystemInit(); // Note: Added for MikroE implementation.

@@ -6,7 +6,7 @@
     "max_speed": "120.000",
     "name": "ATSAME53N20A",
     "ram": "262144",
-    "sdk_config": "{\"MCU_NAME\":\"ATSAME53N20A\",\"CORE_NAME\":\"M4\",\"_MSDK_HAL_LOW_LEVEL_TARGET_\":\"mikroe\",\"_MSDK_ETH_PHY_CHIP_\":\"NULL\"}",
+    "sdk_config": "{\"MCU_NAME\":\"ATSAME53N20A\",\"CORE_NAME\":\"M4EF\",\"_MSDK_HAL_LOW_LEVEL_TARGET_\":\"mikroe\",\"_MSDK_ETH_PHY_CHIP_\":\"NULL\"}",
     "necto_config": "",
     "uid": "ATSAME53N20A",
     "vendor": "Microchip",

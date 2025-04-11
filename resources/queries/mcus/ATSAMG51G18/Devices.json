@@ -6,7 +6,7 @@
     "max_speed": "48.000",
     "name": "ATSAMG51G18",
     "ram": "65536",
-    "sdk_config": "{\"MCU_NAME\":\"ATSAMG51G18\",\"CORE_NAME\":\"M4\",\"_MSDK_HAL_LOW_LEVEL_TARGET_\":\"mikroe\",\"_MSDK_ETH_PHY_CHIP_\":\"NULL\"}",
+    "sdk_config": "{\"MCU_NAME\":\"ATSAMG51G18\",\"CORE_NAME\":\"M4EF\",\"_MSDK_HAL_LOW_LEVEL_TARGET_\":\"mikroe\",\"_MSDK_ETH_PHY_CHIP_\":\"NULL\"}",
     "necto_config": "",
     "uid": "ATSAMG51G18",
     "vendor": "Microchip",
