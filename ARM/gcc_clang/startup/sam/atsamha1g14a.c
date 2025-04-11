@@ -394,7 +394,10 @@ Reset_Handler(void)
     if (__xc32_on_bootstrap)
       __xc32_on_bootstrap();
 
-    /* Branch to application's main function */
+	/* Initialize system clock settings */
+	SystemInit(); // Note: Added for MikroE implementation.
+
+	/* Branch to application's main function */
     main();
 
 #if (defined(__DEBUG) || defined(__DEBUG_D))
