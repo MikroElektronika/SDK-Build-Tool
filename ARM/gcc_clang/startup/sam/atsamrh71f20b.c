@@ -263,7 +263,8 @@ int main(void);
 void __attribute__((weak, used, optimize("-O1"), long_call, externally_visible)) Dummy_Handler(void);
 
 /* Reset handler and application-provided reset handler */
-void __attribute__((weak, optimize("-O1"), long_call, naked, externally_visible)) Reset_Handler(void);
+//void __attribute__((weak, optimize("-O1"), long_call, naked, externally_visible)) Reset_Handler(void); // NOTE: Changed for MikroE implementation.
+void __attribute__((weak, optimize("-O1"), long_call, used, externally_visible)) Reset_Handler(void);
 extern void __attribute__((weak, used, long_call)) __XC32_RESET_HANDLER_NAME(void);
 
 /* Cortex-M7 core handlers */
@@ -614,7 +615,8 @@ __always_inline __STATIC_INLINE void __attribute__((optimize("-O1"))) fpu_enable
  * To initialize the device, and call the main() routine.
  */
 void __attribute__((weak, optimize("-O1"), section(".text.Reset_Handler"), long_call,
-                    naked, externally_visible))
+//                    naked, externally_visible)) // NOTE: Changed for MikroE implementation.
+                    used, externally_visible))
 Reset_Handler(void)
 {
 #ifdef SCB_VTOR_TBLOFF_Msk
