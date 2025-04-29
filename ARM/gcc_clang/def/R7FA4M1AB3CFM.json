@@ -449,7 +449,7 @@
                 }
             ],
             "key": "SYSTEM_MEMWAIT",
-            "unused": "fe"
+            "unused": "000000fe"
         },
         {
             "address": "4001e032",
