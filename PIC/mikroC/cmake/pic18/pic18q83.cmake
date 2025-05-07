@@ -1,5 +1,5 @@
-if(${MCU_NAME} MATCHES "(^PIC18F57Q43$)")
-    set(SYSTEM_LIB_SOURCE "system/P18/src/__Lib_System_Q43.c")
+if(${MCU_NAME} MATCHES "(^PIC18F27Q83$|^PIC18F47Q83$|^PIC18F57Q83$)")
+    set(SYSTEM_LIB_SOURCE "system/P18/src/__Lib_System_Q83.c")
     set(SYSTEM_LIB_INCLUDE_DIR "")
     set(MATH_LIB_SOURCE "math/P18/__Lib_Math.c")
     set(MATH_DOUBLE_SOURCE "math_double/P18/__Lib_MathDouble.c")

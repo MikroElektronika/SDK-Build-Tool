@@ -1449,7 +1449,7 @@
             "name": "Low Priority Interrupt"
         }
     ],
-    "mcu": "PIC18F47Q43",
+    "mcu": "PIC18F57Q83",
     "prog_options": {
         "codegrip": {
             "debugging": "True",
