@@ -30,7 +30,7 @@ build_failed = False
 compiler_list = {
     'ARM': ['gcc_arm_none_eabi', 'clang-llvm'],
     'RISCV': ['xpack-riscv-none-embed-gcc', 'clang-llvm-riscv'],
-    'PIC': ['mchp_xc8'],
+    'PIC': ['mikrocpic'],
     'DSPIC': ['mchp_xc16'],
     'PIC32': ['mchp_xc32']
 }
@@ -786,7 +786,7 @@ def main():
     files = get_changed_files('main')
     archs = []
     architectures = ["ARM", "RISCV", "PIC32", "PIC", "dsPIC", "AVR"]
-    valid_entries = ["gcc_clang", "XC32", "XC16", "XC8"]
+    valid_entries = ["gcc_clang", "XC32", "XC16", "mikroC"]
     for file in files:
         for architecture in architectures:
             if architecture == file.split('/')[0] and architecture not in archs:
