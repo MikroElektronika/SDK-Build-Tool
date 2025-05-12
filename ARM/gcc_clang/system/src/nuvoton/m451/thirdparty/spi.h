@@ -15,7 +15,8 @@
 /*---------------------------------------------------------------------------------------------------------*/
 /* Include related headers                                                                                 */
 /*---------------------------------------------------------------------------------------------------------*/
-#include "M451Series.h"
+// #include "M451Series.h" // Note: Changed for MikroE implementation.
+#include "mcu.h" // Note: Added for MikroE implementation.
 
 #ifdef __cplusplus
 extern "C"
