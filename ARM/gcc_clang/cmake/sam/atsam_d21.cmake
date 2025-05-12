@@ -3,7 +3,7 @@ if(${MCU_NAME} MATCHES "^ATSAMD21E15A$|^ATSAMD21E16A$|^ATSAMD21E17A$|^ATSAMD21E1
     set(${startupFile} startup/${vendor}/${mcu_match}.c PARENT_SCOPE)
     list(APPEND local_list_include system/src/sam/atsam_d21/system_sam_d21.c)
     list(APPEND local_list_include common/syscalls.c)
-    list(APPEND local_dir_install system/src/sam/atsam_d21/thirdparty/atsamd21a )
+    list(APPEND local_dir_install system/src/sam/atsam_d21/thirdparty/atsamd21a)
     set(${thirdpartyInstall} atsam_d21/thirdparty/atsamd21a PARENT_SCOPE)
 endif()
 
