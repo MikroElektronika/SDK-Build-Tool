@@ -785,6 +785,31 @@
             "unused": "fffffffe"
         },
         {
+            "address": "4001e0a0",
+            "default": "00000000",
+            "fields": [
+                {
+                    "hidden": false,
+                    "init": "0",
+                    "key": "OPCM",
+                    "label": "Operating Power Control Mode Select",
+                    "mask": "3",
+                    "settings": [
+                        {
+                            "label": "High-speed mode",
+                            "value": "0"
+                        },
+                        {
+                            "label": "Low-speed mode",
+                            "value": "3"
+                        }
+                    ]
+                }
+            ],
+            "key": "SYSTEM_OPCCR",
+            "unused": "fffffffc"
+        },
+        {
             "address": "4001e0a2",
             "default": "00000005",
             "fields": [

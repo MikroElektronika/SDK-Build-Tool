@@ -862,6 +862,39 @@
             "unused": "ffffff08"
         },
         {
+            "address": "4001e0a0",
+            "default": "00000002",
+            "fields": [
+                {
+                    "hidden": false,
+                    "init": "0",
+                    "key": "OPCM",
+                    "label": "Operating Power Control Mode Select",
+                    "mask": "3",
+                    "settings": [
+                        {
+                            "label": "High-speed mode",
+                            "value": "0"
+                        },
+                        {
+                            "label": "Middle-speed mode",
+                            "value": "1"
+                        },
+                        {
+                            "label": "Low-voltage mode",
+                            "value": "2"
+                        },
+                        {
+                            "label": "Low-speed mode",
+                            "value": "3"
+                        }
+                    ]
+                }
+            ],
+            "key": "SYSTEM_OPCCR",
+            "unused": "fffffffc"
+        },
+        {
             "address": "4001e0d0",
             "default": "00000000",
             "fields": [
