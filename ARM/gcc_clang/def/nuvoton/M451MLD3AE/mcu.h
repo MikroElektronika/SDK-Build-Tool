@@ -138,8 +138,15 @@ typedef enum IRQn
 
 /*@}*/ /* end of group CMSIS */
 
-#include "core_cm4.h"                       /* Cortex-M4 processor and core peripherals           */
-#include "system_M451Series.h"              /* M451 System include file                           */
+// Note: Changed for MikroE implementation.
+// #include "core_cm4.h"                       /* Cortex-M4 processor and core peripherals           */
+// Note: Changed for MikroE implementation.
+// #include "system_M451Series.h"              /* M451 System include file                           */
+#include <stdint.h>
+
+#define __I volatile // Note: Added for MikroE implementation.
+#define __O __I // Note: Added for MikroE implementation.
+#define __IO __I // Note: Added for MikroE implementation.
 #include <stdint.h>
 
 
@@ -17199,30 +17206,54 @@ typedef struct
 #define NULL        0
 #endif
 
-#include "sys.h"
-#include "clk.h"
-#include "gpio.h"
-#include "i2c.h"
-#include "crc.h"
-#include "ebi.h"
-#include "rtc.h"
-#include "timer.h"
-#include "wdt.h"
-#include "wwdt.h"
-#include "spi.h"
-#include "sc.h"
-#include "scuart.h"
-#include "acmp.h"
-#include "eadc.h"
-#include "dac.h"
-#include "can.h"
-#include "usbd.h"
-#include "fmc.h"
-#include "uart.h"
-#include "pwm.h"
-#include "pdma.h"
-#include "tk.h"
-#include "otg.h"
+// Note: Changed for MikroE implementation.
+// #include "sys.h"
+// Note: Changed for MikroE implementation.
+// #include "clk.h"
+// Note: Changed for MikroE implementation.
+// #include "gpio.h"
+// Note: Changed for MikroE implementation.
+// #include "i2c.h"
+// Note: Changed for MikroE implementation.
+// #include "crc.h"
+// Note: Changed for MikroE implementation.
+// #include "ebi.h"
+// Note: Changed for MikroE implementation.
+// #include "rtc.h"
+// Note: Changed for MikroE implementation.
+// #include "timer.h"
+// Note: Changed for MikroE implementation.
+// #include "wdt.h"
+// Note: Changed for MikroE implementation.
+// #include "wwdt.h"
+// Note: Changed for MikroE implementation.
+// #include "spi.h"
+// Note: Changed for MikroE implementation.
+// #include "sc.h"
+// Note: Changed for MikroE implementation.
+// #include "scuart.h"
+// Note: Changed for MikroE implementation.
+// #include "acmp.h"
+// Note: Changed for MikroE implementation.
+// #include "eadc.h"
+// Note: Changed for MikroE implementation.
+// #include "dac.h"
+// Note: Changed for MikroE implementation.
+// #include "can.h"
+// Note: Changed for MikroE implementation.
+// #include "usbd.h"
+// Note: Changed for MikroE implementation.
+// #include "fmc.h"
+// Note: Changed for MikroE implementation.
+// #include "uart.h"
+// Note: Changed for MikroE implementation.
+// #include "pwm.h"
+// Note: Changed for MikroE implementation.
+// #include "pdma.h"
+// Note: Changed for MikroE implementation.
+// #include "tk.h"
+// Note: Changed for MikroE implementation.
+// #include "otg.h"
 
 typedef volatile unsigned char  vu8;
 typedef volatile unsigned long  vu32;
