@@ -16,8 +16,9 @@
 
 Support added for following hardware:
 
-+ ATSAMRH71 MCU Support package for GCC & Clang
-  + ATSAMRH71F20B
-  + ATSAMRH71F20C
++ MKW35A MCU Support package for GCC & Clang
+  + MKW35A512VFP4
+  + MKW35A512VFT4
+  + MKW35Z512VHT4
 
 ---
