@@ -82,14 +82,16 @@ endmacro()
 ## Function to deduce chip architecture from current MCU name and CORE
 #############################################################################
 function(find_chip_architecture _chip_architecture)
-    if((${MEMAKE_CORE_NAME} STREQUAL "M0") OR (${MEMAKE_CORE_NAME} STREQUAL "M3") OR
-        (${MEMAKE_CORE_NAME} STREQUAL "M4EF") OR (${MEMAKE_CORE_NAME} STREQUAL "M4DSP") OR
-        (${MEMAKE_CORE_NAME} STREQUAL "M7"))
+    if((${MEMAKE_CORE_NAME} STREQUAL "M0") OR (${MEMAKE_CORE_NAME} STREQUAL "M23") OR
+        (${MEMAKE_CORE_NAME} STREQUAL "M3") OR (${MEMAKE_CORE_NAME} STREQUAL "M4EF") OR
+        (${MEMAKE_CORE_NAME} STREQUAL "M4DSP") OR (${MEMAKE_CORE_NAME} STREQUAL "M7"))
         if(${MEMAKE_MCU_NAME} MATCHES "^STM.*")
             set(${_chip_architecture} "arm" PARENT_SCOPE)
         elseif(${MEMAKE_MCU_NAME} MATCHES "^MK.*")
             set(${_chip_architecture} "arm" PARENT_SCOPE)
         elseif(${MEMAKE_MCU_NAME} MATCHES "^TM4C.*")
+            set(${_chip_architecture} "arm" PARENT_SCOPE)
+        elseif(${MEMAKE_MCU_NAME} MATCHES "^M23.*")
             set(${_chip_architecture} "arm" PARENT_SCOPE)
         else()
             set(${_chip_architecture} "UNSUPPORTED_CHIP_SELECTED_FOR_FOLLOWING_IMPLEMENTATION" PARENT_SCOPE)
@@ -238,7 +240,7 @@ function(set_flags flags)
     elseif (${CORE_NAME} STREQUAL "M0+")
         set(${flags} -std=gnu99 -Wl,-Map=output.map,-gc-sections,--print-memory-usage -mcpu=cortex-m0plus -mthumb --specs=nosys.specs -ffunction-sections -fdata-sections -fno-common -fmessage-length=0 PARENT_SCOPE)
     elseif (${CORE_NAME} STREQUAL "M23")
-        set(${flags} -std=gnu99 -Wl,-Map=output.map,-gc-sections,--print-memory-usage -mcpu=cortex-m23 -mthumb --specs=nosys.specs -mfloat-abi=hard -mfpu=fpv5-sp-d16 -ffunction-sections -fdata-sections -fno-common -fmessage-length=0 -Wno-int-conversion -Wno-incompatible-function-pointer-types -Wno-implicit-function-declaration PARENT_SCOPE)
+        set(${flags} -std=gnu99 -Wl,-Map=output.map,-gc-sections,--print-memory-usage -mcpu=cortex-m23 -mthumb --specs=nosys.specs -mfloat-abi=soft -ffunction-sections -fdata-sections -fno-common -fmessage-length=0 -Wno-int-conversion -Wno-incompatible-function-pointer-types -Wno-implicit-function-declaration PARENT_SCOPE)
     elseif (${CORE_NAME} STREQUAL "M3")
         set(${flags} -std=gnu99 -Wl,-Map=output.map,-gc-sections,--print-memory-usage -mcpu=cortex-m3 -mthumb --specs=nosys.specs -ffunction-sections -fdata-sections -fno-common -fmessage-length=0 -Wno-int-conversion -Wno-incompatible-function-pointer-types -Wno-implicit-function-declaration PARENT_SCOPE)
     elseif (${CORE_NAME} STREQUAL "M33EF")
