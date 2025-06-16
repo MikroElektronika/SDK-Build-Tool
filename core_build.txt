@@ -11,7 +11,7 @@ stm32h563ag_i
 stm32h563ig_i
 stm32h563mi_rg
 stm32h563ri_vg
-stm32h563vi_zg_zi
+stm32h563vi_zg_z
 stm32h7b3ai_ii
 stm32h7b3li_ni
 stm32h7b3qi_zi
