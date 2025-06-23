@@ -1,0 +1,5 @@
+if(${MCU_NAME} MATCHES "^M2354KJFAE$|^M2354LJFAE$|^M2354SJFAE$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.S PARENT_SCOPE)
+    set(${thirdpartyInstall} m2354/thirdparty/m2354 PARENT_SCOPE)
+endif()
