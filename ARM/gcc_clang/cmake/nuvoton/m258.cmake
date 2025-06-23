@@ -1,0 +1,5 @@
+if(${MCU_NAME} MATCHES "^M258KE3AE$|^M258KG6AE$|^M258QE3AE$|^M258SE3AE$|^M258SG6AE$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.S PARENT_SCOPE)
+    set(${thirdpartyInstall} m258/thirdparty/m258 PARENT_SCOPE)
+endif()
