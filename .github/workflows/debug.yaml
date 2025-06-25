@@ -1,0 +1,19 @@
+name: Debug Secrets
+
+on:
+  workflow_dispatch:
+
+jobs:
+  show-secrets:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print all secrets
+        run: |
+          echo "PASSPORT_USERNAME=${{ secrets.PASSPORT_USERNAME }}"
+          echo "PASSPORT_PASSWORD=${{ secrets.PASSPORT_PASSWORD }}"
+          echo "PASSPORT_TOKEN_URL=${{ secrets.PASSPORT_TOKEN_URL }}"
+          echo "PD_SETUPS_API_URL=${{ secrets.PD_SETUPS_API_URL }}"
+          echo "PD_SETUPS_API_KEY=${{ secrets.PD_SETUPS_API_KEY }}"
+          echo "PD_SETUPS_USERNAME=${{ secrets.PD_SETUPS_USERNAME }}"
+          echo "PD_SETUPS_PASSWORD=${{ secrets.PD_SETUPS_PASSWORD }}"
