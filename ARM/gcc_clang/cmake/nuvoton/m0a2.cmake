@@ -1,0 +1,7 @@
+if(${MCU_NAME} MATCHES "^M0A21EB1AC$|^M0A21EC1AC$|^M0A21OB1AC$|^M0A21OC1AC$|^M0A23EC1AC$|^M0A23EC1ACU$|^M0A23OC1AC$|^M0A23OC1ACU$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.S PARENT_SCOPE)
+    list(APPEND local_list_include system/src/nuvoton/m0a2/system_m0a2.c)
+    list(APPEND local_dir_install system/src/nuvoton/m0a2/thirdparty/m0a2)
+    set(${thirdpartyInstall} m0a2/thirdparty/m0a2 PARENT_SCOPE)
+endif()
