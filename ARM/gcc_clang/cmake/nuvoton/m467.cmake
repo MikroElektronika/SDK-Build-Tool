@@ -1,0 +1,7 @@
+if(${MCU_NAME} MATCHES "^M467HJHAN$|^M467JJHAN$|^M467KJHAN$|^M467SJHAN$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.S PARENT_SCOPE)
+    list(APPEND local_list_include system/src/nuvoton/m467/system_m467.c)
+    list(APPEND local_dir_install system/src/nuvoton/m467/thirdparty/m467)
+    set(${thirdpartyInstall} m467/thirdparty/m467 PARENT_SCOPE)
+endif()
