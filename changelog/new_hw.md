@@ -1,0 +1,31 @@
+<p align="center">
+  <img src="http://www.mikroe.com/img/designs/beta/logo_small.png?raw=true" alt="MikroElektronika"/>
+</p>
+
+---
+
+# `DATE`
+
+## Changes
+
+- [`DATE`](#date)
+  - [Changes](#changes)
+    - [NEW HARDWARE](#new-hardware)
+
+### NEW HARDWARE
+
+Support added for following hardware:
+
++ NANO120 MCU Support package for GCC & Clang
+  + NANO120KD3BN
+  + NANO120KE3BN
+  + NANO120LC2BN
+  + NANO120LD2BN
+  + NANO120LD3BN
+  + NANO120LE3BN
+  + NANO120SC2BN
+  + NANO120SD2BN
+  + NANO120SD3BN
+  + NANO120SE3BN
+
+---
