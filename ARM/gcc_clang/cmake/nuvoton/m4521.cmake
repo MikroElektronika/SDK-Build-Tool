@@ -1,0 +1,7 @@
+if(${MCU_NAME} MATCHES "^M4521LE6AE$|^M4521SE6AE$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.S PARENT_SCOPE)
+    list(APPEND local_list_include system/src/nuvoton/m4521/system_m4521.c)
+    list(APPEND local_dir_install system/src/nuvoton/m4521/thirdparty/m4521)
+    set(${thirdpartyInstall} m4521/thirdparty/m4521 PARENT_SCOPE)
+endif()
