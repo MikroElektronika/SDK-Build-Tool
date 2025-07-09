@@ -1,0 +1,7 @@
+if(${MCU_NAME} MATCHES "^NUC126LE4AE$|^NUC126LG4AE$|^NUC126NE4AE$|^NUC126SE4AE$|^NUC126SG4AE$|^NUC126VG4AE$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.S PARENT_SCOPE)
+    list(APPEND local_list_include system/src/nuvoton/nuc126/system_nuc126.c)
+    list(APPEND local_dir_install system/src/nuvoton/nuc126/thirdparty/nuc126)
+    set(${thirdpartyInstall} nuc126/thirdparty/nuc126 PARENT_SCOPE)
+endif()
