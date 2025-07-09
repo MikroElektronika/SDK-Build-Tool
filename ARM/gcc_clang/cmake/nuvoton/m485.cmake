@@ -1,0 +1,7 @@
+if(${MCU_NAME} MATCHES "^M485KIDAE$|^M485LIDAE$|^M485SIDAE$|^M485YIDAE$|^M485ZIDAE$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.S PARENT_SCOPE)
+    list(APPEND local_list_include system/src/nuvoton/m485/system_m485.c)
+    list(APPEND local_dir_install system/src/nuvoton/m485/thirdparty/m485)
+    set(${thirdpartyInstall} m485/thirdparty/m485 PARENT_SCOPE)
+endif()
