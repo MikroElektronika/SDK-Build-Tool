@@ -1,0 +1,7 @@
+if(${MCU_NAME} MATCHES "^NANO112LB1AN$|^NANO112LC2AN$|^NANO112RB1AN$|^NANO112RC2AN$|^NANO112SB1AN$|^NANO112SC2AN$|^NANO112VC2AN$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.S PARENT_SCOPE)
+    list(APPEND local_list_include system/src/nuvoton/nano112/system_nano112.c)
+    list(APPEND local_dir_install system/src/nuvoton/nano112/thirdparty/nano112)
+    set(${thirdpartyInstall} nano112/thirdparty/nano112 PARENT_SCOPE)
+endif()
