@@ -1,0 +1,7 @@
+if(${MCU_NAME} MATCHES "^NUC029LEE$|^NUC029SEE$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.S PARENT_SCOPE)
+    list(APPEND local_list_include system/src/nuvoton/nuc029_ee/system_nuc029_ee.c)
+    list(APPEND local_dir_install system/src/nuvoton/nuc029_ee/thirdparty/nuc029_ee)
+    set(${thirdpartyInstall} nuc029_ee/thirdparty/nuc029_ee PARENT_SCOPE)
+endif()
