@@ -1,0 +1,7 @@
+if(${MCU_NAME} MATCHES "^NUC122LC1AN$|^NUC122LD2AN$|^NUC122SC1AN$|^NUC122SD2AN$|^NUC122ZC1AN$|^NUC122ZD2AN$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.S PARENT_SCOPE)
+    list(APPEND local_list_include system/src/nuvoton/nuc122/system_nuc122.c)
+    list(APPEND local_dir_install system/src/nuvoton/nuc122/thirdparty/nuc122)
+    set(${thirdpartyInstall} nuc122/thirdparty/nuc122 PARENT_SCOPE)
+endif()
