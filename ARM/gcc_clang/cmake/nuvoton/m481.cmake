@@ -1,0 +1,7 @@
+if(${MCU_NAME} MATCHES "^M481LE8AE$|^M481LGCAE$|^M481LIDAE$|^M481SE8AE$|^M481SGCAE$|^M481SGCAE2A$|^M481SIDAE$|^M481ZE8AE$|^M481ZGCAE$|^M481ZIDAE$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.S PARENT_SCOPE)
+    list(APPEND local_list_include system/src/nuvoton/m481/system_m481.c)
+    list(APPEND local_dir_install system/src/nuvoton/m481/thirdparty/m481)
+    set(${thirdpartyInstall} m481/thirdparty/m481 PARENT_SCOPE)
+endif()
