@@ -1,0 +1,31 @@
+<p align="center">
+  <img src="http://www.mikroe.com/img/designs/beta/logo_small.png?raw=true" alt="MikroElektronika"/>
+</p>
+
+---
+
+# `DATE`
+
+## Changes
+
+- [`DATE`](#date)
+  - [Changes](#changes)
+    - [NEW HARDWARE](#new-hardware)
+
+### NEW HARDWARE
+
+Support added for following hardware:
+
++ M453 MCU Support package for GCC & Clang
+  + M453LC3AE
+  + M453LD3AE
+  + M453LE6AE
+  + M453LG6AE
+  + M453RD3AE
+  + M453RE6AE
+  + M453RG6AE
+  + M453VD3AE
+  + M453VE6AE
+  + M453VG6AE
+
+---
