@@ -1,0 +1,7 @@
+if(${MCU_NAME} MATCHES "^M483KGCAE$|^M483KGCAE2A$|^M483KIDAE$|^M483SE8AE$|^M483SGCAE$|^M483SGCAE2A$|^M483SIDAE$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.S PARENT_SCOPE)
+    list(APPEND local_list_include system/src/nuvoton/m483/system_m483.c)
+    list(APPEND local_dir_install system/src/nuvoton/m483/thirdparty/m483)
+    set(${thirdpartyInstall} m483/thirdparty/m483 PARENT_SCOPE)
+endif()
