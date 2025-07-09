@@ -1,0 +1,7 @@
+if(${MCU_NAME} MATCHES "^M071MD2AE$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.S PARENT_SCOPE)
+    list(APPEND local_list_include system/src/nuvoton/m071m/system_m071m.c)
+    list(APPEND local_dir_install system/src/nuvoton/m071m/thirdparty/m071m)
+    set(${thirdpartyInstall} m071m/thirdparty/m071m PARENT_SCOPE)
+endif()
