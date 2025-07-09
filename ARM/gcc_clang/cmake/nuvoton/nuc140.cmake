@@ -1,0 +1,7 @@
+if(${MCU_NAME} MATCHES "^NUC140LC1CN$|^NUC140LD2CN$|^NUC140LE3CN$|^NUC140RC1CN$|^NUC140RD2CN$|^NUC140RE3CN$|^NUC140VE3CN$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.S PARENT_SCOPE)
+    list(APPEND local_list_include system/src/nuvoton/nuc140/system_nuc140.c)
+    list(APPEND local_dir_install system/src/nuvoton/nuc140/thirdparty/nuc140)
+    set(${thirdpartyInstall} nuc140/thirdparty/nuc140 PARENT_SCOPE)
+endif()
