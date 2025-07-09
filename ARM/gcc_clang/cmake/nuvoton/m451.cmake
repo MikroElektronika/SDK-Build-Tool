@@ -1,0 +1,7 @@
+if(${MCU_NAME} MATCHES "^M451LC3AE$|^M451LD3AE$|^M451LE6AE$|^M451LG6AE$|^M451MLC3AE$|^M451MLD3AE$|^M451MLE6AE$|^M451MLG6AE$|^M451MSC3AE$|^M451MSD3AE$|^M451RC3AE$|^M451RD3AE$|^M451RE6AE$|^M451RG6AE$|^M451VE6AE$|^M451VG6AE$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.S PARENT_SCOPE)
+    list(APPEND local_list_include system/src/nuvoton/m451/system_m451.c)
+    list(APPEND local_dir_install system/src/nuvoton/m451/thirdparty/m451)
+    set(${thirdpartyInstall} m451/thirdparty/m451 PARENT_SCOPE)
+endif()
