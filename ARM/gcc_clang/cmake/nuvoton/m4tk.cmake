@@ -1,0 +1,7 @@
+if(${MCU_NAME} MATCHES "^M4TKLE6AE$|^M4TKLG6AE$|^M4TKRE6AE$|^M4TKRG6AE$|^M4TKVE6AE$|^M4TKVG6AE$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.S PARENT_SCOPE)
+    list(APPEND local_list_include system/src/nuvoton/m4tk/system_m4tk.c)
+    list(APPEND local_dir_install system/src/nuvoton/m4tk/thirdparty/m4tk)
+    set(${thirdpartyInstall} m4tk/thirdparty/m4tk PARENT_SCOPE)
+endif()
