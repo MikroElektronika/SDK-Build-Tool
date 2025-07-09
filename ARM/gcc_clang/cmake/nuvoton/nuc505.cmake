@@ -1,0 +1,7 @@
+if(${MCU_NAME} MATCHES "^NUC505DL13Y$|^NUC505DLA$|^NUC505DS13Y$|^NUC505DSA$|^NUC505YLA$|^NUC505YLA2Y$|^NUC505YO13Y$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.S PARENT_SCOPE)
+    list(APPEND local_list_include system/src/nuvoton/nuc505/system_nuc505.c)
+    list(APPEND local_dir_install system/src/nuvoton/nuc505/thirdparty/nuc505)
+    set(${thirdpartyInstall} nuc505/thirdparty/nuc505 PARENT_SCOPE)
+endif()
