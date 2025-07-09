@@ -1,0 +1,7 @@
+if(${MCU_NAME} MATCHES "^NUC240LC2AE$|^NUC240LD2AE$|^NUC240LE3AE$|^NUC240SC2AE$|^NUC240SD2AE$|^NUC240SE3AE$|^NUC240VE3AE$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.S PARENT_SCOPE)
+    list(APPEND local_list_include system/src/nuvoton/nuc240/system_nuc240.c)
+    list(APPEND local_dir_install system/src/nuvoton/nuc240/thirdparty/nuc240)
+    set(${thirdpartyInstall} nuc240/thirdparty/nuc240 PARENT_SCOPE)
+endif()
