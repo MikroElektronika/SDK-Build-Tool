@@ -1,0 +1,7 @@
+if(${MCU_NAME} MATCHES "^NANO130KC2BN$|^NANO130KD2BN$|^NANO130KD3BN$|^NANO130KE3BN$|^NANO130SC2BN$|^NANO130SD2BN$|^NANO130SD3BN$|^NANO130SE3BN$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.S PARENT_SCOPE)
+    list(APPEND local_list_include system/src/nuvoton/nano130/system_nano130.c)
+    list(APPEND local_dir_install system/src/nuvoton/nano130/thirdparty/nano130)
+    set(${thirdpartyInstall} nano130/thirdparty/nano130 PARENT_SCOPE)
+endif()
