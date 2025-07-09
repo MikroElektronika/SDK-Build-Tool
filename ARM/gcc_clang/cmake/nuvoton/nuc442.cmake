@@ -1,0 +1,7 @@
+if(${MCU_NAME} MATCHES "^NUC442JG8AE$|^NUC442JI8AE$|^NUC442KG8AE$|^NUC442KI8AE$|^NUC442RG8AE$|^NUC442RI8AE$|^NUC442VG8AE$|^NUC442VI8AE$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.S PARENT_SCOPE)
+    list(APPEND local_list_include system/src/nuvoton/nuc442/system_nuc442.c)
+    list(APPEND local_dir_install system/src/nuvoton/nuc442/thirdparty/nuc442)
+    set(${thirdpartyInstall} nuc442/thirdparty/nuc442 PARENT_SCOPE)
+endif()
