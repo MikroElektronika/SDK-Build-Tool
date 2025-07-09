@@ -1,0 +1,7 @@
+if(${MCU_NAME} MATCHES "^MINI54FDE$|^MINI54LDE$|^MINI54TDE$|^MINI54ZDE$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.S PARENT_SCOPE)
+    list(APPEND local_list_include system/src/nuvoton/mini54/system_mini54.c)
+    list(APPEND local_dir_install system/src/nuvoton/mini54/thirdparty/mini54)
+    set(${thirdpartyInstall} mini54/thirdparty/mini54 PARENT_SCOPE)
+endif()
