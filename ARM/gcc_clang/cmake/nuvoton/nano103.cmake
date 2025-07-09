@@ -1,0 +1,7 @@
+if(${MCU_NAME} MATCHES "^NANO103LD3AE$|^NANO103SD3AE$|^NANO103ZD3AE$")
+    set(${linkerScript} linker_scripts/${vendor}/${mcu_match}.ld PARENT_SCOPE)
+    set(${startupFile} startup/${vendor}/${mcu_match}.S PARENT_SCOPE)
+    list(APPEND local_list_include system/src/nuvoton/nano103/system_nano103.c)
+    list(APPEND local_dir_install system/src/nuvoton/nano103/thirdparty/nano103)
+    set(${thirdpartyInstall} nano103/thirdparty/nano103 PARENT_SCOPE)
+endif()
