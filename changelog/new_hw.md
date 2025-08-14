@@ -1,0 +1,37 @@
+<p align="center">
+  <img src="http://www.mikroe.com/img/designs/beta/logo_small.png?raw=true" alt="MikroElektronika"/>
+</p>
+
+---
+
+# `DATE`
+
+## Changes
+
+- [`DATE`](#date)
+  - [Changes](#changes)
+    - [NEW HARDWARE](#new-hardware)
+
+### NEW HARDWARE
+
+Support added for following hardware:
+
++ XMC4500 MCU Support package for GCC & Clang
+  + XMC4500-E144F1024
+  + XMC4500-E144X1024
+  + XMC4500-F100F1024
+  + XMC4500-F100F768
+  + XMC4500-F100K1024
+  + XMC4500-F100K768
+  + XMC4500-F144F1024
+  + XMC4500-F144F768
+  + XMC4500-F144K1024
+  + XMC4500-F144K768
+  + XMC4502-F100F768
+  + XMC4502-F100K768
+  + XMC4504-F100F512
+  + XMC4504-F100K512
+  + XMC4504-F144F512
+  + XMC4504-F144K512
+
+---
