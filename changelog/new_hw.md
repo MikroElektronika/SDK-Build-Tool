@@ -1,0 +1,33 @@
+<p align="center">
+  <img src="http://www.mikroe.com/img/designs/beta/logo_small.png?raw=true" alt="MikroElektronika"/>
+</p>
+
+---
+
+# `DATE`
+
+## Changes
+
+- [`DATE`](#date)
+  - [Changes](#changes)
+    - [NEW HARDWARE](#new-hardware)
+
+### NEW HARDWARE
+
+Support added for following hardware:
+
++ XMC4800-F MCU Support package for GCC & Clang
+  + XMC4800-F100F1024
+  + XMC4800-F100F1536
+  + XMC4800-F100F2048
+  + XMC4800-F100K1024
+  + XMC4800-F100K1536
+  + XMC4800-F100K2048
+  + XMC4800-F144F1024
+  + XMC4800-F144F1536
+  + XMC4800-F144F2048
+  + XMC4800-F144K1024
+  + XMC4800-F144K1536
+  + XMC4800-F144K2048
+
+---
