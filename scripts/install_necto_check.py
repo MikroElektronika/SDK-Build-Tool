@@ -125,10 +125,10 @@ def main():
 
     # Step 4 - Run the NECTO installer.
     cmd = (
-        f'\'{installer['installer_path']}\' installer '
+        f'{installer['installer_path']} installer '
         f'--install-packages '
         f'necto_installer necto_application database clocks schemas mikroe_utils_common preinit unit_test_lib mikrosdk '
-        f'\'{installer['necto_path']}\' \'{installer['necto_path_app_data']}\''
+        f'{installer['necto_path']} {installer['necto_path_app_data']}'
     )
     run_command(cmd)
     print('\033[32mNECTO installation completed successfully.\033[32m')
