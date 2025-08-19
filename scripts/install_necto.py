@@ -28,10 +28,24 @@ elif sys.platform.startswith('darwin'):
 
 # Runs a shell command and prints the output.
 def run_command(command):
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    print(f"Running: {command}")
+    process = subprocess.Popen(
+        command,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True
+    )
+
+    # Print output line by line as it comes
     for line in process.stdout:
-        print(line.strip())
+        print(line, end="")
+
     process.wait()
+
+    if process.returncode != 0:
+        raise RuntimeError(f"Command failed with exit code {process.returncode}: {command}")
+
     return process.returncode
 
 def main():
@@ -56,40 +70,6 @@ def main():
 
     print("Step 3: Install NECTO")
     run_command(f'{installer_runner} installer --install-packages necto_installer necto_application database clocks schemas mikroe_utils_common preinit unit_test_lib mikrosdk {installer_handler['necto_path']} {installer_handler['necto_path_app_data']}')
-
-    print("Step 4: Move installer to root NECTO")
-    if os.path.isfile(f"{installer_handler['necto_path']}/installer_tmp"):
-        shutil.move(f"{installer_handler['necto_path']}/installer_tmp", f"{installer_handler['necto_path']}/installer")
-
-    print("Step 5: Move instance_uuid.txt to root NECTO")
-    if os.path.isfile(f"{installer_handler['root_path']}/instance_uuid.txt"):
-        shutil.move(f"{installer_handler['root_path']}/instance_uuid.txt", f"{installer_handler['necto_path']}/instance_uuid.txt")
-
-    print("Step 6: Read hash from instance_uuid.txt")
-    with open(f"{installer_handler['necto_path']}/instance_uuid.txt", "r") as f:
-        line = f.readline().strip()
-
-    print("Step 7: Copy NECTOStudio.conf to current directory")
-    shutil.copy(f"{installer_handler['root_path']}/.config/MikroElektronika/NECTOStudio.conf", f"{installer_handler['root_path']}/NECTOStudio.conf")
-
-    print("Step 8: Add the read hash to it")
-    with open(f"{installer_handler['root_path']}/NECTOStudio.conf", "r+") as f:
-        content = f.read()
-        f.seek(0, 0)
-        f.write(f"[{line}]\n" + content)
-
-    print("Step 9: Copy it back to .config/MikroElektronika")
-    shutil.copy(f"{installer_handler['root_path']}/NECTOStudio.conf", f"{installer_handler['root_path']}/.config/MikroElektronika/NECTOStudio.conf")
-
-    print("Step 10: Move installed_packages.json to NECTO root")
-    if os.path.isfile(f"{installer_handler['root_path']}/installed_packages.json"):
-        shutil.move(f"{installer_handler['root_path']}/installed_packages.json", f"{installer_handler['necto_path']}/MikroElektronika/installed_packages.json")
-
-    print("Step 11: Remove NECTOInstaller.zip")
-    os.remove(f"{installer_handler['root_path']}/NECTOInstaller.zip")
-
-    print("Step 12: Remove NECTOStudio.conf")
-    os.remove(f"{installer_handler['root_path']}/NECTOStudio.conf")
 
 if __name__ == "__main__":
     main()
