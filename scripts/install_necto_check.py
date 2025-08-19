@@ -50,12 +50,17 @@ def parse_and_print_progress(line):
         return
 
     obj = json.loads(line)
-    if obj.get("method") == "install_progress":
-        params = obj.get("params", {})
-        pkg = params.get("package")
-        prog = params.get("progress")
-        if pkg is not None and prog is not None:
-            print(f"[{pkg}] progress: {prog}%")
+    try:
+        obj = json.loads(line)
+        if obj.get("method") == "install_progress":
+            params = obj.get("params", {})
+            pkg = params.get("package")
+            prog = params.get("progress")
+            if pkg is not None and prog is not None:
+                print(f"[{pkg}] progress: {prog}%")
+    except json.JSONDecodeError:
+        # Not a JSON line, just print raw
+        print(line.strip())
 
 def run_command(cmd):
     print(f"\033[36mRunning: {cmd}\033[36m")
