@@ -77,9 +77,9 @@ def parse_and_print_progress(line):
             params = obj.get('params', {})
             pkg = params.get('package')
             prog = params.get('progress')
-            if pkg is not None and prog is not None and previous_prog != int(prog):
-                previous_prog = int(prog)
-                if prog == '100':
+            if pkg is not None and prog is not None and previous_prog != prog:
+                previous_prog = prog
+                if prog == 100:
                     print(f'\033[32m[{pkg}] progress: {prog}%\033[32m')
                     package_installation_validation[pkg] = True
     except json.JSONDecodeError:
