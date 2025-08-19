@@ -67,7 +67,7 @@ def run_command(cmd):
         text=True
     )
     for line in proc.stdout:
-        print(line, end="")
+        parse_and_print_progress(line)
     proc.wait()
     if proc.returncode != 0:
         raise RuntimeError(f"\033[31mCommand failed with exit code {proc.returncode}: {cmd}.\033[31m")
