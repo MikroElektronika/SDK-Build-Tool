@@ -72,27 +72,11 @@ def make_executable(path: str):
         print(f"Warning: chmod +x failed for {path}: {e}")
 
 def download(url, dest):
-    # Download NECTO installer archive/disk image.
-    print(f'\033[34mDownloading {installer['operating_system']} NECTO Installer\033[34m')
-    os.makedirs(os.path.dirname(dest), exist_ok=True)
 
-    # Check if it is downloaded.
-    downloaded_location, _ = urllib.request.urlretrieve(url, dest)
-    if not os.path.exists(downloaded_location):
-        raise FileNotFoundError(f'\033[31mDownload failed: {downloaded_location} does not exist\033[31m')
-    print(f'\033[32mNECTO installer is downloaded successfully: {downloaded_location}\033[32m ({os.path.getsize(downloaded_location)} bytes)')
     return downloaded_location
 
 def extract_zip(zip_path, target_dir):
-    # Extract zip archive.
-    import zipfile
-    print(f"Extracting ZIP: {zip_path} -> {target_dir}")
-    with zipfile.ZipFile(zip_path, "r") as z:
-        z.extractall(target_dir)
 
-    # Locate runner
-    if not installer['installer_path']:
-        raise FileNotFoundError(f"\033[31mCould not locate NECTO installer binary after extracting {zip_path}\033[31m")
 
 def find_file_by_prefix(root: str, prefix: str) -> Optional[str]:
     for dirpath, _, files in os.walk(root):
@@ -178,15 +162,30 @@ def main():
     # NECTO installer archive/disk image path.
     archive_path = os.path.join(root, installer["archive_name"])
 
-    # Download installer archive/image.
-    download(installer["necto_link"], archive_path)
+    # Download NECTO installer archive/disk image.
+    print(f'\033[34mDownloading {installer['operating_system']} NECTO Installer\033[34m')
+    os.makedirs(os.path.dirname(archive_path), exist_ok=True)
+
+    # Check if it is downloaded.
+    downloaded_location, _ = urllib.request.urlretrieve(installer["necto_link"], archive_path)
+    if not os.path.exists(downloaded_location):
+        raise FileNotFoundError(f'\033[31mDownload failed: {downloaded_location} does not exist\033[31m')
+    print(f'\033[32mNECTO installer is downloaded successfully: {downloaded_location}\033[32m ({os.path.getsize(downloaded_location)} bytes)')
 
     # Windows/Linux option.
     if use_zip:
-        extract_zip(archive_path, root)
+        # Extract zip archive.
+        import zipfile
+        print(f"Extracting ZIP: {archive_path} -> {root}")
+        with zipfile.ZipFile(archive_path, "r") as z:
+            z.extractall(root)
 
-        if not sys.platform.startswith("win"):
-            make_executable(installer['installer_path'])
+        # Locate runner
+        if not installer['installer_path']:
+            raise FileNotFoundError(f"\033[31mCould not locate NECTO installer binary after extracting {archive_path}\033[31m")
+
+        # if not sys.platform.startswith("win"):
+            # make_executable(installer['installer_path'])
 
         cmd = (
             f"\"{installer['installer_path']}\" installer "
@@ -202,7 +201,7 @@ def main():
         # macOS DMG flow
         mount_point = "/Volumes/NECTOInstaller"
         print(f"Mounting DMG: {archive_path}")
-        mount_dmg(archive_path, mount_point)
+        run_command(f"hdiutil attach '{archive_path}' -mountpoint '{mount_point}' -nobrowse -quiet")
 
         app_path = '/Volumes/NECTOInstaller/NECTO Installer.app'
 
@@ -212,7 +211,7 @@ def main():
         run_command(f"cp -R '{app_path}' '{dest_app}'")
 
         # Find a runnable inside the copied app and run it
-        make_executable(installer['installer_path'])
+        # make_executable(installer['installer_path'])
 
         cmd = (
             f"\"{installer['installer_path']}\" installer "
