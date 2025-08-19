@@ -37,6 +37,30 @@ elif sys.platform.startswith('darwin'):
         'installer_path':       '/Users/runner/NECTO Installer.app/Contents/MacOS/installer'
     }
 
+# Dictionary for checking if all the packages were installed.
+package_installation_validation = {
+    'clang_format': False,
+    'clangd': False,
+    'cmake': False,
+    'codegrip_gdb_server': False,
+    'database': False,
+    'images': False,
+    'images_sdk': False,
+    'mikroe_utils_common': False,
+    'mikrosdk': False,
+    'necto_application': False,
+    'necto_config': False,
+    'necto_data': False,
+    'necto_installer': False,
+    'preinit': False,
+    'srecord': False,
+    'tabnine': False,
+    'templates': False,
+    'unit_test_lib': False,
+    'clocks': False,
+    'schemas': False
+}
+
 # Counter for main NECTO packages installation.
 previous_prog = 101
 
@@ -55,10 +79,9 @@ def parse_and_print_progress(line):
             prog = params.get('progress')
             if pkg is not None and prog is not None and previous_prog != int(prog):
                 previous_prog = int(prog)
-                if prog != '100':
-                    print(f'[{pkg}] progress: {prog}%')
-                else:
+                if prog == '100':
                     print(f'\033[32m[{pkg}] progress: {prog}%\033[32m')
+                    package_installation_validation[pkg] = True
     except json.JSONDecodeError:
         # Not a JSON line, just print raw.
         print(line.strip())
@@ -133,6 +156,8 @@ def main():
     print('\n\nRunning NECTO installation command.\n')
     run_command(cmd)
     print('\033[32mNECTO installation completed successfully.\033[32m')
+
+    print(package_installation_validation)
 
 if __name__ == '__main__':
     main()
