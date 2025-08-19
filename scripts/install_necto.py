@@ -1,7 +1,27 @@
-import os
-import shutil
-import subprocess
-import urllib.request
+import subprocess, os, sys, shutil, urllib.request
+
+if sys.platform.startswith('win'):
+    import zipfile
+    installer_handler = {
+        'root_path': 'C:runner',
+        'necto_path': 'C:runner/MikroElektronika',
+        'necto_path_app_data': 'C:runner/appdata/NECTOStudio7',
+        'necto_link': 'https://software-update.mikroe.com/NECTOStudio7/live/necto/win/NECTOInstaller.zip'
+    }
+elif sys.platform.startswith('linux'):
+    installer_handler = {
+        'root_path': '/home/runner',
+        'necto_path': '/home/runner/MikroElektronika',
+        'necto_path_app_data': '/home/runner/.MIKROE/NECTOStudio7',
+        'necto_link': 'https://software-update.mikroe.com/NECTOStudio7/live/necto/linux/NECTOInstaller.zip'
+    }
+elif sys.platform.startswith('darwin'):
+    installer_handler = {
+        'root_path': '/home/runner',
+        'necto_path': '/home/runner/MikroElektronika',
+        'necto_path_app_data': '/home/runner/.MIKROE/NECTOStudio7',
+        'necto_link': 'https://software-update.mikroe.com/NECTOStudio7/live/necto/macos/NECTOInstaller.dmg'
+    }
 
 # Runs a shell command and prints the output.
 def run_command(command):
@@ -12,71 +32,57 @@ def run_command(command):
     return process.returncode
 
 def main():
-    original_working_dir = os.getcwd()
-    print(f"Original working directory: {original_working_dir}")
+    print("Step 1: Download installer")
+    installer_zip = os.path.join(installer_handler['root_path'], 'NECTOInstaller.zip')
 
-    os.chdir('/home/runner/')
-    print(f"Script executed from: {os.getcwd()}")
-    print("Current folder contents")
-    for file in os.listdir(os.getcwd()):
-        print(file)
+    print("Downloading Live NECTOInstaller")
 
-    url = os.getenv('NECTO_DOWNLOAD_URL')
-    if 'live' in url:
-        print("Step 1: Downloading Live NECTOStudio version")
+    installer_runner = os.path.join(installer_handler['root_path'], 'NECTOInstaller.exe')
+    urllib.request.urlretrieve(installer_handler['necto_link'], installer_zip)
+
+    print("Step 2. Extract Windows NECTOInstaller")
+    if sys.platform.startswith('win'):
+        with zipfile.ZipFile(installer_zip, 'r') as zip_ref:
+            zip_ref.extractall(installer_handler['root_path'])
     else:
-        print("Step 1: Downloading Development NECTOStudio version")
-    urllib.request.urlretrieve(url, "NECTOInstaller.zip")
-
-    print("Step 2: Extract installer")
-    run_command("7za x NECTOInstaller.zip")
+        run_command(f"7za x {installer_zip} -o{installer_handler['root_path']}")
 
     print("Step 3: Install NECTO")
-    run_command("./NECTOInstaller installer --install-packages necto_installer necto_application database clocks schemas mikroe_utils_common preinit unit_test_lib mikrosdk /home/runner/MikroElektronika /home/runner/.MIKROE/NECTOStudio7_Development > /dev/null 2>&1")
+    run_command(f'{installer_runner} installer --install-packages necto_installer necto_application database clocks schemas mikroe_utils_common preinit unit_test_lib mikrosdk {installer_handler['necto_path']} {installer_handler['necto_path_app_data']}')
 
-    print("Step 4: Move installer to MIKROE if it's generated in root")
-    if os.path.isfile("/home/runner/MikroElektronika/installer_tmp"):
-        shutil.move("/home/runner/MikroElektronika/installer_tmp", "/home/runner/MikroElektronika/installer")
+    print("Step 4: Move installer to root NECTO")
+    if os.path.isfile(f"{installer_handler['necto_path']}/installer_tmp"):
+        shutil.move(f"{installer_handler['necto_path']}/installer_tmp", f"{installer_handler['necto_path']}/installer")
 
-    print("Step 5: Move instance_uuid.txt to MIKROE if it's generated in root")
-    if os.path.isfile("/home/runner/instance_uuid.txt"):
-        shutil.move("/home/runner/instance_uuid.txt", "/home/runner/MikroElektronika/instance_uuid.txt")
+    print("Step 5: Move instance_uuid.txt to root NECTO")
+    if os.path.isfile(f"{installer_handler['root_path']}/instance_uuid.txt"):
+        shutil.move(f"{installer_handler['root_path']}/instance_uuid.txt", f"{installer_handler['necto_path']}/instance_uuid.txt")
 
     print("Step 6: Read hash from instance_uuid.txt")
-    with open("/home/runner/MikroElektronika/instance_uuid.txt", "r") as f:
+    with open(f"{installer_handler['necto_path']}/instance_uuid.txt", "r") as f:
         line = f.readline().strip()
 
     print("Step 7: Copy NECTOStudio.conf to current directory")
-    shutil.copy("/home/runner/.config/MikroElektronika/NECTOStudio.conf", "/home/runner/NECTOStudio.conf")
+    shutil.copy(f"{installer_handler['root_path']}/.config/MikroElektronika/NECTOStudio.conf", f"{installer_handler['root_path']}/NECTOStudio.conf")
 
     print("Step 8: Add the read hash to it")
-    with open("/home/runner/NECTOStudio.conf", "r+") as f:
+    with open(f"{installer_handler['root_path']}/NECTOStudio.conf", "r+") as f:
         content = f.read()
         f.seek(0, 0)
         f.write(f"[{line}]\n" + content)
 
     print("Step 9: Copy it back to .config/MikroElektronika")
-    shutil.copy("/home/runner/NECTOStudio.conf", "/home/runner/.config/MikroElektronika/NECTOStudio.conf")
+    shutil.copy(f"{installer_handler['root_path']}/NECTOStudio.conf", f"{installer_handler['root_path']}/.config/MikroElektronika/NECTOStudio.conf")
 
-    print("Step 10: Move installed_packages.json to MIKROE if it's generated in root")
-    if os.path.isfile("/home/runner/installed_packages.json"):
-        shutil.move("/home/runner/installed_packages.json", "/home/runner/MikroElektronika/installed_packages.json")
+    print("Step 10: Move installed_packages.json to NECTO root")
+    if os.path.isfile(f"{installer_handler['root_path']}/installed_packages.json"):
+        shutil.move(f"{installer_handler['root_path']}/installed_packages.json", f"{installer_handler['necto_path']}/MikroElektronika/installed_packages.json")
 
     print("Step 11: Remove NECTOInstaller.zip")
-    os.remove("/home/runner/NECTOInstaller.zip")
+    os.remove(f"{installer_handler['root_path']}/NECTOInstaller.zip")
 
-    print("Step 12: Remove NECTOInstaller")
-    os.remove("/home/runner/NECTOInstaller")
-
-    print("Step 13: Remove NECTOStudio.conf")
-    os.remove("/home/runner/NECTOStudio.conf")
-
-    print("Current folder contents")
-    for file in os.listdir(os.getcwd()):
-        print(file)
-
-    os.chdir(original_working_dir)
-    print(f"Returned to original working directory: {os.getcwd()}")
+    print("Step 12: Remove NECTOStudio.conf")
+    os.remove(f"{installer_handler['root_path']}/NECTOStudio.conf")
 
 if __name__ == "__main__":
     main()
