@@ -49,7 +49,6 @@ def parse_and_print_progress(line):
     if not line.strip() or line.startswith("Content-Length:"):
         return
 
-    obj = json.loads(line)
     try:
         obj = json.loads(line)
         if obj.get("method") == "install_progress":
