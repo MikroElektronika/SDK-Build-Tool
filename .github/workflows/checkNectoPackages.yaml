@@ -47,7 +47,7 @@ jobs:
 
       - name: Verify NECTO installation
         run: |
-          python -u scripts/install_necto.py ${{ matrix.os }}
+          python -u scripts/install_necto_check.py ${{ matrix.os }}
 
   # Verify packages (runs in parallel after build passes)
 #   packages_verification:
