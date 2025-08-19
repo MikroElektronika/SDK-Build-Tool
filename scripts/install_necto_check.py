@@ -43,6 +43,8 @@ elif sys.platform.startswith("darwin"):
     }
     use_zip = False
 
+previous_prog = -1
+
 def parse_and_print_progress(line):
     # Ignore empty lines and Content-Length headers
     if not line.strip() or line.startswith("Content-Length:"):
@@ -54,8 +56,12 @@ def parse_and_print_progress(line):
             params = obj.get("params", {})
             pkg = params.get("package")
             prog = params.get("progress")
-            if pkg is not None and prog is not None:
-                print(f"[{pkg}] progress: {prog}%")
+            if pkg is not None and prog is not None and previous_prog != prog:
+                previous_prog = prog
+                if prog != '100':
+                    print(f"[{pkg}] progress: {prog}%")
+                else:
+                    print(f"\033[32m[{pkg}] progress: {prog}%\033[32m")
     except json.JSONDecodeError:
         # Not a JSON line, just print raw
         print(line.strip())
