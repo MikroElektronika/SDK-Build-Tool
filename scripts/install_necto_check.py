@@ -4,6 +4,7 @@ import sys
 import stat
 import subprocess
 import urllib.request
+from typing import Optional, Tuple
 
 # -----------------------------
 # Platform-specific parameters
@@ -15,8 +16,7 @@ if sys.platform.startswith("win"):
         "necto_path_app_data": r"C:\Users\runner\AppData\Local\NECTOStudio7",
         "necto_link": "https://software-update.mikroe.com/NECTOStudio7/live/necto/win/NECTOInstaller.zip",
         "archive_name": "NECTOInstaller.zip",
-        # We'll discover the exact runner after extraction
-        "runner_hint": "NECTOInstaller",  # base prefix to look for
+        "runner_hint": "NECTOInstaller",
     }
     use_zip = True
 elif sys.platform.startswith("linux"):
@@ -42,11 +42,10 @@ elif sys.platform.startswith("darwin"):
 else:
     raise RuntimeError(f"Unsupported platform: {sys.platform}")
 
-
 # -----------------------------
 # Utilities
 # -----------------------------
-def run_command(cmd: str) -> int:
+def run_command(cmd: str, env: Optional[dict] = None) -> int:
     """Run shell command, stream stdout+stderr live, fail on nonzero exit."""
     print(f"Running: {cmd}")
     proc = subprocess.Popen(
@@ -55,7 +54,7 @@ def run_command(cmd: str) -> int:
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
-        env={**os.environ},  # inherit env; override if needed
+        env=(env or os.environ),
     )
     for line in proc.stdout:
         print(line, end="")
@@ -64,14 +63,12 @@ def run_command(cmd: str) -> int:
         raise RuntimeError(f"Command failed with exit code {proc.returncode}: {cmd}")
     return proc.returncode
 
-
 def make_executable(path: str):
     try:
         mode = os.stat(path).st_mode
         os.chmod(path, mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
     except Exception as e:
         print(f"Warning: chmod +x failed for {path}: {e}")
-
 
 def download(url: str, dest: str) -> str:
     print(f"Downloading: {url}\n  -> {dest}")
@@ -82,32 +79,26 @@ def download(url: str, dest: str) -> str:
     print(f"Downloaded file: {saved} ({os.path.getsize(saved)} bytes)")
     return saved
 
-
 def extract_zip(zip_path: str, target_dir: str):
     import zipfile
     print(f"Extracting ZIP: {zip_path} -> {target_dir}")
     with zipfile.ZipFile(zip_path, "r") as z:
         z.extractall(target_dir)
 
-
-def find_file_by_prefix(root: str, prefix: str) -> str | None:
-    """Find first file starting with prefix (case-sensitive) anywhere under root."""
+def find_file_by_prefix(root: str, prefix: str) -> Optional[str]:
     for dirpath, _, files in os.walk(root):
         for f in files:
             if f.startswith(prefix):
                 return os.path.join(dirpath, f)
     return None
 
-
-def find_any_installer(root: str) -> str | None:
-    """Fallback: find any likely runner containing 'NECTO' in name."""
+def find_any_installer(root: str) -> Optional[str]:
     for dirpath, _, files in os.walk(root):
         for f in files:
             name = f.lower()
-            if ("necto" in name) and (name.endswith(".exe") or not sys.platform.startswith("win")):
+            if "necto" in name:
                 return os.path.join(dirpath, f)
     return None
-
 
 # -----------------------------
 # macOS DMG handling
@@ -115,48 +106,62 @@ def find_any_installer(root: str) -> str | None:
 def mount_dmg(dmg_path: str, mount_point: str) -> None:
     run_command(f"hdiutil attach '{dmg_path}' -mountpoint '{mount_point}' -nobrowse -quiet")
 
-
 def unmount_dmg(mount_point: str) -> None:
-    # Try a polite detach first; if busy, try forcing (helps in CI sometimes)
     try:
         run_command(f"hdiutil detach '{mount_point}' -quiet")
     except RuntimeError:
         run_command(f"hdiutil detach '{mount_point}' -force -quiet")
 
-
-def find_runner_in_mounted_dmg(mount_point: str) -> tuple[str, str]:
+def find_pkg_or_app(mount_point: str) -> Tuple[Optional[str], Optional[str]]:
     """
-    Return (kind, path):
-      kind = 'pkg'  -> system installer package
-      kind = 'app'  -> runnable binary inside .app/Contents/MacOS
+    Returns (pkg_path, app_path) where either can be None.
     """
-    pkg_candidates = []
-    app_candidates = []
-
+    pkg_path = None
+    app_path = None
     for root, dirs, files in os.walk(mount_point):
         for f in files:
-            if f.lower().endswith(".pkg"):
-                pkg_candidates.append(os.path.join(root, f))
+            if f.lower().endswith(".pkg") and pkg_path is None:
+                pkg_path = os.path.join(root, f)
         for d in dirs:
-            if d.lower().endswith(".app"):
-                app_candidates.append(os.path.join(root, d))
+            if d.lower().endswith(".app") and app_path is None:
+                app_path = os.path.join(root, d)
+    return pkg_path, app_path
 
-    if pkg_candidates:
-        print(f"Found PKG: {pkg_candidates[0]}")
-        return ("pkg", pkg_candidates[0])
+def pick_app_runner(app_path: str) -> str:
+    """
+    Pick a runnable binary inside .app/Contents/MacOS.
+    Prefer names containing 'NECTO' or 'Installer', else largest executable.
+    """
+    macos_dir = os.path.join(app_path, "Contents", "MacOS")
+    if not os.path.isdir(macos_dir):
+        raise FileNotFoundError(f"{macos_dir} not found inside app")
 
-    if app_candidates:
-        app_path = app_candidates[0]
-        macos_dir = os.path.join(app_path, "Contents", "MacOS")
-        if os.path.isdir(macos_dir):
-            for f in os.listdir(macos_dir):
-                candidate = os.path.join(macos_dir, f)
-                if os.path.isfile(candidate) and os.access(candidate, os.X_OK):
-                    print(f"Found app runner: {candidate}")
-                    return ("app", candidate)
+    candidates = []
+    for f in os.listdir(macos_dir):
+        p = os.path.join(macos_dir, f)
+        if os.path.isfile(p) and os.access(p, os.X_OK):
+            candidates.append(p)
 
-    raise FileNotFoundError("No .pkg or runnable .app found inside DMG")
+    if not candidates:
+        # Some apps ship non-exec files; make all +x and retry
+        for f in os.listdir(macos_dir):
+            p = os.path.join(macos_dir, f)
+            if os.path.isfile(p):
+                make_executable(p)
+        candidates = [os.path.join(macos_dir, f) for f in os.listdir(macos_dir)
+                      if os.path.isfile(os.path.join(macos_dir, f)) and os.access(os.path.join(macos_dir, f), os.X_OK)]
 
+    if not candidates:
+        raise FileNotFoundError("No executable found in Contents/MacOS")
+
+    # Prefer sensible names
+    pref = [p for p in candidates if ("necto" in os.path.basename(p).lower() or "installer" in os.path.basename(p).lower())]
+    if pref:
+        return pref[0]
+
+    # Fallback: pick largest
+    candidates.sort(key=lambda p: os.path.getsize(p), reverse=True)
+    return candidates[0]
 
 # -----------------------------
 # Main
@@ -171,58 +176,62 @@ def main():
     download(installer["necto_link"], archive_path)
 
     # 2) Extract or Mount & locate runner
-    runner_path = None
-
     if use_zip:
+        # Windows / Linux
         extract_zip(archive_path, root)
-        # Try to find an installer binary
-        # Prefer exact prefix, then fallback
-        runner_path = find_file_by_prefix(root, installer["runner_hint"])
-        if not runner_path:
-            runner_path = find_any_installer(root)
+
+        # Locate runner
+        runner_path = find_file_by_prefix(root, installer["runner_hint"]) or find_any_installer(root)
         if not runner_path:
             raise FileNotFoundError(f"Could not locate NECTO installer binary after extracting {archive_path}")
 
         if not sys.platform.startswith("win"):
             make_executable(runner_path)
 
-        # Build command to run the binary
+        # Linux headless tip
+        env = dict(os.environ)
+        if sys.platform.startswith("linux"):
+            env.setdefault("QT_QPA_PLATFORM", "offscreen")
+
         cmd = (
             f"\"{runner_path}\" installer "
             f"--install-packages "
             f"necto_installer necto_application database clocks schemas mikroe_utils_common preinit unit_test_lib mikrosdk "
             f"\"{installer['necto_path']}\" \"{installer['necto_path_app_data']}\""
         )
+        run_command(cmd, env=env)
+        print("NECTO installation completed successfully.")
+        return
 
-        # On headless Linux CI, Qt can try to pick a GUI backend; keep it quiet
-        if sys.platform.startswith("linux"):
-            os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+    # macOS DMG flow
+    mount_point = "/Volumes/NECTOInstaller"
+    print(f"Mounting DMG: {archive_path}")
+    mount_dmg(archive_path, mount_point)
 
-        run_command(cmd)
+    try:
+        pkg_path, app_path = find_pkg_or_app(mount_point)
 
-    else:
-        # macOS DMG flow
-        mount_point = "/Volumes/NECTOInstaller"
-        try:
-            print(f"Mounting DMG: {archive_path}")
-            mount_dmg(archive_path, mount_point)
-            kind, found = find_runner_in_mounted_dmg(mount_point)
-        finally:
-            print("Unmounting DMG…")
-            try:
-                unmount_dmg(mount_point)
-            except Exception as e:
-                print(f"Warning: DMG unmount issue: {e}")
-
-        if kind == "pkg":
-            # Must use the system installer for .pkg
-            # GitHub macOS runners allow passwordless sudo for installer
-            cmd = f"sudo /usr/sbin/installer -pkg '{found}' -target /"
+        if pkg_path:
+            # Run the pkg directly while the volume is mounted
+            cmd = f"sudo /usr/sbin/installer -pkg '{pkg_path}' -target /"
             run_command(cmd)
-        else:
-            # app runner binary (CLI-capable)
-            runner_path = found
+            print("NECTO installation completed successfully (pkg).")
+            return
+
+        if app_path:
+            # Copy the .app out of the mounted volume first
+            dest_app = os.path.join(root, os.path.basename(app_path))
+            print(f"Copying app: '{app_path}' -> '{dest_app}'")
+            run_command(f"cp -R '{app_path}' '{dest_app}'")
+
+            # Now we can unmount the DMG safely
+            print("Detaching DMG…")
+            unmount_dmg(mount_point)
+
+            # Find a runnable inside the copied app and run it
+            runner_path = pick_app_runner(dest_app)
             make_executable(runner_path)
+
             cmd = (
                 f"\"{runner_path}\" installer "
                 f"--install-packages "
@@ -230,9 +239,17 @@ def main():
                 f"\"{installer['necto_path']}\" \"{installer['necto_path_app_data']}\""
             )
             run_command(cmd)
+            print("NECTO installation completed successfully (app).")
+            return
 
-    print("NECTO installation completed successfully.")
+        raise FileNotFoundError("No .pkg or .app found inside DMG")
 
+    finally:
+        # Ensure DMG is not left mounted (ok if already detached)
+        try:
+            unmount_dmg(mount_point)
+        except Exception as e:
+            print(f"Note: DMG unmount attempt: {e}")
 
 if __name__ == "__main__":
     main()
