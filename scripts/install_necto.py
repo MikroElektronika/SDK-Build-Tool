@@ -8,6 +8,7 @@ if sys.platform.startswith('win'):
         'necto_path_app_data': 'C:runner/appdata/NECTOStudio7',
         'necto_link': 'https://software-update.mikroe.com/NECTOStudio7/live/necto/win/NECTOInstaller.zip'
     }
+    installer_arcive = 'NECTOInstaller.zip'
 elif sys.platform.startswith('linux'):
     installer_handler = {
         'root_path': '/home/runner',
@@ -15,6 +16,7 @@ elif sys.platform.startswith('linux'):
         'necto_path_app_data': '/home/runner/.MIKROE/NECTOStudio7',
         'necto_link': 'https://software-update.mikroe.com/NECTOStudio7/live/necto/linux/NECTOInstaller.zip'
     }
+    installer_arcive = 'NECTOInstaller.zip'
 elif sys.platform.startswith('darwin'):
     installer_handler = {
         'root_path': '/home/runner',
@@ -22,6 +24,7 @@ elif sys.platform.startswith('darwin'):
         'necto_path_app_data': '/home/runner/.MIKROE/NECTOStudio7',
         'necto_link': 'https://software-update.mikroe.com/NECTOStudio7/live/necto/macos/NECTOInstaller.dmg'
     }
+    installer_arcive = 'NECTOInstaller.dmg'
 
 # Runs a shell command and prints the output.
 def run_command(command):
@@ -33,19 +36,22 @@ def run_command(command):
 
 def main():
     print("Step 1: Download installer")
-    installer_zip = os.path.join(installer_handler['root_path'], 'NECTOInstaller.zip')
-
-    print("Downloading Live NECTOInstaller")
-
+    print("Downloading NECTOInstaller")
     installer_runner = os.path.join(installer_handler['root_path'], 'NECTOInstaller.exe')
-    urllib.request.urlretrieve(installer_handler['necto_link'], installer_zip)
+    urllib.request.urlretrieve(installer_handler['necto_link'])
 
-    print("Step 2. Extract Windows NECTOInstaller")
+    print("Step 2. Extract NECTOInstaller")
+    installer_zip = os.path.join(installer_handler['root_path'], installer_arcive)
     if sys.platform.startswith('win'):
         with zipfile.ZipFile(installer_zip, 'r') as zip_ref:
             zip_ref.extractall(installer_handler['root_path'])
-    else:
+    elif sys.platform.startswith('linux'):
         run_command(f"7za x {installer_zip} -o{installer_handler['root_path']}")
+    elif sys.platform.startswith('darwin'):
+        print(f"Mounting {installer_zip}...")
+        run_command(f"hdiutil attach {installer_zip} -mountpoint {installer_handler['root_path']} -nobrowse -quiet")
+        # Copy app bundle or installer from the DMG
+        run_command(f"cp -R {installer_handler['root_path']}/* {installer_handler['root_path']}")
 
     print("Step 3: Install NECTO")
     run_command(f'{installer_runner} installer --install-packages necto_installer necto_application database clocks schemas mikroe_utils_common preinit unit_test_lib mikrosdk {installer_handler['necto_path']} {installer_handler['necto_path_app_data']}')
