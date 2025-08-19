@@ -5,7 +5,6 @@ import stat
 import subprocess
 import json
 import urllib.request
-from typing import Optional, Tuple
 
 # -----------------------------
 # Platform-specific parameters.
@@ -50,7 +49,7 @@ def parse_and_print_progress(line):
         return
 
     try:
-        obj = json.loads(line)
+        obj = json.loads(line.split('Content-Length:')[0])
         if obj.get("method") == "install_progress":
             params = obj.get("params", {})
             pkg = params.get("package")
