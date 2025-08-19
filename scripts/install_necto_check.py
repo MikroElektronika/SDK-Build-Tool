@@ -3,6 +3,7 @@ import os
 import sys
 import stat
 import subprocess
+import json
 import urllib.request
 from typing import Optional, Tuple
 
@@ -43,6 +44,19 @@ elif sys.platform.startswith("darwin"):
     }
     use_zip = False
 
+def parse_and_print_progress(line):
+    # Ignore empty lines and Content-Length headers
+    if not line.strip() or line.startswith("Content-Length:"):
+        return
+
+    obj = json.loads(line)
+    if obj.get("method") == "install_progress":
+        params = obj.get("params", {})
+        pkg = params.get("package")
+        prog = params.get("progress")
+        if pkg is not None and prog is not None:
+            print(f"[{pkg}] progress: {prog}%")
+
 def run_command(cmd):
     print(f"\033[36mRunning: {cmd}\033[36m")
     proc = subprocess.Popen(
@@ -50,7 +64,7 @@ def run_command(cmd):
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        text=True,
+        text=True
     )
     for line in proc.stdout:
         print(line, end="")
@@ -88,8 +102,9 @@ def main():
         if not installer['installer_path']:
             raise FileNotFoundError(f"\033[31mCould not locate NECTO installer binary after extracting {archive_path}\033[31m")
 
-        # if not sys.platform.startswith("win"):
-            # make_executable(installer['installer_path'])
+        if sys.platform.startswith("linux"):
+            mode = os.stat(installer['installer_path']).st_mode
+            os.chmod(installer['installer_path'], mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
         cmd = (
             f"\"{installer['installer_path']}\" installer "
@@ -113,9 +128,6 @@ def main():
         dest_app = os.path.join(root, os.path.basename(app_path))
         print(f"Copying app: '{app_path}' -> '{dest_app}'")
         run_command(f"cp -R '{app_path}' '{dest_app}'")
-
-        # Find a runnable inside the copied app and run it
-        # make_executable(installer['installer_path'])
 
         cmd = (
             f"\"{installer['installer_path']}\" installer "
