@@ -43,7 +43,7 @@ elif sys.platform.startswith("darwin"):
     }
     use_zip = False
 
-previous_prog = -1
+previous_prog = 101
 
 def parse_and_print_progress(line):
     # Ignore empty lines and Content-Length headers
@@ -56,8 +56,8 @@ def parse_and_print_progress(line):
             params = obj.get("params", {})
             pkg = params.get("package")
             prog = params.get("progress")
-            if pkg is not None and prog is not None and previous_prog != prog:
-                previous_prog = prog
+            if pkg is not None and prog is not None and previous_prog != int(prog):
+                previous_prog = int(prog)
                 if prog != '100':
                     print(f"[{pkg}] progress: {prog}%")
                 else:
