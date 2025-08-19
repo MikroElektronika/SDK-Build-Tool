@@ -46,6 +46,7 @@ elif sys.platform.startswith("darwin"):
 previous_prog = 101
 
 def parse_and_print_progress(line):
+    global previous_prog
     # Ignore empty lines and Content-Length headers
     if not line.strip() or line.startswith("Content-Length:"):
         return
