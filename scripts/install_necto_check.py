@@ -130,6 +130,7 @@ def main():
         f'necto_installer necto_application database clocks schemas mikroe_utils_common preinit unit_test_lib mikrosdk '
         f'{installer['necto_path']} {installer['necto_path_app_data']}'
     )
+    print('\n\nRunning NECTO installation command.\n')
     run_command(cmd)
     print('\033[32mNECTO installation completed successfully.\033[32m')
 
