@@ -1,44 +1,5 @@
-#!/usr/bin/env python3
-import os
-import sys
-import stat
-import subprocess
-import json
+import os, sys, stat, json, subprocess
 import urllib.request
-
-# Platform-specific parameters.
-if sys.platform.startswith('win'):
-    installer = {
-        'root_path':            'C:/Users/runner',
-        'necto_path':           'C:/Users/runner/MikroElektronika',
-        'necto_path_app_data':  'C:/Users/runner/AppData/Local/MIKROE/NECTOStudio7',
-        'necto_link':           'https://software-update.mikroe.com/NECTOStudio7/live/necto/win/NECTOInstaller.zip',
-        'archive_name':         'NECTOInstaller.zip',
-        'installer_path':       'C:/Users/runner/NECTOInstaller.exe',
-        'installer_os':         'Windows'
-    }
-
-elif sys.platform.startswith('linux'):
-    installer = {
-        'root_path':            '/home/runner',
-        'necto_path':           '/home/runner/MikroElektronika',
-        'necto_path_app_data':  '/home/runner/.MIKROE/NECTOStudio7',
-        'necto_link':           'https://software-update.mikroe.com/NECTOStudio7/live/necto/linux/NECTOInstaller.zip',
-        'archive_name':         'NECTOInstaller.zip',
-        'installer_path':       '/home/runner/NECTOInstaller',
-        'installer_os':         'Linux'
-    }
-
-elif sys.platform.startswith('darwin'):
-    installer = {
-        'root_path':            '/Users/runner',
-        'necto_path':           '/Users/runner/MikroElektronika',
-        'necto_path_app_data':  '/Users/runner/.MIKROE/NECTOStudio7',
-        'necto_link':           'https://software-update.mikroe.com/NECTOStudio7/live/necto/macos/NECTOInstaller.dmg',
-        'archive_name':         'NECTOInstaller.dmg',
-        'installer_path':       '/Users/runner/NECTO Installer.app/Contents/MacOS/installer',
-        'installer_os':         'Mac'
-    }
 
 # Dictionary for checking if all the packages were installed.
 package_installation_validation = {
@@ -67,6 +28,42 @@ package_installation_validation = {
 # Counter for main NECTO packages installation.
 previous_prog = 101
 installation_downloading = 'downloading'
+
+# Function for defining platform-specific parameters.
+def define_paths():
+    if sys.platform.startswith('win'):
+        installer = {
+            'root_path':            'C:/Users/runner',
+            'necto_path':           'C:/Users/runner/MikroElektronika',
+            'necto_path_app_data':  'C:/Users/runner/AppData/Local/MIKROE/NECTOStudio7',
+            'necto_link':           'https://software-update.mikroe.com/NECTOStudio7/live/necto/win/NECTOInstaller.zip',
+            'archive_name':         'NECTOInstaller.zip',
+            'installer_path':       'C:/Users/runner/NECTOInstaller.exe',
+            'installer_os':         'Windows'
+        }
+
+    elif sys.platform.startswith('linux'):
+        installer = {
+            'root_path':            '/home/runner',
+            'necto_path':           '/home/runner/MikroElektronika',
+            'necto_path_app_data':  '/home/runner/.MIKROE/NECTOStudio7',
+            'necto_link':           'https://software-update.mikroe.com/NECTOStudio7/live/necto/linux/NECTOInstaller.zip',
+            'archive_name':         'NECTOInstaller.zip',
+            'installer_path':       '/home/runner/NECTOInstaller',
+            'installer_os':         'Linux'
+        }
+
+    elif sys.platform.startswith('darwin'):
+        installer = {
+            'root_path':            '/Users/runner',
+            'necto_path':           '/Users/runner/MikroElektronika',
+            'necto_path_app_data':  '/Users/runner/.MIKROE/NECTOStudio7',
+            'necto_link':           'https://software-update.mikroe.com/NECTOStudio7/live/necto/macos/NECTOInstaller.dmg',
+            'archive_name':         'NECTOInstaller.dmg',
+            'installer_path':       '/Users/runner/NECTO Installer.app/Contents/MacOS/installer',
+            'installer_os':         'Mac'
+        }
+    return installer
 
 # Function for printing only the installation progress information.
 def parse_and_print_progress(line):
@@ -114,7 +111,7 @@ def run_command(cmd):
     if proc.returncode != 0:
         raise RuntimeError(f'\033[31mCommand failed with exit code {proc.returncode}: {cmd}.\033[31m')
 
-def main():
+def install_necto(installer):
     # Make sure to create the root folder for NECTO installation.
     os.makedirs(installer['root_path'], exist_ok=True)
 
@@ -176,11 +173,8 @@ def main():
 
     if len(failed_packages):
         with open('message.txt', 'w') as message_file:
-            message_file.write(f':firecracker: {installer['installer_os']}:\nFailed to download the following main NECTO packages:\n - {"\n - ".join(failed_packages)}')
+            message_file.write(f':firecracker: Step 1 for {installer['installer_os']} failed: No packages found for:\n - {"\n - ".join(failed_packages)}')
         exit(1)
 
     with open('message.txt', 'w') as message_file:
-        message_file.write(f':white_check_mark: {installer['installer_os']}: All main NECTO packages are installed successfully!')
-
-if __name__ == '__main__':
-    main()
+        message_file.write(f':white_check_mark: Step 1 for {installer['installer_os']} passsed: All main NECTO packages are installed successfully!')
