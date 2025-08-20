@@ -49,6 +49,16 @@ jobs:
         run: |
           python -u scripts/install_necto_check.py
 
+      - name: Send notification to Mattermost
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        env:
+          MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL_TEST }}
+        run: |
+          MESSAGE=$(cat message.txt)
+          curl -X POST -H 'Content-Type: application/json' \
+          --data "{\"text\": \"$MESSAGE\"}" \
+          $MATTERMOST_WEBHOOK_URL
+
   # Verify packages (runs in parallel after build passes)
 #   packages_verification:
 #     needs: necto_verification

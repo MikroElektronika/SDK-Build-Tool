@@ -14,7 +14,8 @@ if sys.platform.startswith('win'):
         'necto_path_app_data':  'C:/Users/runner/AppData/Local/MIKROE/NECTOStudio7',
         'necto_link':           'https://software-update.mikroe.com/NECTOStudio7/live/necto/win/NECTOInstaller.zip',
         'archive_name':         'NECTOInstaller.zip',
-        'installer_path':       'C:/Users/runner/NECTOInstaller.exe'
+        'installer_path':       'C:/Users/runner/NECTOInstaller.exe',
+        'installer_os':         'Windows'
     }
 
 elif sys.platform.startswith('linux'):
@@ -24,7 +25,8 @@ elif sys.platform.startswith('linux'):
         'necto_path_app_data':  '/home/runner/.MIKROE/NECTOStudio7',
         'necto_link':           'https://software-update.mikroe.com/NECTOStudio7/live/necto/linux/NECTOInstaller.zip',
         'archive_name':         'NECTOInstaller.zip',
-        'installer_path':       '/home/runner/NECTOInstaller'
+        'installer_path':       '/home/runner/NECTOInstaller',
+        'installer_os':         'Linux'
     }
 
 elif sys.platform.startswith('darwin'):
@@ -34,7 +36,8 @@ elif sys.platform.startswith('darwin'):
         'necto_path_app_data':  '/Users/runner/.MIKROE/NECTOStudio7',
         'necto_link':           'https://software-update.mikroe.com/NECTOStudio7/live/necto/macos/NECTOInstaller.dmg',
         'archive_name':         'NECTOInstaller.dmg',
-        'installer_path':       '/Users/runner/NECTO Installer.app/Contents/MacOS/installer'
+        'installer_path':       '/Users/runner/NECTO Installer.app/Contents/MacOS/installer',
+        'installer_os':         'Mac'
     }
 
 # Dictionary for checking if all the packages were installed.
@@ -162,7 +165,22 @@ def main():
     run_command(cmd)
     print('\033[32mNECTO installation completed successfully.\033[32m')
 
+    # Print results of package installation.
     print(package_installation_validation)
+    failed_packages = []
+
+    for package in package_installation_validation:
+        # Fail the job if any of main NECTO packages was not installed.
+        if package_installation_validation[package] == False:
+            failed_packages.append(package)
+
+    if len(failed_packages):
+        with open('message.txt', 'w') as message_file:
+            message_file.write(f'Failed to download the following packages for {installer['installer_os']}:\n {"\n :large_red_square: ".join(failed_packages)}')
+        exit(1)
+
+    with open('message.txt', 'w') as message_file:
+        message_file.write(f':large_green_square: {installer['installer_os']} NECTO installation verification for main packages passed!')
 
 if __name__ == '__main__':
     main()
