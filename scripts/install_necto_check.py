@@ -180,7 +180,7 @@ def main():
         exit(1)
 
     with open('message.txt', 'w') as message_file:
-        message_file.write(f':white_check_mark: {installer['installer_os']}:\nAll main NECTO packages are installed successfully!')
+        message_file.write(f':white_check_mark: {installer['installer_os']}: All main NECTO packages are installed successfully!')
 
 if __name__ == '__main__':
     main()
