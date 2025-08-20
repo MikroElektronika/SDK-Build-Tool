@@ -63,6 +63,9 @@ def query_packages(db_path, sdk_version, verification_handler):
     rows = cursor.fetchall()
 
     for row in rows:
+        # Skip MCUs without installer_package
+        if not row[1]:
+            continue
         installer_package = json.loads(row[1])
         for compiler in installer_package:
             package = installer_package[compiler]

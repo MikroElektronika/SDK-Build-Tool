@@ -29,7 +29,8 @@ def main():
 
     with open('message.txt', 'w') as message_file:
         message_file.write(f'''\
-:underage: Step 1 for {installer['installer_os']} not executed
+NECTO check status:
+:firecracker: Script failed to execute Step 1 for {installer['installer_os']}
 :underage: Step 2 for {installer['installer_os']} not executed
 :underage: Step 3 for {installer['installer_os']} not executed
 :underage: Step 4 for {installer['installer_os']} not executed
@@ -41,6 +42,15 @@ def main():
 
     if args.step == 'step1':
         necto.install_necto(installer)
+        with open('message.txt', 'r') as message_file:
+            message_content = message_file.read()
+
+    message_content.replace(
+        f':underage: Step 2 for {installer['installer_os']} not executed',
+        f':firecracker: Script failed to execute Step 2 for {installer['installer_os']}'
+    )
+    with open('message.txt', 'w') as message_file:
+        message_file.write(message_content)
 
     if args.step == 'step2':
         sdk_version = database.get_latest_sdk_version(db_path)
