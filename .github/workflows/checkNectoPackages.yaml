@@ -50,7 +50,7 @@ jobs:
           python -u scripts/install_necto_check.py
 
       - name: Send notification to Mattermost
-        if: ${{ github.event_name == 'workflow_dispatch' }}
+        if: always()
         env:
           MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL_TEST }}
         run: |
