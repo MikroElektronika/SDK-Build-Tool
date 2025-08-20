@@ -146,3 +146,8 @@ def install_packages(installer, verification_handler):
         )
         with open('message.txt', 'w') as message_file:
             message_file.writelines(message_content)
+
+def create_dependencies_file(verification_handler):
+    with open('package_dependencies.json', 'w') as dependency_file:
+        json.dump(verification_handler, dependency_file, indent=4)
+
