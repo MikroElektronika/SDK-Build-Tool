@@ -36,9 +36,11 @@ def fetch_current_indexed_packages(es : Elasticsearch, index_name):
 
     all_packages = []
     for eachHit in response['hits']['hits']:
-        if not 'name' in eachHit['_source'] or eachHit['_source']['category'] not in category_filter:
+        if not 'name' in eachHit['_source']:
             continue
-        all_packages.append(eachHit['_source'])
+        if 'category' in eachHit['_source']:
+            if eachHit['_source']['category'] in category_filter:
+                all_packages.append(eachHit['_source'])
 
     # Sort all_packages alphabetically by the 'name' field
     all_packages.sort(key=lambda x: x['name'])
