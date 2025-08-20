@@ -125,7 +125,7 @@ def query_packages(db_path, sdk_version, verification_handler):
         INNER JOIN Devices ON ProgrammerToDevice.device_uid = Devices.uid
         INNER JOIN SDKToDevice ON Devices.uid = SDKToDevice.device_uid
         WHERE SDKToDevice.sdk_uid = '{sdk_version}'
-        AND SDKToDevice.device_uid NOT LIKE "%\_%" ESCAPE "\";
+        AND SDKToDevice.device_uid NOT LIKE "%\\_%" ESCAPE "\\";
     """)
     rows = cursor.fetchall()
 

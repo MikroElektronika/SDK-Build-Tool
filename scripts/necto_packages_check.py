@@ -30,7 +30,7 @@ def main():
     if args.step == 'step1':
         with open('message.txt', 'w') as message_file:
             message_file.write(f'''\
-:mikroe: NECTO check status:
+# :mikroe: NECTO check status:
 :firecracker: Script failed to execute Step 1 for {installer['installer_os']}
 :underage: Step 2 for {installer['installer_os']} not executed
 :underage: Step 3 for {installer['installer_os']} not executed
