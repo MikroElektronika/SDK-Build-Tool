@@ -162,12 +162,10 @@ def install_necto(installer):
     run_command(cmd)
     print('\033[32mNECTO installation completed successfully.\033[32m')
 
-    # Print results of package installation.
-    print(package_installation_validation)
     failed_packages = []
 
     for package in package_installation_validation:
-        # Fail the job if any of main NECTO packages was not installed.
+        # Memorize all the mandatory packages that failed to be installed.
         if package_installation_validation[package] == False:
             failed_packages.append(package)
 
@@ -175,14 +173,18 @@ def install_necto(installer):
         message_content = message_file.read()
 
     if len(failed_packages):
+        # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 1 for {installer['installer_os']}',
             f':firecracker: Step 1 for {installer['installer_os']} failed: No packages found for:\n - {"\n - ".join(failed_packages)}'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
+
+        # Fail the job immediatelly.
         exit(1)
     else:
+        # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 1 for {installer['installer_os']}',
             f':white_check_mark: Step 1 for {installer['installer_os']} passsed: All main NECTO packages are installed successfully!'

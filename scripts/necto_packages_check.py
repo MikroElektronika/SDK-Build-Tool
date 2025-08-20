@@ -28,6 +28,7 @@ def main():
     db_path = os.path.join(installer['necto_path_app_data'], 'databases/necto_db.db')
 
     if args.step == 'step1':
+        # Create an initial message file.
         with open('message.txt', 'w') as message_file:
             message_file.write(f'''\
 # :mikroe: NECTO check status:
@@ -41,9 +42,11 @@ def main():
 :underage: Step 8 for {installer['installer_os']} not executed
     ''')
 
+        # Verify NECTO installation.
         necto.install_necto(installer)
 
     if args.step == 'step2':
+        # Update the message file.
         with open('message.txt', 'r') as message_file:
             message_content = message_file.read()
         message_content = message_content.replace(
@@ -53,11 +56,13 @@ def main():
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
 
+        # Verify NECTO packages installations.
         sdk_version = database.get_latest_sdk_version(db_path)
         database.query_packages(db_path, sdk_version, verification_handler)
         packages.install_packages(installer, verification_handler)
 
     if args.step == 'step3':
+        # Update the message file.
         with open('message.txt', 'r') as message_file:
             message_content = message_file.read()
         message_content = message_content.replace(
@@ -67,11 +72,13 @@ def main():
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
 
+        # Create the package dependencies file.
         sdk_version = database.get_latest_sdk_version(db_path)
         database.query_packages(db_path, sdk_version, verification_handler)
         packages.create_dependencies_file(installer, verification_handler)
 
     if args.step == 'step4':
+        # Update the message file.
         with open('message.txt', 'r') as message_file:
             message_content = message_file.read()
         message_content = message_content.replace(
@@ -80,6 +87,7 @@ def main():
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
+        packages.check_dependencies()
 
 if __name__ == '__main__':
     main()

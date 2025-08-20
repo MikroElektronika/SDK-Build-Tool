@@ -95,35 +95,38 @@ def run_command(cmd):
 def install_packages(installer, verification_handler):
     error_lines = []
 
+    # Fetch all the packages that are being checked from kibana.
     es = Elasticsearch([os.environ['ES_HOST']], http_auth=(os.environ['ES_USER'], os.environ['ES_PASSWORD']))
-
     index = os.environ['ES_INDEX_LIVE']
-
     indexed_items = fetch_current_indexed_packages(es, index)
 
     package_counter = 0
 
-    # Fetch package info from kibana
+    # Fetch package info from kibana.
     for package in verification_handler:
         num_of_retries = 0
         install_location = ''
-        # Open and load the SDK JSON file
+        # Find the install location for the package based on kibana data.
         for item in indexed_items:
             if item['name'] == package:
                 install_location = item['install_location'].replace('%APPLICATION_DATA_DIR%', installer['necto_path_app_data'])
                 break
         if install_location == '':
+            # If there is no install location data in kibana - remember the package.
             print(f'\033[91mERROR! For package {package} there is no info in kibana.\033[0m')
             error_lines.append(f'- No info for {package} in kibana.\n')
 
+        # Try to install the package 3 times.
         print(f'Installing package: {package} ({package_counter}/{len(verification_handler)})')
         while (num_of_retries < 3):
             run_command(f'"{installer['installer_path']}" installer --install-packages {package} {installer['necto_path']} {installer['necto_path_app_data']}')
+            # Verify if the package has been installed.
             if os.path.exists(install_location):
                 print(f"\033[94mThe {package} package was downloaded successfully.\033[0m")
                 break
             num_of_retries += 1
 
+        # After the third try remember the package as it failed to be installed.
         if num_of_retries == 2:
             print(f'\033[91mPackage is not installed in {install_location} after 3 retries.\033[0m')
             error_lines.append(f'- Failed to install {package}.\n')
@@ -134,14 +137,18 @@ def install_packages(installer, verification_handler):
         message_content = message_file.read()
 
     if len(error_lines):
+        # Update the message file.
         message_content = message_content.replace(
             f':underage: Step 2 for {installer['installer_os']} not executed',
             f':firecracker: Step 2 for {installer['installer_os']} failed:\n{'\n'.join(error_lines)}'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
+
+        # Fail the job immediately.
         exit(1)
     else:
+        # Update the message file.
         message_content = message_content.replace(
             f':underage: Step 2 for {installer['installer_os']} not executed',
             f':white_check_mark: Step 2 for {installer['installer_os']} passsed: All NECTO packages are installed successfully!'

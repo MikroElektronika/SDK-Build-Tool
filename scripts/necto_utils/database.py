@@ -69,11 +69,12 @@ def query_packages(db_path, sdk_version, verification_handler):
         installer_package = json.loads(row[1])
         for compiler in installer_package:
             package = installer_package[compiler]
-            # Create the MCU-to-CORE dependency.
-            if package not in verification_handler:
-                verification_handler.update({package: []})
-            if row[0] not in verification_handler[package]:
-                verification_handler[package].append(row[0])
+            if package != '':
+                # Create the MCU-to-CORE dependency.
+                if package not in verification_handler:
+                    verification_handler.update({package: []})
+                if row[0] not in verification_handler[package]:
+                    verification_handler[package].append(row[0])
 
     # Step 2 - query the Card packages.
     cursor.execute(f"""
@@ -93,11 +94,12 @@ def query_packages(db_path, sdk_version, verification_handler):
         msdk_mcu_card_name = sdk_config['_MSDK_MCU_CARD_NAME_']
         installer_package = json.loads(row[1])
         package = installer_package['package']
-        # Create the Card-to-BSP dependency.
-        if package not in verification_handler:
-            verification_handler.update({package: []})
-        if msdk_mcu_card_name not in verification_handler[package]:
-            verification_handler[package].append(msdk_mcu_card_name)
+        if package != '':
+            # Create the Card-to-BSP dependency.
+            if package not in verification_handler:
+                verification_handler.update({package: []})
+            if msdk_mcu_card_name not in verification_handler[package]:
+                verification_handler[package].append(msdk_mcu_card_name)
 
     # Step 3 - query the Board packages.
     cursor.execute(f"""
@@ -113,11 +115,12 @@ def query_packages(db_path, sdk_version, verification_handler):
         msdk_board_name = sdk_config['_MSDK_BOARD_NAME_']
         installer_package = json.loads(row[1])
         package = installer_package['package']
-        # Create the Board-to-BSP dependency.
-        if package not in verification_handler:
-            verification_handler.update({package: []})
-        if msdk_board_name not in verification_handler[package]:
-            verification_handler[package].append(msdk_board_name)
+        if package != '':
+            # Create the Board-to-BSP dependency.
+            if package not in verification_handler:
+                verification_handler.update({package: []})
+            if msdk_board_name not in verification_handler[package]:
+                verification_handler[package].append(msdk_board_name)
 
     # Step 4 - query the Prog packages.
     cursor.execute(f"""
@@ -135,8 +138,9 @@ def query_packages(db_path, sdk_version, verification_handler):
             continue
         # device_support_package has data like ["samd20_device_support"]
         package = row[1].split('"')[1]
-        # Create the MCU-to-PROG dependency.
-        if package not in verification_handler:
-            verification_handler.update({package: []})
-        if row[0] not in verification_handler[package]:
-            verification_handler[package].append(row[0])
+        if package != '':
+            # Create the MCU-to-PROG dependency.
+            if package not in verification_handler:
+                verification_handler.update({package: []})
+            if row[0] not in verification_handler[package]:
+                verification_handler[package].append(row[0])
