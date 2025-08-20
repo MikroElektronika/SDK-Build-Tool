@@ -175,7 +175,7 @@ def install_necto(installer):
         message_content = message_file.read()
 
     if len(failed_packages):
-        message_content.replace(
+        message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 1 for {installer['installer_os']}',
             f':firecracker: Step 1 for {installer['installer_os']} failed: No packages found for:\n - {"\n - ".join(failed_packages)}'
         )
@@ -183,7 +183,7 @@ def install_necto(installer):
             message_file.write(message_content)
         exit(1)
     else:
-        message_content.replace(
+        message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 1 for {installer['installer_os']}',
             f':white_check_mark: Step 1 for {installer['installer_os']} passsed: All main NECTO packages are installed successfully!'
         )

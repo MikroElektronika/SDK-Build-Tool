@@ -46,7 +46,7 @@ def main():
     if args.step == 'step2':
         with open('message.txt', 'r') as message_file:
             message_content = message_file.read()
-        message_content.replace(
+        message_content = message_content.replace(
             f':underage: Step 2 for {installer['installer_os']} not executed',
             f':firecracker: Script failed to execute Step 2 for {installer['installer_os']}'
         )
@@ -60,7 +60,7 @@ def main():
     if args.step == 'step3':
         with open('message.txt', 'r') as message_file:
             message_content = message_file.read()
-        message_content.replace(
+        message_content = message_content.replace(
             f':underage: Step 3 for {installer['installer_os']} not executed',
             f':firecracker: Script failed to execute Step 3 for {installer['installer_os']}'
         )
@@ -74,7 +74,7 @@ def main():
     if args.step == 'step4':
         with open('message.txt', 'r') as message_file:
             message_content = message_file.read()
-        message_content.replace(
+        message_content = message_content.replace(
             f':underage: Step 4 for {installer['installer_os']} not executed',
             f':firecracker: Script failed to execute Step 4 for {installer['installer_os']}'
         )
