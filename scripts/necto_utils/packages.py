@@ -69,8 +69,8 @@ def parse_and_print_progress(line):
                     else:
                         installation_downloading = 'downloading'
     except json.JSONDecodeError:
-        # Not a JSON line, just print raw.
-        print(line.strip())
+        # Not a JSON line, just print nothing.
+        return
 
 # Function for executing the commands.
 def run_command(cmd):
