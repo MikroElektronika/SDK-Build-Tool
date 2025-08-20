@@ -63,11 +63,11 @@ package_installation_validation = {
 
 # Counter for main NECTO packages installation.
 previous_prog = 101
-installation_unpacking = 'installation'
+installation_downloading = 'downloading'
 
 # Function for printing only the installation progress information.
 def parse_and_print_progress(line):
-    global previous_prog
+    global previous_prog, installation_unpacking
 
     try:
         # Fetch the installation progress info from the stdout line.
@@ -82,10 +82,10 @@ def parse_and_print_progress(line):
                 previous_prog = prog
                 if prog == 100:
                     print(f'\033[32m[{pkg}] {installation_unpacking} progress: {prog}%\033[32m')
-                    if installation_unpacking == 'installation':
-                        installation_unpacking = 'unpacking'
-                    else:
+                    if installation_unpacking == 'downloading':
                         installation_unpacking = 'installation'
+                    else:
+                        installation_unpacking = 'downloading'
                     package_installation_validation[pkg] = True
     except json.JSONDecodeError:
         # Not a JSON line, just print raw.
