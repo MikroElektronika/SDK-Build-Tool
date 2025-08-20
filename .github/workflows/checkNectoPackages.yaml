@@ -45,7 +45,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r scripts/requirements/check_necto_links.txt
 
-      - name: Verify NECTO installation
+      - name: Step 1 - Verify NECTO installation
         run: |
           python -u scripts/install_necto_check.py
 

@@ -67,7 +67,7 @@ installation_downloading = 'downloading'
 
 # Function for printing only the installation progress information.
 def parse_and_print_progress(line):
-    global previous_prog, installation_unpacking
+    global previous_prog, installation_downloading
 
     try:
         # Fetch the installation progress info from the stdout line.
@@ -81,11 +81,11 @@ def parse_and_print_progress(line):
             if pkg is not None and prog is not None and previous_prog != prog:
                 previous_prog = prog
                 if prog == 100:
-                    print(f'\033[32m[{pkg}] {installation_unpacking} progress: {prog}%\033[32m')
-                    if installation_unpacking == 'downloading':
-                        installation_unpacking = 'installation'
+                    print(f'\033[32m[{pkg}] {installation_downloading} progress: {prog}%\033[32m')
+                    if installation_downloading == 'downloading':
+                        installation_downloading = 'installation'
                     else:
-                        installation_unpacking = 'downloading'
+                        installation_downloading = 'downloading'
                     package_installation_validation[pkg] = True
     except json.JSONDecodeError:
         # Not a JSON line, just print raw.
