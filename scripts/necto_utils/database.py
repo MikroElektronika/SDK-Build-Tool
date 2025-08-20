@@ -130,6 +130,9 @@ def query_packages(db_path, sdk_version, verification_handler):
     rows = cursor.fetchall()
 
     for row in rows:
+        # Skip MCUs without prog package.
+        if not row[1]:
+            continue
         # device_support_package has data like ["samd20_device_support"]
         package = row[1].split('"')[1]
         # Create the MCU-to-PROG dependency.
