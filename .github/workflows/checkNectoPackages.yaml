@@ -50,7 +50,7 @@ jobs:
           python -u scripts/install_necto_check.py
 
       - name: Send notification to Mattermost
-        if: always()
+        if: always() && matrix.os != 'windows-latest'
         env:
           MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL_TEST }}
         run: |
@@ -58,6 +58,20 @@ jobs:
           curl -X POST -H 'Content-Type: application/json' \
           --data "{\"text\": \"$MESSAGE\"}" \
           $MATTERMOST_WEBHOOK_URL
+
+      - name: Send notification to Mattermost (Windows)
+        if: always() && matrix.os == 'windows-latest'
+        env:
+          MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL_TEST }}
+        run: |
+          $MESSAGE = Get-Content -Raw message.txt
+          $WEBHOOK = $env:MATTERMOST_WEBHOOK_URL
+          # Build JSON safely (escapes quotes/newlines)
+          $payload = @{ text = $MESSAGE } | ConvertTo-Json -Compress
+          curl.exe -X POST `
+            -H 'Content-Type: application/json' `
+            -d $payload `
+            $WEBHOOK
 
   # Verify packages (runs in parallel after build passes)
 #   packages_verification:

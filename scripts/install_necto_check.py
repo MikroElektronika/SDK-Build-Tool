@@ -176,11 +176,11 @@ def main():
 
     if len(failed_packages):
         with open('message.txt', 'w') as message_file:
-            message_file.write(f'Failed to download the following packages for {installer['installer_os']}:\n {"\n :large_red_square: ".join(failed_packages)}')
+            message_file.write(f':firecracker: {installer['installer_os']}:\nFailed to download the following main NECTO packages:\n - {"\n - ".join(failed_packages)}')
         exit(1)
 
     with open('message.txt', 'w') as message_file:
-        message_file.write(f':large_green_square: {installer['installer_os']} NECTO installation verification for main packages passed!')
+        message_file.write(f':white_check_mark: {installer['installer_os']}:\nAll main NECTO packages are installed successfully!')
 
 if __name__ == '__main__':
     main()
