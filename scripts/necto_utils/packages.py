@@ -132,12 +132,17 @@ def install_packages(installer, verification_handler):
         message_content = message_file.read()
 
     if len(error_lines):
-        message_content.append(f':firecracker: Step 2 for {installer['installer_os']} failed:\n')
-        message_content.append(error_lines)
+        message_content.replace(
+            f':underage: Step 2 for {installer['installer_os']} not executed',
+            f':firecracker: Step 2 for {installer['installer_os']} failed:\n{'\n'.join(error_lines)}'
+        )
+        with open('message.txt', 'w') as message_file:
+            message_file.write(message_content)
+        exit(1)
     else:
-        message_content.append(f':white_check_mark: Step 2 for {installer['installer_os']} passsed: All NECTO packages are installed successfully!\n')
-
-    with open('message.txt', 'w') as message_file:
-        message_file.writelines(message_content)
-
-    return
+        message_content.replace(
+            f':underage: Step 2 for {installer['installer_os']} not executed',
+            f':white_check_mark: Step 2 for {installer['installer_os']} passsed: All NECTO packages are installed successfully!'
+        )
+        with open('message.txt', 'w') as message_file:
+            message_file.writelines(message_content)

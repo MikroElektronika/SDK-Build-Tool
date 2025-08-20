@@ -21,15 +21,28 @@ def main():
         """,
         type = str
     )
+    args = parser.parse_args()
 
     verification_handler = {}
     installer = necto.define_paths()
     db_path = os.path.join(installer['necto_path_app_data'], 'databases/necto_db.db')
 
-    if parser.step == 'step1':
+    with open('message.txt', 'w') as message_file:
+        message_file.write(f'''\
+:underage: Step 1 for {installer['installer_os']} not executed
+:underage: Step 2 for {installer['installer_os']} not executed
+:underage: Step 3 for {installer['installer_os']} not executed
+:underage: Step 4 for {installer['installer_os']} not executed
+:underage: Step 5 for {installer['installer_os']} not executed
+:underage: Step 6 for {installer['installer_os']} not executed
+:underage: Step 7 for {installer['installer_os']} not executed
+:underage: Step 8 for {installer['installer_os']} not executed
+''')
+
+    if args.step == 'step1':
         necto.install_necto(installer)
 
-    if parser.step == 'step2':
+    if args.step == 'step2':
         sdk_version = database.get_latest_sdk_version(db_path)
         database.query_packages(db_path, sdk_version, verification_handler)
         packages.install_packages(installer, verification_handler)

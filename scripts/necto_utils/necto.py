@@ -171,10 +171,21 @@ def install_necto(installer):
         if package_installation_validation[package] == False:
             failed_packages.append(package)
 
-    if len(failed_packages):
-        with open('message.txt', 'w') as message_file:
-            message_file.write(f':firecracker: Step 1 for {installer['installer_os']} failed: No packages found for:\n - {"\n - ".join(failed_packages)}')
-        exit(1)
+    with open('message.txt', 'r') as message_file:
+        message_content = message_file.read()
 
-    with open('message.txt', 'w') as message_file:
-        message_file.write(f':white_check_mark: Step 1 for {installer['installer_os']} passsed: All main NECTO packages are installed successfully!')
+    if len(failed_packages):
+        message_content.replace(
+            f':underage: Step 1 for {installer['installer_os']} not executed',
+            f':firecracker: Step 1 for {installer['installer_os']} failed: No packages found for:\n - {"\n - ".join(failed_packages)}'
+        )
+        with open('message.txt', 'w') as message_file:
+            message_file.write(message_content)
+        exit(1)
+    else:
+        message_content.replace(
+            f':underage: Step 1 for {installer['installer_os']} not executed',
+            f':white_check_mark: Step 1 for {installer['installer_os']} passsed: All main NECTO packages are installed successfully!'
+        )
+        with open('message.txt', 'w') as message_file:
+            message_file.write(message_content)
