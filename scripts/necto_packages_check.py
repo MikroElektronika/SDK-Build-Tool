@@ -87,7 +87,43 @@ def main():
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
-        packages.check_dependencies()
+        packages.check_mcu_dependencies(installer, verification_handler)
+
+    if args.step == 'step5':
+        # Update the message file.
+        with open('message.txt', 'r') as message_file:
+            message_content = message_file.read()
+        message_content = message_content.replace(
+            f':underage: Step 5 for {installer['installer_os']} not executed',
+            f':firecracker: Script failed to execute Step 5 for {installer['installer_os']}'
+        )
+        with open('message.txt', 'w') as message_file:
+            message_file.write(message_content)
+        packages.check_codegrip_dependencies(installer, verification_handler)
+
+    if args.step == 'step6':
+        # Update the message file.
+        with open('message.txt', 'r') as message_file:
+            message_content = message_file.read()
+        message_content = message_content.replace(
+            f':underage: Step 6 for {installer['installer_os']} not executed',
+            f':firecracker: Script failed to execute Step 6 for {installer['installer_os']}'
+        )
+        with open('message.txt', 'w') as message_file:
+            message_file.write(message_content)
+        packages.check_mchp_dependencies(installer, verification_handler)
+
+    if args.step == 'step7':
+        # Update the message file.
+        with open('message.txt', 'r') as message_file:
+            message_content = message_file.read()
+        message_content = message_content.replace(
+            f':underage: Step 7 for {installer['installer_os']} not executed',
+            f':firecracker: Script failed to execute Step 7 for {installer['installer_os']}'
+        )
+        with open('message.txt', 'w') as message_file:
+            message_file.write(message_content)
+        packages.check_board_dependencies(installer, verification_handler)
 
 if __name__ == '__main__':
     main()
