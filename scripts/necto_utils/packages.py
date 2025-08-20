@@ -118,7 +118,7 @@ def install_packages(installer, verification_handler):
 
         print(f'Installing package: {package} ({package_counter}/{len(verification_handler)})')
         while (num_of_retries < 3):
-            run_command(f'{installer['installer_path']} installer --install-packages {package} {installer['necto_path']} {installer['necto_path_app_data']}')
+            run_command(f'"{installer['installer_path']}" installer --install-packages {package} {installer['necto_path']} {installer['necto_path_app_data']}')
             if os.path.exists(install_location):
                 print(f"\033[94mThe {package} package was downloaded successfully.\033[0m")
                 break
