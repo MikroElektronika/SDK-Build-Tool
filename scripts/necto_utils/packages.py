@@ -185,6 +185,7 @@ def check_mcu_dependencies(installer, verification_handler):
     indexed_items = fetch_current_indexed_packages(es, index)
 
     failed_mcus = []
+    print(verification_handler)
 
     for package in verification_handler:
         # Find the install location for the package based on kibana data.
@@ -243,6 +244,7 @@ def check_codegrip_dependencies(installer, verification_handler):
     indexed_items = fetch_current_indexed_packages(es, index)
 
     failed_mcus = []
+    print(verification_handler)
 
     for package in verification_handler:
         # Find the install location for the package based on kibana data.
@@ -291,6 +293,7 @@ def check_mchp_dependencies(installer, verification_handler):
     indexed_items = fetch_current_indexed_packages(es, index)
 
     failed_mcus = []
+    print(verification_handler)
 
     for package in verification_handler:
         # Find the install location for the package based on kibana data.
@@ -339,6 +342,7 @@ def check_board_dependencies(installer, verification_handler):
     indexed_items = fetch_current_indexed_packages(es, index)
 
     failed_boards = []
+    print(verification_handler)
 
     for package in verification_handler:
         # Find the install location for the package based on kibana data.
@@ -389,6 +393,7 @@ def check_card_dependencies(installer, verification_handler):
     indexed_items = fetch_current_indexed_packages(es, index)
 
     failed_cards = []
+    print(verification_handler)
 
     for package in verification_handler:
         # Find the install location for the package based on kibana data.

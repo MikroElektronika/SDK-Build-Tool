@@ -70,6 +70,12 @@ jobs:
         run: |
           python -u scripts/necto_packages_check.py "step3"
 
+      - name: package_dependencies.json as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: package_dependencies
+          path: package_dependencies.json
+
       - name: Step 4 - Check if all CORE-to-MCU dependencies are correct
         if: always()
         run: |
