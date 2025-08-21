@@ -116,11 +116,13 @@ def install_packages(installer, verification_handler):
                 else:
                     # If it is not the first met matching kibana item - it is an error.
                     error_lines.append(f' - {package} has multiple instances in kibana - remove the unused ones.')
+                    print(error_lines)
                     install_location = ''
         if install_location == '':
             # If there is no install location data in kibana - remember the package.
             print(f'\033[91mERROR! For package {package} there is no info in kibana.\033[0m')
             error_lines.append(f'- No info for {package} in kibana.\n')
+            print(error_lines)
         else:
             # Try to install the package 3 times.
             print(f'Installing package: {package} ({package_counter}/{len(verification_handler)})')
@@ -136,8 +138,11 @@ def install_packages(installer, verification_handler):
             if num_of_retries == 2:
                 print(f'\033[91mPackage is not installed in {install_location} after 3 retries.\033[0m')
                 error_lines.append(f'- Failed to install {package}.\n')
+                print(error_lines)
 
             package_counter += 1
+            
+    print(error_lines)
 
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
@@ -160,7 +165,7 @@ def install_packages(installer, verification_handler):
             f':white_check_mark: Step 2 for {installer['installer_os']} passsed: All NECTO packages are installed successfully!'
         )
         with open('message.txt', 'w') as message_file:
-            message_file.writelines(message_content)
+            message_file.write(message_content)
 
 # Function for creating dependencies file.
 def create_dependencies_file(verification_handler):
@@ -223,7 +228,7 @@ def check_mcu_dependencies(installer, verification_handler):
             f':white_check_mark: Step 4 for {installer['installer_os']} passsed: All MCUs have corresponding regexes in CMake files!'
         )
         with open('message.txt', 'w') as message_file:
-            message_file.writelines(message_content)
+            message_file.write(message_content)
 
 # Function for checking MCU-to-CODEGRIP dependancies.
 def check_codegrip_dependencies(installer, verification_handler):
@@ -242,7 +247,7 @@ def check_codegrip_dependencies(installer, verification_handler):
         for item in indexed_items:
             if item['name'] == package and item['name'] == 'CODEGRIP Device Pack':
                 install_location = item['install_location'].replace('%APPLICATION_DATA_DIR%', installer['necto_path_app_data'])
-                failed_mcus.append(failed_mcus[package])
+                failed_mcus.append(verification_handler[package])
             # Find .mcu file with the MCU name.
             for root, _, files in os.walk(install_location):
                 for file in files:
@@ -271,7 +276,7 @@ def check_codegrip_dependencies(installer, verification_handler):
             f':white_check_mark: Step 5 for {installer['installer_os']} passsed: All MCUs have corresponding regexes in CMake files!'
         )
         with open('message.txt', 'w') as message_file:
-            message_file.writelines(message_content)
+            message_file.write(message_content)
 
 # Function for checking MCU-to-CODEGRIP dependancies.
 def check_mchp_dependencies(installer, verification_handler):
@@ -290,7 +295,7 @@ def check_mchp_dependencies(installer, verification_handler):
         for item in indexed_items:
             if item['name'] == package and item['name'] == 'MPLAB Device Pack':
                 install_location = item['install_location'].replace('%APPLICATION_DATA_DIR%', installer['necto_path_app_data'])
-                failed_mcus.append(failed_mcus[package])
+                failed_mcus.append(verification_handler[package])
             # Find .mcu file with the MCU name.
             for root, _, files in os.walk(install_location):
                 for file in files:
@@ -319,7 +324,7 @@ def check_mchp_dependencies(installer, verification_handler):
             f':white_check_mark: Step 6 for {installer['installer_os']} passsed: All MCUs have corresponding regexes in CMake files!'
         )
         with open('message.txt', 'w') as message_file:
-            message_file.writelines(message_content)
+            message_file.write(message_content)
 
 # Function for checking MCU-to-CODEGRIP dependancies.
 def check_board_dependencies(installer, verification_handler):
@@ -331,29 +336,31 @@ def check_board_dependencies(installer, verification_handler):
     index = os.environ['ES_INDEX_LIVE']
     indexed_items = fetch_current_indexed_packages(es, index)
 
-    failed_mcus = []
+    failed_boards = []
 
     for package in verification_handler:
         # Find the install location for the package based on kibana data.
         for item in indexed_items:
             if item['name'] == package and item['name'] == 'Board Package':
                 install_location = item['install_location'].replace('%APPLICATION_DATA_DIR%', installer['necto_path_app_data'])
-                failed_mcus.append(failed_mcus[package])
+                failed_boards.append(package)
             # Find .mcu file with the MCU name.
             for root, _, files in os.walk(install_location):
                 for file in files:
-                    for mcu in verification_handler[package]:
-                        if file.replace('.PIC', '') == mcu:
-                            failed_mcus.remove(mcu)
+                    if '.cmake' in file:
+                        with open(os.path.join(root, file), 'r') as bsp_header:
+                            bsp_content = bsp_header.read()
+                        if verification_handler[package] not in bsp_content:
+                            failed_boards.remove(package)
 
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
 
-    if len(failed_mcus):
+    if len(failed_boards):
         # Update the message file.
         message_content = message_content.replace(
             f':underage: Step 6 for {installer['installer_os']} not executed',
-            f':firecracker: Step 6 for {installer['installer_os']} failed for the following MCUs:\n - {'\n - '.join(failed_mcus)}'
+            f':firecracker: Step 6 for {installer['installer_os']} failed for the following MCUs:\n - {'\n - '.join(failed_boards)}'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
@@ -367,4 +374,49 @@ def check_board_dependencies(installer, verification_handler):
             f':white_check_mark: Step 6 for {installer['installer_os']} passsed: All MCUs have corresponding regexes in CMake files!'
         )
         with open('message.txt', 'w') as message_file:
-            message_file.writelines(message_content)
+            message_file.write(message_content)
+
+# Function for checking MCU-to-CODEGRIP dependancies.
+def check_card_dependencies(installer, verification_handler):
+    with open('package_dependencies.json', 'r') as dependency_file:
+        verification_handler = json.load(dependency_file)
+
+    # Fetch all the packages that are being checked from kibana.
+    es = Elasticsearch([os.environ['ES_HOST']], http_auth=(os.environ['ES_USER'], os.environ['ES_PASSWORD']))
+    index = os.environ['ES_INDEX_LIVE']
+    indexed_items = fetch_current_indexed_packages(es, index)
+
+    failed_cards = []
+
+    for package in verification_handler:
+        # Find the install location for the package based on kibana data.
+        for item in indexed_items:
+            if item['name'] == package and item['name'] == 'Board Package':
+                install_location = item['install_location'].replace('%APPLICATION_DATA_DIR%', installer['necto_path_app_data'])
+                failed_cards.append(package)
+            # Find .mcu file with the MCU name.
+            if verification_handler[package].lower() in install_location:
+                failed_cards.remove(package)
+
+    with open('message.txt', 'r') as message_file:
+        message_content = message_file.read()
+
+    if len(failed_cards):
+        # Update the message file.
+        message_content = message_content.replace(
+            f':underage: Step 6 for {installer['installer_os']} not executed',
+            f':firecracker: Step 6 for {installer['installer_os']} failed for the following MCUs:\n - {'\n - '.join(failed_cards)}'
+        )
+        with open('message.txt', 'w') as message_file:
+            message_file.write(message_content)
+
+        # Fail the job immediately.
+        exit(1)
+    else:
+        # Update the message file.
+        message_content = message_content.replace(
+            f':underage: Step 6 for {installer['installer_os']} not executed',
+            f':white_check_mark: Step 6 for {installer['installer_os']} passsed: All MCUs have corresponding regexes in CMake files!'
+        )
+        with open('message.txt', 'w') as message_file:
+            message_file.write(message_content)

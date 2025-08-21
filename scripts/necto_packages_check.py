@@ -13,10 +13,10 @@ def main():
         step1   - Check installation of mandatory NECTO packages;
         step2   - Check installation of CORE, BSP, CODEGRIP and MCHP NECTO packages;
         step3   - Create dependencies between MCUs, Boards, Cards and packages from step2;
-        step4   - Check if all CORE-to-MCU dependencies are correct.
-        step5   - Check if all CODEGRIP-to-MCU dependencies are correct.
-        step6   - Check if all MCHP-to-MCU dependencies are correct.
-        step7   - Check if all Board-to-BSP dependencies are correct.
+        step4   - Check if all CORE-to-MCU dependencies are correct;
+        step5   - Check if all CODEGRIP-to-MCU dependencies are correct;
+        step6   - Check if all MCHP-to-MCU dependencies are correct;
+        step7   - Check if all Board-to-BSP dependencies are correct;
         step8   - Check if all Card-to-BSP dependencies are correct.
         """,
         type = str
@@ -124,6 +124,20 @@ def main():
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
         packages.check_board_dependencies(installer, verification_handler)
+
+    if args.step == 'step8':
+        # Update the message file.
+        with open('message.txt', 'r') as message_file:
+            message_content = message_file.read()
+        message_content = message_content.replace(
+            f':underage: Step 8 for {installer['installer_os']} not executed',
+            f':firecracker: Script failed to execute Step 8 for {installer['installer_os']}'
+        )
+        with open('message.txt', 'w') as message_file:
+            message_file.write(message_content)
+        packages.check_card_dependencies(installer, verification_handler)
+        
+    print(message_content)
 
 if __name__ == '__main__':
     main()
