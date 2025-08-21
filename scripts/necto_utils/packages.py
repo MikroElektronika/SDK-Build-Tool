@@ -187,7 +187,7 @@ def check_mcu_dependencies(installer, verification_handler):
     for package in verification_handler:
         # Find the install location for the package based on kibana data.
         for item in indexed_items:
-            if item['name'] == package and item['name'] == 'MCU Package':
+            if item['name'] == package and item['category'] == 'MCU Package':
                 install_location = item['install_location'].replace('%APPLICATION_DATA_DIR%', installer['necto_path_app_data'])
             # Find cmake file with the MCU regex.
             for root, _, files in os.walk(install_location):
@@ -245,7 +245,7 @@ def check_codegrip_dependencies(installer, verification_handler):
     for package in verification_handler:
         # Find the install location for the package based on kibana data.
         for item in indexed_items:
-            if item['name'] == package and item['name'] == 'CODEGRIP Device Pack':
+            if item['name'] == package and item['category'] == 'CODEGRIP Device Pack':
                 install_location = item['install_location'].replace('%APPLICATION_DATA_DIR%', installer['necto_path_app_data'])
                 failed_mcus.append(verification_handler[package])
             # Find .mcu file with the MCU name.
@@ -293,7 +293,7 @@ def check_mchp_dependencies(installer, verification_handler):
     for package in verification_handler:
         # Find the install location for the package based on kibana data.
         for item in indexed_items:
-            if item['name'] == package and item['name'] == 'MPLAB Device Pack':
+            if item['name'] == package and item['category'] == 'MPLAB Device Pack':
                 install_location = item['install_location'].replace('%APPLICATION_DATA_DIR%', installer['necto_path_app_data'])
                 failed_mcus.append(verification_handler[package])
             # Find .mcu file with the MCU name.
@@ -341,7 +341,7 @@ def check_board_dependencies(installer, verification_handler):
     for package in verification_handler:
         # Find the install location for the package based on kibana data.
         for item in indexed_items:
-            if item['name'] == package and item['name'] == 'Board Package':
+            if item['name'] == package and item['category'] == 'Board Package':
                 install_location = item['install_location'].replace('%APPLICATION_DATA_DIR%', installer['necto_path_app_data'])
                 failed_boards.append(package)
             # Find .mcu file with the MCU name.
@@ -391,12 +391,13 @@ def check_card_dependencies(installer, verification_handler):
     for package in verification_handler:
         # Find the install location for the package based on kibana data.
         for item in indexed_items:
-            if item['name'] == package and item['name'] == 'Board Package':
+            if item['name'] == package and item['category'] == 'Card Package':
                 install_location = item['install_location'].replace('%APPLICATION_DATA_DIR%', installer['necto_path_app_data'])
                 failed_cards.append(package)
             # Find .mcu file with the MCU name.
-            if verification_handler[package].lower() in install_location:
-                failed_cards.remove(package)
+            for card in verification_handler[package]:
+                if card.lower() in install_location:
+                    failed_cards.remove(package)
 
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
