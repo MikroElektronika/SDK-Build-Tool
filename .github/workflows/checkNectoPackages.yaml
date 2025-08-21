@@ -66,26 +66,32 @@ jobs:
           python -u scripts/necto_packages_check.py "step2"
 
       - name: Step 3 - Create dependencies between MCUs, Boards, Cards and packages from Step 2
+        if: always()
         run: |
           python -u scripts/necto_packages_check.py "step3"
 
       - name: Step 4 - Check if all CORE-to-MCU dependencies are correct
+        if: always()
         run: |
           python -u scripts/necto_packages_check.py "step4"
 
       - name: Step 5 - Check if all CODEGRIP-to-MCU dependencies are correct
+        if: always()
         run: |
           python -u scripts/necto_packages_check.py "step5"
 
       - name: Step 6 - Check if all MCHP-to-MCU dependencies are correct
+        if: always()
         run: |
           python -u scripts/necto_packages_check.py "step6"
 
       - name: Step 7 - Check if all Board-to-BSP dependencies are correct
+        if: always()
         run: |
           python -u scripts/necto_packages_check.py "step7"
 
       - name: Step 8 - Check if all Card-to-BSP dependencies are correct
+        if: always()
         run: |
           python -u scripts/necto_packages_check.py "step8"
 
