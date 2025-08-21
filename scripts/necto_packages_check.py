@@ -137,7 +137,7 @@ def main():
             message_file.write(message_content)
         packages.check_card_dependencies(installer, verification_handler)
         
-    print(message_content)
+        print(message_content)
 
 if __name__ == '__main__':
     main()
