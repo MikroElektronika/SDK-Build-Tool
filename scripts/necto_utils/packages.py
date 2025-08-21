@@ -110,29 +110,34 @@ def install_packages(installer, verification_handler):
         # Find the install location for the package based on kibana data.
         for item in indexed_items:
             if item['name'] == package:
-                install_location = item['install_location'].replace('%APPLICATION_DATA_DIR%', installer['necto_path_app_data'])
-                break
+                if install_location == '':
+                    # If it is the first met matching kibana item - proceed.
+                    install_location = item['install_location'].replace('%APPLICATION_DATA_DIR%', installer['necto_path_app_data'])
+                else:
+                    # If it is not the first met matching kibana item - it is an error.
+                    error_lines.append(f' - {package} has multiple instances in kibana - remove the unused ones.')
+                    install_location = ''
         if install_location == '':
             # If there is no install location data in kibana - remember the package.
             print(f'\033[91mERROR! For package {package} there is no info in kibana.\033[0m')
             error_lines.append(f'- No info for {package} in kibana.\n')
+        else:
+            # Try to install the package 3 times.
+            print(f'Installing package: {package} ({package_counter}/{len(verification_handler)})')
+            while (num_of_retries < 3):
+                run_command(f'"{installer['installer_path']}" installer --install-packages {package} {installer['necto_path']} {installer['necto_path_app_data']}')
+                # Verify if the package has been installed.
+                if os.path.exists(install_location):
+                    print(f"\033[94mThe {package} package was downloaded successfully.\033[0m")
+                    break
+                num_of_retries += 1
 
-        # Try to install the package 3 times.
-        print(f'Installing package: {package} ({package_counter}/{len(verification_handler)})')
-        while (num_of_retries < 3):
-            run_command(f'"{installer['installer_path']}" installer --install-packages {package} {installer['necto_path']} {installer['necto_path_app_data']}')
-            # Verify if the package has been installed.
-            if os.path.exists(install_location):
-                print(f"\033[94mThe {package} package was downloaded successfully.\033[0m")
-                break
-            num_of_retries += 1
+            # After the third try remember the package as it failed to be installed.
+            if num_of_retries == 2:
+                print(f'\033[91mPackage is not installed in {install_location} after 3 retries.\033[0m')
+                error_lines.append(f'- Failed to install {package}.\n')
 
-        # After the third try remember the package as it failed to be installed.
-        if num_of_retries == 2:
-            print(f'\033[91mPackage is not installed in {install_location} after 3 retries.\033[0m')
-            error_lines.append(f'- Failed to install {package}.\n')
-
-        package_counter += 1
+            package_counter += 1
 
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
