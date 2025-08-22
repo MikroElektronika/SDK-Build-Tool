@@ -71,6 +71,7 @@ jobs:
           python -u scripts/necto_packages_check.py "step3"
 
       - name: package_dependencies.json as artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: package_dependencies
