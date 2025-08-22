@@ -203,16 +203,15 @@ def check_mcu_dependencies(installer, verification_handler):
                 # Find cmake file with the MCU regex.
                 for root, _, files in os.walk(install_location):
                     for file in files:
-                        if '.cmake' in file:
+                        if '.cmake' in file and 'coreUtils' not in file and 'Config' not in file and 'step' not in file:
                             # We have 2 .cmake files - 1 for core files, 1 for delays.
                             # We should check both.
-                            failed_mcus.append(verification_handler[package])
+                            failed_mcus.extend(verification_handler[package])
                             with open(os.path.join(root, file), 'r') as package_cmake:
                                 cmake_lines = package_cmake.readlines()
                             for line in cmake_lines:
                                 if '${MCU_NAME}' in line:
                                     regex = re.search(r'MATCHES\s+"([^"]+)"', line)
-                                    print(regex)
                                     # Check if mcu found the matching regex.
                                     for mcu in verification_handler[package]:
                                         if re.match(regex, mcu):
@@ -259,7 +258,7 @@ def check_codegrip_dependencies(installer, verification_handler):
         for item in indexed_items:
             if item['name'] == package and item['category'] == 'CODEGRIP Device Pack':
                 install_location = item['install_location'].replace('%APPLICATION_DATA_DIR%', installer['necto_path_app_data'])
-                failed_mcus.append(verification_handler[package])
+                failed_mcus.extend(verification_handler[package])
                 # Find .mcu file with the MCU name.
                 for root, _, files in os.walk(install_location):
                     for file in files:
@@ -308,7 +307,7 @@ def check_mchp_dependencies(installer, verification_handler):
         for item in indexed_items:
             if item['name'] == package and item['category'] == 'MPLAB Device Pack':
                 install_location = item['install_location'].replace('%APPLICATION_DATA_DIR%', installer['necto_path_app_data'])
-                failed_mcus.append(verification_handler[package])
+                failed_mcus.extend(verification_handler[package])
                 # Find .mcu file with the MCU name.
                 for root, _, files in os.walk(install_location):
                     for file in files:
@@ -357,7 +356,7 @@ def check_board_dependencies(installer, verification_handler):
         for item in indexed_items:
             if item['name'] == package and item['category'] == 'Board Package':
                 install_location = item['install_location'].replace('%APPLICATION_DATA_DIR%', installer['necto_path_app_data'])
-                failed_boards.append(verification_handler[package])
+                failed_boards.extend(verification_handler[package])
                 # Find .mcu file with the MCU name.
                 for root, _, files in os.walk(install_location):
                     for file in files:
