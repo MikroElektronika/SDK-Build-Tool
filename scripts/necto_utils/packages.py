@@ -212,8 +212,8 @@ def check_mcu_dependencies(installer, verification_handler):
                             for line in cmake_lines:
                                 if '${MCU_NAME}' in line:
                                     regex = re.findall(r'"([^"]*)"', line)
-                                    print(regex[0])
                                     if len(regex):
+                                        print(regex[0])
                                         # Check if mcu found the matching regex.
                                         for mcu in verification_handler[package]:
                                             if re.match(regex[0], mcu):
@@ -376,7 +376,7 @@ def check_board_dependencies(installer, verification_handler):
         # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 7 for {installer['installer_os']}',
-            f':firecracker: Step 7 for {installer['installer_os']} failed for the following Boards (BOARD-to-BSP files are missing):\n - {'\n - '.join(failed_boards)}'
+            f':firecracker: Step 7 for {installer['installer_os']} failed for the following Boards (BOARD-to-BSP regexes are incorrect):\n - {'\n - '.join(failed_boards)}'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
@@ -433,6 +433,7 @@ def check_card_dependencies(installer, verification_handler):
         # Fail the job immediately.
         exit(1)
     else:
+        print(failed_cards)
         # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 8 for {installer['installer_os']}',
