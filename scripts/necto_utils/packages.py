@@ -211,12 +211,11 @@ def check_mcu_dependencies(installer, verification_handler):
                                 cmake_lines = package_cmake.readlines()
                             for line in cmake_lines:
                                 if '${MCU_NAME}' in line:
-                                    regex = re.search(r'MATCHES\s+"([^"]+)"', line)
-                                    print(root + file)
-                                    print(regex)
+                                    regex = re.findall(r'"([^"]*)"', line)
+                                    print(regex[0])
                                     # Check if mcu found the matching regex.
                                     for mcu in verification_handler[package]:
-                                        if re.match(regex, mcu):
+                                        if re.match(regex[0], mcu):
                                             # If match found - remove the mcu from the package dependency.
                                             failed_mcus.remove(mcu)
 
@@ -227,7 +226,7 @@ def check_mcu_dependencies(installer, verification_handler):
         # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 4 for {installer['installer_os']}',
-            f':firecracker: Step 4 for {installer['installer_os']} failed for the following MCUs:\n - {'\n - '.join(failed_mcus)}'
+            f':firecracker: Step 4 for {installer['installer_os']} failed for the following MCUs (MCU-to-CORE regexes are missing):\n - {'\n - '.join(failed_mcus)}'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
@@ -276,7 +275,7 @@ def check_codegrip_dependencies(installer, verification_handler):
         # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 5 for {installer['installer_os']}',
-            f':firecracker: Step 5 for {installer['installer_os']} failed for the following MCUs:\n - {'\n - '.join(failed_mcus)}'
+            f':firecracker: Step 5 for {installer['installer_os']} failed for the following MCUs (MCU-to-CODEGRIP files are missing):\n - {'\n - '.join(failed_mcus)}'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
@@ -287,12 +286,12 @@ def check_codegrip_dependencies(installer, verification_handler):
         # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 5 for {installer['installer_os']}',
-            f':white_check_mark: Step 5 for {installer['installer_os']} passsed: All MCUs have corresponding regexes in CMake files!'
+            f':white_check_mark: Step 5 for {installer['installer_os']} passsed: All MCUs have corresponding files in CODEGRIP packs!'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
 
-# Function for checking MCU-to-MCHP dependancies.
+# Function for checking MCU-to-MCHP dependencies.
 def check_mchp_dependencies(installer, verification_handler):
     with open('package_dependencies.json', 'r') as dependency_file:
         verification_handler = json.load(dependency_file)
@@ -325,7 +324,7 @@ def check_mchp_dependencies(installer, verification_handler):
         # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 6 for {installer['installer_os']}',
-            f':firecracker: Step 6 for {installer['installer_os']} failed for the following MCUs:\n - {'\n - '.join(failed_mcus)}'
+            f':firecracker: Step 6 for {installer['installer_os']} failed for the following MCUs (MCU-to-MCHP files are missing):\n - {'\n - '.join(failed_mcus)}'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
@@ -336,12 +335,12 @@ def check_mchp_dependencies(installer, verification_handler):
         # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 6 for {installer['installer_os']}',
-            f':white_check_mark: Step 6 for {installer['installer_os']} passsed: All MCUs have corresponding regexes in CMake files!'
+            f':white_check_mark: Step 6 for {installer['installer_os']} passsed: All MCUs have corresponding files in MCHP files!'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
 
-# Function for checking MCU-to-CODEGRIP dependancies.
+# Function for checking BOARD-to-BSP dependencies.
 def check_board_dependencies(installer, verification_handler):
     with open('package_dependencies.json', 'r') as dependency_file:
         verification_handler = json.load(dependency_file)
@@ -376,7 +375,7 @@ def check_board_dependencies(installer, verification_handler):
         # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 7 for {installer['installer_os']}',
-            f':firecracker: Step 7 for {installer['installer_os']} failed for the following Boards:\n - {'\n - '.join(failed_boards)}'
+            f':firecracker: Step 7 for {installer['installer_os']} failed for the following Boards (BOARD-to-BSP files are missing):\n - {'\n - '.join(failed_boards)}'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
@@ -392,7 +391,7 @@ def check_board_dependencies(installer, verification_handler):
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
 
-# Function for checking MCU-to-CODEGRIP dependancies.
+# Function for checking CARD-to-BSP dependencies.
 def check_card_dependencies(installer, verification_handler):
     with open('package_dependencies.json', 'r') as dependency_file:
         verification_handler = json.load(dependency_file)
@@ -422,7 +421,7 @@ def check_card_dependencies(installer, verification_handler):
         # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 8 for {installer['installer_os']}',
-            f':firecracker: Step 8 for {installer['installer_os']} failed for the following Cards:\n - {'\n - '.join(failed_cards)}'
+            f':firecracker: Step 8 for {installer['installer_os']} failed for the following Cards (CARD-to-BSP files are missing):\n - {'\n - '.join(failed_cards)}'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
