@@ -213,11 +213,12 @@ def check_mcu_dependencies(installer, verification_handler):
                                 if '${MCU_NAME}' in line:
                                     regex = re.findall(r'"([^"]*)"', line)
                                     print(regex[0])
-                                    # Check if mcu found the matching regex.
-                                    for mcu in verification_handler[package]:
-                                        if re.match(regex[0], mcu):
-                                            # If match found - remove the mcu from the package dependency.
-                                            failed_mcus.remove(mcu)
+                                    if len(regex):
+                                        # Check if mcu found the matching regex.
+                                        for mcu in verification_handler[package]:
+                                            if re.match(regex[0], mcu):
+                                                # If match found - remove the mcu from the package dependency.
+                                                failed_mcus.remove(mcu)
 
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
@@ -408,11 +409,14 @@ def check_card_dependencies(installer, verification_handler):
         for item in indexed_items:
             if item['name'] == package and item['category'] == 'Card Package':
                 install_location = item['install_location'].replace('%APPLICATION_DATA_DIR%', installer['necto_path_app_data'])
+                print(package)
                 failed_cards.append(package)
                 # Find .mcu file with the MCU name.
                 for card in verification_handler[package]:
                     if card.lower() in install_location:
                         failed_cards.remove(package)
+                        
+    print(failed_cards)
 
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
