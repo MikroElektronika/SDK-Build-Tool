@@ -142,8 +142,6 @@ def install_packages(installer, verification_handler):
 
             package_counter += 1
 
-    print(error_lines)
-
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
 
@@ -170,9 +168,20 @@ def install_packages(installer, verification_handler):
             message_file.write(message_content)
 
 # Function for creating dependencies file.
-def create_dependencies_file(verification_handler):
+def create_dependencies_file(installer, verification_handler):
     with open('package_dependencies.json', 'w') as dependency_file:
         json.dump(verification_handler, dependency_file, indent=4)
+        
+    with open('message.txt', 'r') as message_file:
+        message_content = message_file.read()
+
+        # Update the message file.
+        message_content = message_content.replace(
+            f':firecracker: Script failed to execute Step 3 for {installer['installer_os']}',
+            f':white_check_mark: Step 3 for {installer['installer_os']} passsed: dependency file is generated successfully!'
+        )
+        with open('message.txt', 'w') as message_file:
+            message_file.write(message_content)
 
 # Function for checking MCU-to-CORE dependancies.
 def check_mcu_dependencies(installer, verification_handler):
@@ -203,6 +212,7 @@ def check_mcu_dependencies(installer, verification_handler):
                             for line in cmake_lines:
                                 if '${MCU_NAME}' in line:
                                     regex = re.search(r'MATCHES\s+"([^"]+)"', line)
+                                    print(regex)
                                     # Check if mcu found the matching regex.
                                     for mcu in verification_handler[package]:
                                         if re.match(regex, mcu):

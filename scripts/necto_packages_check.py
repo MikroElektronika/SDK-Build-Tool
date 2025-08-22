@@ -75,7 +75,7 @@ def main():
         # Create the package dependencies file.
         sdk_version = database.get_latest_sdk_version(db_path)
         database.query_packages(db_path, sdk_version, verification_handler)
-        packages.create_dependencies_file(verification_handler)
+        packages.create_dependencies_file(installer, verification_handler)
 
     if args.step == 'step4':
         # Update the message file.
