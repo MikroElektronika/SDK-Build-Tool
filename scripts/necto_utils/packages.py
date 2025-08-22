@@ -212,6 +212,8 @@ def check_mcu_dependencies(installer, verification_handler):
                             for line in cmake_lines:
                                 if '${MCU_NAME}' in line:
                                     regex = re.search(r'MATCHES\s+"([^"]+)"', line)
+                                    print(root + file)
+                                    print(regex)
                                     # Check if mcu found the matching regex.
                                     for mcu in verification_handler[package]:
                                         if re.match(regex, mcu):
@@ -263,7 +265,7 @@ def check_codegrip_dependencies(installer, verification_handler):
                 for root, _, files in os.walk(install_location):
                     for file in files:
                         for mcu in verification_handler[package]:
-                            if file.replace('.mcu', '') == mcu:
+                            if file.replace('.mcu', '').lower() == mcu.lower():
                                 if mcu in failed_mcus:
                                     failed_mcus.remove(mcu)
 
@@ -290,7 +292,7 @@ def check_codegrip_dependencies(installer, verification_handler):
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
 
-# Function for checking MCU-to-CODEGRIP dependancies.
+# Function for checking MCU-to-MCHP dependancies.
 def check_mchp_dependencies(installer, verification_handler):
     with open('package_dependencies.json', 'r') as dependency_file:
         verification_handler = json.load(dependency_file)
@@ -312,7 +314,7 @@ def check_mchp_dependencies(installer, verification_handler):
                 for root, _, files in os.walk(install_location):
                     for file in files:
                         for mcu in verification_handler[package]:
-                            if file.replace('.PIC', '') == mcu:
+                            if file.replace('.PIC', '').lower() == mcu.lower():
                                 if mcu in failed_mcus:
                                     failed_mcus.remove(mcu)
 
