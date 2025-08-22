@@ -117,7 +117,10 @@ def query_packages(db_path, sdk_version, verification_handler):
         package = installer_package['package']
         if package != '':
             # Create the Board-to-BSP dependency.
-            verification_handler[package] = msdk_board_name
+            if package not in verification_handler:
+                verification_handler.update({package: []})
+            if msdk_board_name not in verification_handler[package]:
+                verification_handler[package].append(msdk_board_name)
 
     # Step 4 - query the Prog packages.
     cursor.execute(f"""
@@ -137,4 +140,7 @@ def query_packages(db_path, sdk_version, verification_handler):
         package = row[1].split('"')[1]
         if package != '':
             # Create the MCU-to-PROG dependency.
-            verification_handler[package] = row[0]
+            if package not in verification_handler:
+                verification_handler.update({package: []})
+            if row[0] not in verification_handler[package]:
+                verification_handler[package].append(row[0])

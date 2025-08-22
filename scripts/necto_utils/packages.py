@@ -357,15 +357,16 @@ def check_board_dependencies(installer, verification_handler):
         for item in indexed_items:
             if item['name'] == package and item['category'] == 'Board Package':
                 install_location = item['install_location'].replace('%APPLICATION_DATA_DIR%', installer['necto_path_app_data'])
-                failed_boards.append(package)
+                failed_boards.append(verification_handler[package])
                 # Find .mcu file with the MCU name.
                 for root, _, files in os.walk(install_location):
                     for file in files:
                         if '.cmake' in file:
                             with open(os.path.join(root, file), 'r') as bsp_header:
                                 bsp_content = bsp_header.read()
-                            if verification_handler[package] in bsp_content and package in failed_boards:
-                                failed_boards.remove(package)
+                            for board in verification_handler[package]:
+                                if board in bsp_content and board in failed_boards:
+                                    failed_boards.remove(board)
 
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
