@@ -13,6 +13,7 @@ env:
   ES_USER: ${{ secrets.ES_USER }}
   ES_PASSWORD: ${{ secrets.ES_PASSWORD }}
   ES_INDEX_LIVE: ${{ secrets.ES_INDEX_LIVE }}
+  HTML_LINK: "https://github.com/${{ github.repository }}/packages/generic/results-html/${{ github.run_number }}/results.html"
 
 jobs:
   necto_verification:

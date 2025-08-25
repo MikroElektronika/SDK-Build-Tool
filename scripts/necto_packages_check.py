@@ -40,6 +40,9 @@ def main():
 :underage: Step 6 for {installer['installer_os']} not executed
 :underage: Step 7 for {installer['installer_os']} not executed
 :underage: Step 8 for {installer['installer_os']} not executed
+
+For detailed information refer to:
+[Results in HTML]({os.environ["HTML_LINK"]})
     ''')
 
         # Verify NECTO installation.
