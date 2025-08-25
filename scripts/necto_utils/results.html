@@ -53,6 +53,22 @@
     .empty{border:1px dashed var(--border); border-radius:14px; padding:18px; text-align:center; color:var(--muted)}
     .footer{margin:18px 0 0; color:var(--muted); font-size:.9rem}
     .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background:#0f162c; padding:2px 6px; border-radius:6px; border:1px solid var(--border)}
+
+    .tab-btn.tab-green {
+        background: linear-gradient(180deg, #0f2b1b, #12351f);
+        border-color: #1e6e31;
+        color: #bff5d5;
+    }
+    .tab-btn.tab-red {
+        background: linear-gradient(180deg, #3a1214, #1f0b0c);
+        border-color: #7a262b;
+        color: #ffd2d2;
+    }
+    .tab-btn.tab-yellow {
+        background: linear-gradient(180deg, #2b2b0f, #353512);
+        border-color: #7a7a26;
+        color: #fff6bf;
+    }
   </style>
 </head>
 <body>
@@ -95,16 +111,8 @@
        Example shown for Step 1 and Step 2. Fill the rest as needed.
        ===================== */
     const stepData = {
-      1: {
-        succeeded: [
-          "STM32F103C8", "STM32H743ZI", "SAME70Q21", "ATSAMD21J18",
-          "PIC32MX795F512L", "MK64FN1M0VLL12", "RA4M1", "GD32F450"
-        ],
-        failed: [
-          "ESP32-S3", "STM32L4P5ZG", "PIC24EP512GU810", "NRF52840"
-        ]
-      },
-      2: { succeeded: ["ATSAMC21J18", "STM32F767ZI"], failed: ["MSP430F5529"] },
+      1: { succeeded: [], failed: [] },
+      2: { succeeded: [], failed: [] },
       3: { succeeded: [], failed: [] },
       4: { succeeded: [], failed: [] },
       5: { succeeded: [], failed: [] },
@@ -158,32 +166,46 @@
     }
 
     function render(){
-      const data = stepData[currentStep] || {succeeded:[], failed:[]};
-      const list = data[currentKind] || [];
-      grid.innerHTML = '';
+    const data = stepData[currentStep] || {succeeded:[], failed:[]};
+    const list = data[currentKind] || [];
+    grid.innerHTML = '';
 
-      barStep.textContent = String(currentStep);
-      barCount.textContent = String(list.length);
-      barLabel.textContent = `Showing ${currentKind.charAt(0).toUpperCase()+currentKind.slice(1)}`;
-      dot.style.background = currentKind==='succeeded' ? 'var(--success-chip)' : 'var(--fail-chip)';
+    barStep.textContent = String(currentStep);
+    barCount.textContent = String(list.length);
+    barLabel.textContent = `Showing ${currentKind.charAt(0).toUpperCase()+currentKind.slice(1)}`;
+    dot.style.background = currentKind==='succeeded' ? 'var(--success-chip)' : 'var(--fail-chip)';
 
-      if (!list.length){
+    // Update tab coloring for all steps
+    for (let i=1; i<=8; i++){
+        const btn = stepTabs.querySelector(`.tab-btn[data-step="${i}"]`);
+        btn.classList.remove('tab-green','tab-red','tab-yellow');
+        const step = stepData[i] || {succeeded:[], failed:[]};
+        if (step.failed.length > 0) {
+        btn.classList.add('tab-red');
+        } else if (step.succeeded.length > 0) {
+        btn.classList.add('tab-green');
+        } else {
+        btn.classList.add('tab-yellow');
+        }
+    }
+
+    if (!list.length){
         grid.style.display = 'none';
         empty.style.display = 'block';
         return;
-      }
-      grid.style.display = 'grid';
-      empty.style.display = 'none';
+    }
+    grid.style.display = 'grid';
+    empty.style.display = 'none';
 
-      list.forEach((name) => {
+    list.forEach((name) => {
         const card = document.createElement('div');
         card.className = `card ${currentKind==='succeeded' ? 'success' : 'failed'}`;
         card.innerHTML = `
-          <div class="name">${escapeHtml(name)}</div>
-          <div class="chip">${currentKind==='succeeded' ? 'Succeeded' : 'Failed'}</div>
+        <div class="name">${escapeHtml(name)}</div>
+        <div class="chip">${currentKind==='succeeded' ? 'Succeeded' : 'Failed'}</div>
         `;
         grid.appendChild(card);
-      });
+    });
     }
 
     function escapeHtml(str){
