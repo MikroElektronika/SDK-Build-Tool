@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MCU Test Results – 8 Steps</title>
+  <style>
+    :root{
+      --bg:#0b1020; --panel:#12172a; --muted:#9aa4b8; --text:#eaf0ff; --accent:#67b8ff; --accent-2:#7ef0c1;
+      --success:#11371c; --success-border:#1e6e31; --success-chip:#2bbf62;
+      --fail:#3a1214; --fail-border:#7a262b; --fail-chip:#ff6b6b;
+      --ring: #2e3652; --card:#0f1427; --border:#222a44;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans", sans-serif; background:radial-gradient(1000px 800px at 10% -5%, rgba(103,184,255,.08), transparent 45%), radial-gradient(800px 600px at 110% 0%, rgba(126,240,193,.07), transparent 50%), var(--bg); color:var(--text)}
+    .wrap{max-width:1200px; margin:32px auto; padding:0 20px}
+    h1{margin:0 0 12px; font-size:clamp(1.4rem,1.4rem + 1.2vw,2.1rem)}
+    .sub{color:var(--muted); margin:0 0 18px}
+
+    /* Top tabs */
+    .tabs{display:flex; flex-wrap:wrap; gap:10px; margin:16px 0 12px}
+    .tab-btn{appearance:none; border:1px solid var(--border); background:linear-gradient(180deg, #141a31, #0f152b); color:var(--text); padding:10px 14px; border-radius:12px; cursor:pointer; transition:.2s; box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+    .tab-btn:hover{transform:translateY(-1px); box-shadow:0 6px 18px rgba(0,0,0,.35)}
+    .tab-btn.active{outline:2px solid var(--ring); background:linear-gradient(180deg, #1a2140, #121a37); color:#fff}
+
+    .panel{background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:16px; box-shadow:0 10px 28px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03)}
+
+    /* Sub-tabs */
+    .subtabs{display:flex; gap:8px; margin:4px 0 16px}
+    .sub-btn{appearance:none; border:1px solid var(--border); background:#0f152b; color:var(--muted); padding:8px 12px; border-radius:999px; cursor:pointer; transition:.2s}
+    .sub-btn.active{color:#fff; background:#1a2140; outline:2px solid var(--ring)}
+
+    /* Info bar */
+    .bar{display:flex; justify-content:space-between; align-items:center; gap:12px; margin:8px 0 14px; color:var(--muted); font-size:.95rem}
+    .pill{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; border:1px solid var(--border); background:#0e1428}
+    .dot{width:8px; height:8px; border-radius:50%}
+
+    /* Grid (4 per row) */
+    .grid{display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:12px}
+    @media (max-width:1000px){ .grid{grid-template-columns:repeat(3,1fr)} }
+    @media (max-width:760px){ .grid{grid-template-columns:repeat(2,1fr)} }
+    @media (max-width:520px){ .grid{grid-template-columns:1fr} }
+
+    .card{border-radius:14px; padding:14px; border:1px solid var(--border); background:var(--card); display:flex; flex-direction:column; gap:8px; min-height:92px}
+    .card.success{background:linear-gradient(180deg, var(--success), #0c1f12); border-color:var(--success-border)}
+    .card.failed{background:linear-gradient(180deg, var(--fail), #1f0b0c); border-color:var(--fail-border)}
+    .name{font-weight:600; letter-spacing:.2px}
+    .chip{align-self:flex-start; padding:4px 8px; border-radius:999px; font-size:.8rem; border:1px solid rgba(255,255,255,.15)}
+    .success .chip{background:rgba(43,191,98,.15); color:#bff5d5; border-color:rgba(46,158,94,.6)}
+    .failed .chip{background:rgba(255,107,107,.12); color:#ffd2d2; border-color:rgba(255,107,107,.55)}
+
+    .empty{border:1px dashed var(--border); border-radius:14px; padding:18px; text-align:center; color:var(--muted)}
+    .footer{margin:18px 0 0; color:var(--muted); font-size:.9rem}
+    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background:#0f162c; padding:2px 6px; border-radius:6px; border:1px solid var(--border)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>MCU Test Results</h1>
+    <p class="sub">Eight-step report with Succeeded/Failed sub-tabs. Grids render 4 cards per row automatically.</p>
+
+    <!-- Top step tabs -->
+    <div id="stepTabs" class="tabs" role="tablist" aria-label="Steps">
+      <!-- Buttons injected by JS -->
+    </div>
+
+    <div class="panel" id="panel">
+      <!-- Sub-tabs -->
+      <div class="subtabs" role="tablist" aria-label="Result tabs">
+        <button class="sub-btn active" data-kind="succeeded" id="subSucceeded" aria-selected="true">Succeeded</button>
+        <button class="sub-btn" data-kind="failed" id="subFailed" aria-selected="false">Failed</button>
+      </div>
+
+      <div class="bar">
+        <div class="pill"><span class="dot" id="dot" style="background:var(--success)"></span><span id="barLabel">Showing Succeeded</span></div>
+        <div class="pill">Step: <strong id="barStep" style="margin-left:6px">1</strong></div>
+        <div class="pill">Count: <strong id="barCount" style="margin-left:6px">0</strong></div>
+      </div>
+
+      <!-- Content grid -->
+      <div id="grid" class="grid" aria-live="polite"></div>
+
+      <div id="empty" class="empty" style="display:none">No items to display for this filter.</div>
+
+      <div class="footer">Tip: Use <span class="kbd">[1–8]</span> to switch steps, and <span class="kbd">S</span>/<span class="kbd">F</span> for sub-tabs.</div>
+    </div>
+  </div>
+
+  <script>
+    /* =====================
+       Data model
+       ---------------------
+       Provide your MCU lists below. Each step has two arrays: succeeded, failed.
+       Example shown for Step 1 and Step 2. Fill the rest as needed.
+       ===================== */
+    const stepData = {
+      1: {
+        succeeded: [
+          "STM32F103C8", "STM32H743ZI", "SAME70Q21", "ATSAMD21J18",
+          "PIC32MX795F512L", "MK64FN1M0VLL12", "RA4M1", "GD32F450"
+        ],
+        failed: [
+          "ESP32-S3", "STM32L4P5ZG", "PIC24EP512GU810", "NRF52840"
+        ]
+      },
+      2: { succeeded: ["ATSAMC21J18", "STM32F767ZI"], failed: ["MSP430F5529"] },
+      3: { succeeded: [], failed: [] },
+      4: { succeeded: [], failed: [] },
+      5: { succeeded: [], failed: [] },
+      6: { succeeded: [], failed: [] },
+      7: { succeeded: [], failed: [] },
+      8: { succeeded: [], failed: [] }
+    };
+
+    /* =====================
+       UI wiring
+       ===================== */
+    const stepTabs = document.getElementById('stepTabs');
+    const grid = document.getElementById('grid');
+    const empty = document.getElementById('empty');
+    const barStep = document.getElementById('barStep');
+    const barCount = document.getElementById('barCount');
+    const barLabel = document.getElementById('barLabel');
+    const dot = document.getElementById('dot');
+
+    let currentStep = 1;
+    let currentKind = 'succeeded';
+
+    // Build step buttons
+    for (let i=1; i<=8; i++){
+      const btn = document.createElement('button');
+      btn.className = 'tab-btn' + (i===1 ? ' active' : '');
+      btn.textContent = `Step ${i}`;
+      btn.setAttribute('data-step', i);
+      btn.setAttribute('role', 'tab');
+      btn.addEventListener('click', () => setStep(i));
+      stepTabs.appendChild(btn);
+    }
+
+    // Sub-tab buttons
+    document.getElementById('subSucceeded').addEventListener('click', () => setKind('succeeded'));
+    document.getElementById('subFailed').addEventListener('click', () => setKind('failed'));
+
+    function setStep(step){
+      currentStep = step;
+      for (const b of stepTabs.querySelectorAll('.tab-btn')){
+        b.classList.toggle('active', Number(b.dataset.step)===step);
+      }
+      render();
+    }
+
+    function setKind(kind){
+      currentKind = kind;
+      document.getElementById('subSucceeded').classList.toggle('active', kind==='succeeded');
+      document.getElementById('subFailed').classList.toggle('active', kind==='failed');
+      render();
+    }
+
+    function render(){
+      const data = stepData[currentStep] || {succeeded:[], failed:[]};
+      const list = data[currentKind] || [];
+      grid.innerHTML = '';
+
+      barStep.textContent = String(currentStep);
+      barCount.textContent = String(list.length);
+      barLabel.textContent = `Showing ${currentKind.charAt(0).toUpperCase()+currentKind.slice(1)}`;
+      dot.style.background = currentKind==='succeeded' ? 'var(--success-chip)' : 'var(--fail-chip)';
+
+      if (!list.length){
+        grid.style.display = 'none';
+        empty.style.display = 'block';
+        return;
+      }
+      grid.style.display = 'grid';
+      empty.style.display = 'none';
+
+      list.forEach((name) => {
+        const card = document.createElement('div');
+        card.className = `card ${currentKind==='succeeded' ? 'success' : 'failed'}`;
+        card.innerHTML = `
+          <div class="name">${escapeHtml(name)}</div>
+          <div class="chip">${currentKind==='succeeded' ? 'Succeeded' : 'Failed'}</div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'",'&#039;');
+    }
+
+    // Keyboard shortcuts: 1-8 for steps, S/F for sub-tabs
+    window.addEventListener('keydown', (e)=>{
+      if(e.key>='1' && e.key<='8'){ setStep(Number(e.key)); }
+      if(e.key==='s' || e.key==='S'){ setKind('succeeded'); }
+      if(e.key==='f' || e.key==='F'){ setKind('failed'); }
+    });
+
+    // Initial render
+    render();
+  </script>
+</body>
+</html>
