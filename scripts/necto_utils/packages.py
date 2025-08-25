@@ -243,11 +243,11 @@ def check_mcu_dependencies(installer, verification_handler):
                                 cmake_lines = package_cmake.readlines()
                             for line in cmake_lines:
                                 if '${MCU_NAME}' in line:
-                                    regex = re.findall(r'"([^"]*)"', line)
+                                    regex = re.findall(r'"([^"]*)"'.lower(), line.lower())
                                     if len(regex):
                                         # Check if mcu found the matching regex.
                                         for mcu in verification_handler[package]:
-                                            if re.match(regex[0], mcu):
+                                            if re.match(regex[0].lower(), mcu.lower()):
                                                 # If match found - remove the mcu from the package dependency.
                                                 if mcu in failed_mcus:
                                                     failed_mcus.remove(mcu)
