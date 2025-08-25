@@ -163,11 +163,26 @@ def install_necto(installer):
     print('\033[32mNECTO installation completed successfully.\033[32m')
 
     failed_packages = []
+    passed_packages = []
 
     for package in package_installation_validation:
         # Memorize all the mandatory packages that failed to be installed.
         if package_installation_validation[package] == False:
             failed_packages.append(package)
+        else:
+            passed_packages.append(package)
+
+    with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
+        results_contents = results_html.read()
+
+    results_contents = results_contents.replace(
+        'STEP1_PASSED', passed_packages
+    ).replace(
+        'STEP1_FAILED', failed_packages
+    )
+
+    with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
+        results_html.write(results_contents)
 
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()

@@ -102,6 +102,8 @@ def install_packages(installer, verification_handler):
     indexed_items = fetch_current_indexed_packages(es, index)
 
     package_counter = 0
+    failed_packages = []
+    passed_packages = []
 
     # Fetch package info from kibana.
     for package in verification_handler:
