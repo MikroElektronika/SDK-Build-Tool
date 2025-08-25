@@ -70,12 +70,12 @@ jobs:
         run: |
           python -u scripts/necto_packages_check.py "step3"
 
-      - name: package_dependencies.json as artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: package_dependencies
-          path: package_dependencies.json
+      # - name: package_dependencies.json as artifact
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: package_dependencies
+      #     path: package_dependencies.json
 
       - name: Step 4 - Check if all CORE-to-MCU dependencies are correct
         if: always()
@@ -101,6 +101,15 @@ jobs:
         if: always()
         run: |
           python -u scripts/necto_packages_check.py "step8"
+
+      - name: Message and dependencies files as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts
+          path: |
+            package_dependencies.json
+            message.txt
 
       # - name: Send notification to Mattermost
       #   if: always() && matrix.os != 'windows-latest'
