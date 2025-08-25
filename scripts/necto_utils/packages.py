@@ -144,6 +144,13 @@ def install_packages(installer, verification_handler):
 
             package_counter += 1
             
+    if len(passed_packages):
+        passed_packages[0] = '"' + passed_packages[0]
+        passed_packages[-1] = passed_packages[-1] + '"'
+    if len(failed_packages):
+        failed_packages[0] = '"' + failed_packages[0]
+        failed_packages[-1] = failed_packages[-1] + '"'
+            
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
         results_contents = results_html.read()
 
@@ -199,7 +206,7 @@ def create_dependencies_file(installer, verification_handler):
         results_contents = results_html.read()
 
     results_contents = results_contents.replace(
-        'STEP3_PASSED', 'package_dependencies.json'
+        'STEP3_PASSED', '"package_dependencies.json"'
     ).replace(
         'STEP3_FAILED', ''
     )
@@ -246,6 +253,13 @@ def check_mcu_dependencies(installer, verification_handler):
                                                     failed_mcus.remove(mcu)
                                                 if mcu not in passed_mcus:
                                                     passed_mcus.append(mcu)
+                                                    
+    if len(passed_mcus):
+        passed_mcus[0] = '"' + passed_mcus[0]
+        passed_mcus[-1] = passed_mcus[-1] + '"'
+    if len(failed_mcus):
+        failed_mcus[0] = '"' + failed_mcus[0]
+        failed_mcus[-1] = failed_mcus[-1] + '"'
 
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
         results_contents = results_html.read()
@@ -310,6 +324,13 @@ def check_codegrip_dependencies(installer, verification_handler):
                                     failed_mcus.remove(mcu)
                                     passed_mcus.append(mcu)
                                     
+    if len(passed_mcus):
+        passed_mcus[0] = '"' + passed_mcus[0]
+        passed_mcus[-1] = passed_mcus[-1] + '"'
+    if len(failed_mcus):
+        failed_mcus[0] = '"' + failed_mcus[0]
+        failed_mcus[-1] = failed_mcus[-1] + '"'
+                                    
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
         results_contents = results_html.read()
 
@@ -372,6 +393,13 @@ def check_mchp_dependencies(installer, verification_handler):
                                 if mcu in failed_mcus:
                                     failed_mcus.remove(mcu)
                                     passed_mcus.append(mcu)
+                                    
+    if len(passed_mcus):
+        passed_mcus[0] = '"' + passed_mcus[0]
+        passed_mcus[-1] = passed_mcus[-1] + '"'
+    if len(failed_mcus):
+        failed_mcus[0] = '"' + failed_mcus[0]
+        failed_mcus[-1] = failed_mcus[-1] + '"'
                                     
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
         results_contents = results_html.read()
@@ -438,6 +466,13 @@ def check_board_dependencies(installer, verification_handler):
                                     failed_boards.remove(board)
                                     passed_boards.append(board)
                                     
+    if len(passed_boards):
+        passed_boards[0] = '"' + passed_boards[0]
+        passed_boards[-1] = passed_boards[-1] + '"'
+    if len(failed_boards):
+        failed_boards[0] = '"' + failed_boards[0]
+        failed_boards[-1] = failed_boards[-1] + '"'
+                                    
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
         results_contents = results_html.read()
 
@@ -497,6 +532,13 @@ def check_card_dependencies(installer, verification_handler):
                     if card.lower() in install_location:
                         failed_cards.remove(package)
                         passed_cards.append(package)
+                        
+    if len(passed_cards):
+        passed_cards[0] = '"' + passed_cards[0]
+        passed_cards[-1] = passed_cards[-1] + '"'
+    if len(failed_cards):
+        failed_cards[0] = '"' + failed_cards[0]
+        failed_cards[-1] = failed_cards[-1] + '"'
                         
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
         results_contents = results_html.read()

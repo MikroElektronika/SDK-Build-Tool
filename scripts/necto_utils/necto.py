@@ -171,6 +171,13 @@ def install_necto(installer):
             failed_packages.append(package)
         else:
             passed_packages.append(package)
+            
+    if len(passed_packages):
+        passed_packages[0] = '"' + passed_packages[0]
+        passed_packages[-1] = passed_packages[-1] + '"'
+    if len(failed_packages):
+        failed_packages[0] = '"' + failed_packages[0]
+        failed_packages[-1] = failed_packages[-1] + '"'
 
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
         results_contents = results_html.read()

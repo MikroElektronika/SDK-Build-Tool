@@ -45,7 +45,7 @@
     .card{border-radius:14px; padding:14px; border:1px solid var(--border); background:var(--card); display:flex; flex-direction:column; gap:8px; min-height:92px}
     .card.success{background:linear-gradient(180deg, var(--success), #0c1f12); border-color:var(--success-border)}
     .card.failed{background:linear-gradient(180deg, var(--fail), #1f0b0c); border-color:var(--fail-border)}
-    .name{font-weight:600; letter-spacing:.2px}
+    .name {font-weight:600; letter-spacing:.2px; word-break: break-word; white-space: normal}
     .chip{align-self:flex-start; padding:4px 8px; border-radius:999px; font-size:.8rem; border:1px solid rgba(255,255,255,.15)}
     .success .chip{background:rgba(43,191,98,.15); color:#bff5d5; border-color:rgba(46,158,94,.6)}
     .failed .chip{background:rgba(255,107,107,.12); color:#ffd2d2; border-color:rgba(255,107,107,.55)}
@@ -111,14 +111,14 @@
        Example shown for Step 1 and Step 2. Fill the rest as needed.
        ===================== */
     const stepData = {
-      1: { succeeded: ["STEP1_PASSED"], failed: ["STEP1_FAILED"] },
-      2: { succeeded: ["STEP2_PASSED"], failed: ["STEP2_FAILED"] },
-      3: { succeeded: ["STEP3_PASSED"], failed: ["STEP3_FAILED"] },
-      4: { succeeded: ["STEP4_PASSED"], failed: ["STEP4_FAILED"] },
-      5: { succeeded: ["STEP5_PASSED"], failed: ["STEP5_FAILED"] },
-      6: { succeeded: ["STEP6_PASSED"], failed: ["STEP6_FAILED"] },
-      7: { succeeded: ["STEP7_PASSED"], failed: ["STEP7_FAILED"] },
-      8: { succeeded: ["STEP8_PASSED"], failed: ["STEP8_FAILED"] }
+      1: { succeeded: [STEP1_PASSED], failed: [STEP1_FAILED] },
+      2: { succeeded: [STEP2_PASSED], failed: [STEP2_FAILED] },
+      3: { succeeded: [STEP3_PASSED], failed: [STEP3_FAILED] },
+      4: { succeeded: [STEP4_PASSED], failed: [STEP4_FAILED] },
+      5: { succeeded: [STEP5_PASSED], failed: [STEP5_FAILED] },
+      6: { succeeded: [STEP6_PASSED], failed: [STEP6_FAILED] },
+      7: { succeeded: [STEP7_PASSED], failed: [STEP7_FAILED] },
+      8: { succeeded: [STEP8_PASSED], failed: [STEP8_FAILED] }
     };
 
     /* =====================
