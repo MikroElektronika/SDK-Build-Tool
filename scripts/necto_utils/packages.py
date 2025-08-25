@@ -153,7 +153,7 @@ def install_packages(installer, verification_handler):
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
-            
+
         print(message_content)
 
         # Fail the job immediately.
@@ -171,7 +171,7 @@ def install_packages(installer, verification_handler):
 def create_dependencies_file(installer, verification_handler):
     with open('package_dependencies.json', 'w') as dependency_file:
         json.dump(verification_handler, dependency_file, indent=4)
-        
+
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
 
@@ -415,8 +415,6 @@ def check_card_dependencies(installer, verification_handler):
                 for card in verification_handler[package]:
                     if card.lower() in install_location:
                         failed_cards.remove(package)
-                        
-    print(failed_cards)
 
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
@@ -433,11 +431,12 @@ def check_card_dependencies(installer, verification_handler):
         # Fail the job immediately.
         exit(1)
     else:
-        print(failed_cards)
         # Update the message file.
+        print(message_content)
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 8 for {installer['installer_os']}',
             f':white_check_mark: Step 8 for {installer['installer_os']} passsed: All Cards have corresponding folders!'
         )
+        print(message_content)
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
