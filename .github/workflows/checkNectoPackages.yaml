@@ -112,6 +112,19 @@ jobs:
             message.txt
             scripts/necto_utils/results.html
 
+      - name: Upload results.html as a GitHub Package
+        if: always()
+        run: |
+          PACKAGE_OWNER=${{ github.repository_owner }}
+          PACKAGE_NAME=results-html
+          PACKAGE_VERSION=${{ github.run_number }}
+
+          curl -X PUT \
+            -u "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: text/html" \
+            --data-binary @scripts/necto_utils/results.html \
+            "https://uploads.github.com/repos/${{ github.repository }}/packages/generic/${PACKAGE_NAME}/${PACKAGE_VERSION}/results.html"
+
       # - name: Send notification to Mattermost
       #   if: always() && matrix.os != 'windows-latest'
       #   env:
