@@ -116,13 +116,10 @@ def install_packages(installer, verification_handler):
                 else:
                     # If it is not the first met matching kibana item - it is an error.
                     error_lines.append(f' - {package} has multiple instances in kibana - remove the unused ones.')
-                    print(error_lines)
                     install_location = ''
         if install_location == '':
             # If there is no install location data in kibana - remember the package.
-            print(f'\033[91mERROR! For package {package} there is no info in kibana.\033[0m')
             error_lines.append(f'- No info for {package} in kibana.\n')
-            print(error_lines)
         else:
             # Try to install the package 3 times.
             print(f'Installing package: {package} ({package_counter}/{len(verification_handler)})')
@@ -138,7 +135,6 @@ def install_packages(installer, verification_handler):
             if num_of_retries == 2:
                 print(f'\033[91mPackage is not installed in {install_location} after 3 retries.\033[0m')
                 error_lines.append(f'- Failed to install {package}.\n')
-                print(error_lines)
 
             package_counter += 1
 
@@ -153,8 +149,6 @@ def install_packages(installer, verification_handler):
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
-
-        print(message_content)
 
         # Fail the job immediately.
         exit(1)
@@ -213,7 +207,6 @@ def check_mcu_dependencies(installer, verification_handler):
                                 if '${MCU_NAME}' in line:
                                     regex = re.findall(r'"([^"]*)"', line)
                                     if len(regex):
-                                        print(regex[0])
                                         # Check if mcu found the matching regex.
                                         for mcu in verification_handler[package]:
                                             if re.match(regex[0], mcu):
@@ -409,7 +402,6 @@ def check_card_dependencies(installer, verification_handler):
         for item in indexed_items:
             if item['name'] == package and item['category'] == 'Card Package':
                 install_location = item['install_location'].replace('%APPLICATION_DATA_DIR%', installer['necto_path_app_data'])
-                print(package)
                 failed_cards.append(package)
                 # Find .mcu file with the MCU name.
                 for card in verification_handler[package]:
@@ -432,11 +424,9 @@ def check_card_dependencies(installer, verification_handler):
         exit(1)
     else:
         # Update the message file.
-        print(message_content)
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 8 for {installer['installer_os']}',
             f':white_check_mark: Step 8 for {installer['installer_os']} passsed: All Cards have corresponding folders!'
         )
-        print(message_content)
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
