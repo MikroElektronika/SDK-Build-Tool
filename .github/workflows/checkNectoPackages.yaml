@@ -110,6 +110,7 @@ jobs:
           path: |
             package_dependencies.json
             message.txt
+            scripts/necto_utils/results.html
 
       # - name: Send notification to Mattermost
       #   if: always() && matrix.os != 'windows-latest'

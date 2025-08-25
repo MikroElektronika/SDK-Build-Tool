@@ -118,10 +118,12 @@ def install_packages(installer, verification_handler):
                 else:
                     # If it is not the first met matching kibana item - it is an error.
                     error_lines.append(f' - {package} has multiple instances in kibana - remove the unused ones.')
+                    failed_packages.append(package)
                     install_location = ''
         if install_location == '':
             # If there is no install location data in kibana - remember the package.
             error_lines.append(f'- No info for {package} in kibana.\n')
+            failed_packages.append(package)
         else:
             # Try to install the package 3 times.
             print(f'Installing package: {package} ({package_counter}/{len(verification_handler)})')
@@ -130,6 +132,7 @@ def install_packages(installer, verification_handler):
                 # Verify if the package has been installed.
                 if os.path.exists(install_location):
                     print(f"\033[94mThe {package} package was downloaded successfully.\033[0m")
+                    passed_packages.append(package)
                     break
                 num_of_retries += 1
 
@@ -137,8 +140,21 @@ def install_packages(installer, verification_handler):
             if num_of_retries == 2:
                 print(f'\033[91mPackage is not installed in {install_location} after 3 retries.\033[0m')
                 error_lines.append(f'- Failed to install {package}.\n')
+                failed_packages.append(package)
 
             package_counter += 1
+            
+    with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
+        results_contents = results_html.read()
+
+    results_contents = results_contents.replace(
+        'STEP5_PASSED', 'package_dependencies.json'
+    ).replace(
+        'STEP6_FAILED', []
+    )
+
+    with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
+        results_html.write(results_contents)
 
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
@@ -171,13 +187,25 @@ def create_dependencies_file(installer, verification_handler):
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
 
-        # Update the message file.
-        message_content = message_content.replace(
-            f':firecracker: Script failed to execute Step 3 for {installer['installer_os']}',
-            f':white_check_mark: Step 3 for {installer['installer_os']} passsed: dependency file is generated successfully!'
-        )
-        with open('message.txt', 'w') as message_file:
-            message_file.write(message_content)
+    # Update the message file.
+    message_content = message_content.replace(
+        f':firecracker: Script failed to execute Step 3 for {installer['installer_os']}',
+        f':white_check_mark: Step 3 for {installer['installer_os']} passsed: dependency file is generated successfully!'
+    )
+    with open('message.txt', 'w') as message_file:
+        message_file.write(message_content)
+            
+    with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
+        results_contents = results_html.read()
+
+    results_contents = results_contents.replace(
+        'STEP5_PASSED', 'package_dependencies.json'
+    ).replace(
+        'STEP6_FAILED', []
+    )
+
+    with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
+        results_html.write(results_contents)
 
 # Function for checking MCU-to-CORE dependancies.
 def check_mcu_dependencies(installer, verification_handler):
@@ -217,7 +245,17 @@ def check_mcu_dependencies(installer, verification_handler):
                                                 failed_mcus.remove(mcu)
                                                 passed_mcus.append(mcu)
 
-    print(passed_mcus)
+    with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
+        results_contents = results_html.read()
+
+    results_contents = results_contents.replace(
+        'STEP4_PASSED', passed_mcus
+    ).replace(
+        'STEP4_FAILED', failed_mcus
+    )
+
+    with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
+        results_html.write(results_contents)
 
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
@@ -269,6 +307,18 @@ def check_codegrip_dependencies(installer, verification_handler):
                                 if mcu in failed_mcus:
                                     failed_mcus.remove(mcu)
                                     passed_mcus.append(mcu)
+                                    
+    with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
+        results_contents = results_html.read()
+
+    results_contents = results_contents.replace(
+        'STEP5_PASSED', passed_mcus
+    ).replace(
+        'STEP5_FAILED', failed_mcus
+    )
+
+    with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
+        results_html.write(results_contents)
 
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
@@ -320,6 +370,18 @@ def check_mchp_dependencies(installer, verification_handler):
                                 if mcu in failed_mcus:
                                     failed_mcus.remove(mcu)
                                     passed_mcus.append(mcu)
+                                    
+    with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
+        results_contents = results_html.read()
+
+    results_contents = results_contents.replace(
+        'STEP6_PASSED', passed_mcus
+    ).replace(
+        'STEP6_FAILED', failed_mcus
+    )
+
+    with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
+        results_html.write(results_contents)
 
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
@@ -373,6 +435,18 @@ def check_board_dependencies(installer, verification_handler):
                                 if board in bsp_content and board in failed_boards:
                                     failed_boards.remove(board)
                                     passed_boards.append(board)
+                                    
+    with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
+        results_contents = results_html.read()
+
+    results_contents = results_contents.replace(
+        'STEP7_PASSED', passed_boards
+    ).replace(
+        'STEP7_FAILED', failed_boards
+    )
+
+    with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
+        results_html.write(results_contents)
 
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
@@ -421,6 +495,18 @@ def check_card_dependencies(installer, verification_handler):
                     if card.lower() in install_location:
                         failed_cards.remove(package)
                         passed_cards.append(package)
+                        
+    with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
+        results_contents = results_html.read()
+
+    results_contents = results_contents.replace(
+        'STEP8_PASSED', passed_cards
+    ).replace(
+        'STEP8_FAILED', failed_cards
+    )
+
+    with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
+        results_html.write(results_contents)
 
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
