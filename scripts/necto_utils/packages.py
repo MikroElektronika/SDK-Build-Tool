@@ -148,9 +148,9 @@ def install_packages(installer, verification_handler):
         results_contents = results_html.read()
 
     results_contents = results_contents.replace(
-        'STEP5_PASSED', 'package_dependencies.json'
+        'STEP2_PASSED', passed_packages
     ).replace(
-        'STEP6_FAILED', []
+        'STEP2_FAILED', failed_packages
     )
 
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
@@ -199,9 +199,9 @@ def create_dependencies_file(installer, verification_handler):
         results_contents = results_html.read()
 
     results_contents = results_contents.replace(
-        'STEP5_PASSED', 'package_dependencies.json'
+        'STEP3_PASSED', 'package_dependencies.json'
     ).replace(
-        'STEP6_FAILED', []
+        'STEP3_FAILED', []
     )
 
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
@@ -242,8 +242,10 @@ def check_mcu_dependencies(installer, verification_handler):
                                         for mcu in verification_handler[package]:
                                             if re.match(regex[0], mcu):
                                                 # If match found - remove the mcu from the package dependency.
-                                                failed_mcus.remove(mcu)
-                                                passed_mcus.append(mcu)
+                                                if mcu in failed_mcus:
+                                                    failed_mcus.remove(mcu)
+                                                if mcu not in passed_mcus:
+                                                    passed_mcus.append(mcu)
 
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
         results_contents = results_html.read()
