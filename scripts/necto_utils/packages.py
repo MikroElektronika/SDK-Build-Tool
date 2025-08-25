@@ -236,13 +236,13 @@ def check_mcu_dependencies(installer, verification_handler):
                 for root, _, files in os.walk(install_location):
                     for file in files:
                         if '.cmake' in file and 'coreUtils' not in file and 'Config' not in file and 'step' not in file and 'Headers' not in file:
-                            # We have 2 .cmake files - 1 for core files, 1 for delays.
-                            # We should check both.
-                            failed_mcus.extend(verification_handler[package])
                             with open(os.path.join(root, file), 'r') as package_cmake:
                                 cmake_lines = package_cmake.readlines()
                             for line in cmake_lines:
                                 if '${MCU_NAME}' in line:
+                                    # We have 2 .cmake files - 1 for core files, 1 for delays.
+                                    # We should check both.
+                                    failed_mcus.extend(verification_handler[package])
                                     regex = re.findall(r'"([^"]*)"'.lower(), line.lower())
                                     if len(regex):
                                         # Check if mcu found the matching regex.
