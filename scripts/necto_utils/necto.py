@@ -176,9 +176,9 @@ def install_necto(installer):
         results_contents = results_html.read()
 
     results_contents = results_contents.replace(
-        'STEP1_PASSED', passed_packages
+        'STEP1_PASSED', '", "'.join(passed_packages)
     ).replace(
-        'STEP1_FAILED', failed_packages
+        'STEP1_FAILED', '", "'.join(failed_packages)
     )
 
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:

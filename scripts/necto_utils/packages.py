@@ -148,9 +148,9 @@ def install_packages(installer, verification_handler):
         results_contents = results_html.read()
 
     results_contents = results_contents.replace(
-        'STEP2_PASSED', passed_packages
+        'STEP2_PASSED', '", "'.join(passed_packages)
     ).replace(
-        'STEP2_FAILED', failed_packages
+        'STEP2_FAILED', '", "'.join(failed_packages)
     )
 
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
@@ -201,7 +201,7 @@ def create_dependencies_file(installer, verification_handler):
     results_contents = results_contents.replace(
         'STEP3_PASSED', 'package_dependencies.json'
     ).replace(
-        'STEP3_FAILED', []
+        'STEP3_FAILED', ''
     )
 
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
@@ -251,9 +251,9 @@ def check_mcu_dependencies(installer, verification_handler):
         results_contents = results_html.read()
 
     results_contents = results_contents.replace(
-        'STEP4_PASSED', passed_mcus
+        'STEP4_PASSED', '", "'.join(passed_mcus)
     ).replace(
-        'STEP4_FAILED', failed_mcus
+        'STEP4_FAILED', '", "'.join(failed_mcus)
     )
 
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
@@ -314,9 +314,9 @@ def check_codegrip_dependencies(installer, verification_handler):
         results_contents = results_html.read()
 
     results_contents = results_contents.replace(
-        'STEP5_PASSED', passed_mcus
+        'STEP5_PASSED', '", "'.join(passed_mcus)
     ).replace(
-        'STEP5_FAILED', failed_mcus
+        'STEP5_FAILED', '", "'.join(failed_mcus)
     )
 
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
@@ -377,9 +377,9 @@ def check_mchp_dependencies(installer, verification_handler):
         results_contents = results_html.read()
 
     results_contents = results_contents.replace(
-        'STEP6_PASSED', passed_mcus
+        'STEP6_PASSED', '", "'.join(passed_mcus)
     ).replace(
-        'STEP6_FAILED', failed_mcus
+        'STEP6_FAILED', '", "'.join(failed_mcus)
     )
 
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
@@ -442,9 +442,9 @@ def check_board_dependencies(installer, verification_handler):
         results_contents = results_html.read()
 
     results_contents = results_contents.replace(
-        'STEP7_PASSED', passed_boards
+        'STEP7_PASSED', '", "'.join(passed_boards)
     ).replace(
-        'STEP7_FAILED', failed_boards
+        'STEP7_FAILED', '", "'.join(failed_boards)
     )
 
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
@@ -502,9 +502,9 @@ def check_card_dependencies(installer, verification_handler):
         results_contents = results_html.read()
 
     results_contents = results_contents.replace(
-        'STEP8_PASSED', passed_cards
+        'STEP8_PASSED', '", "'.join(passed_cards)
     ).replace(
-        'STEP8_FAILED', failed_cards
+        'STEP8_FAILED', '", "'.join(failed_cards)
     )
 
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
