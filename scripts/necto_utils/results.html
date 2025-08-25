@@ -139,7 +139,22 @@
     for (let i=1; i<=8; i++){
       const btn = document.createElement('button');
       btn.className = 'tab-btn' + (i===1 ? ' active' : '');
-      btn.textContent = `Step ${i}`;
+      if (i==1)
+        btn.textContent = `NECTO install`;
+      else if (i==2)
+        btn.textContent = `NECTO packages install`;
+      else if (i==3)
+        btn.textContent = `Dependency file creation`;
+      else if (i==4)
+        btn.textContent = `MCU-to-CORE dependencies`;
+      else if (i==5)
+        btn.textContent = `MCU-to-CODEGRIP dependencies`;
+      else if (i==6)
+        btn.textContent = `MCU-to-MCHP dependencies`;
+      else if (i==7)
+        btn.textContent = `BOARD-to-BSP dependencies`;
+      else if (i==8)
+        btn.textContent = `CARD-to-BSP dependencies`;
       btn.setAttribute('data-step', i);
       btn.setAttribute('role', 'tab');
       btn.addEventListener('click', () => setStep(i));

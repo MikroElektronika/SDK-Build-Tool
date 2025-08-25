@@ -163,7 +163,7 @@ def install_packages(installer, verification_handler):
         # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 2 for {installer['installer_os']}',
-            f':firecracker: Step 2 for {installer['installer_os']} failed:\n{'\n'.join(error_lines)}'
+            f':firecracker: Step 2 (install all NECTO packages) for {installer['installer_os']} failed!\n{'\n'.join(error_lines)}'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
@@ -174,7 +174,7 @@ def install_packages(installer, verification_handler):
         # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 2 for {installer['installer_os']}',
-            f':white_check_mark: Step 2 for {installer['installer_os']} passsed: All NECTO packages are installed successfully!'
+            f':white_check_mark: Step 2 (install all NECTO packages) for {installer['installer_os']} passsed!'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
@@ -190,7 +190,7 @@ def create_dependencies_file(installer, verification_handler):
     # Update the message file.
     message_content = message_content.replace(
         f':firecracker: Script failed to execute Step 3 for {installer['installer_os']}',
-        f':white_check_mark: Step 3 for {installer['installer_os']} passsed: dependency file is generated successfully!'
+        f':white_check_mark: Step 3 (creating dependency file) for {installer['installer_os']} passsed!'
     )
     with open('message.txt', 'w') as message_file:
         message_file.write(message_content)
@@ -266,7 +266,7 @@ def check_mcu_dependencies(installer, verification_handler):
         # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 4 for {installer['installer_os']}',
-            f':firecracker: Step 4 for {installer['installer_os']} failed for the following MCUs (MCU-to-CORE regexes are missing):\n - {'\n - '.join(failed_mcus)}'
+            f':firecracker: Step 4 (MCU-to-CORE dependencies) for {installer['installer_os']} failed!'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
@@ -277,7 +277,7 @@ def check_mcu_dependencies(installer, verification_handler):
         # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 4 for {installer['installer_os']}',
-            f':white_check_mark: Step 4 for {installer['installer_os']} passsed: All MCUs have corresponding regexes in CMake files!'
+            f':white_check_mark: Step 4 (MCU-to-CORE dependencies) for {installer['installer_os']} passsed!'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
@@ -329,7 +329,7 @@ def check_codegrip_dependencies(installer, verification_handler):
         # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 5 for {installer['installer_os']}',
-            f':firecracker: Step 5 for {installer['installer_os']} failed for the following MCUs (MCU-to-CODEGRIP files are missing):\n - {'\n - '.join(failed_mcus)}'
+            f':firecracker: Step 5 (MCU-to-CODEGRIP dependencies) for {installer['installer_os']} failed!'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
@@ -340,7 +340,7 @@ def check_codegrip_dependencies(installer, verification_handler):
         # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 5 for {installer['installer_os']}',
-            f':white_check_mark: Step 5 for {installer['installer_os']} passsed: All MCUs have corresponding files in CODEGRIP packs!'
+            f':white_check_mark: Step 5 (MCU-to-CODEGRIP dependencies) for {installer['installer_os']} passsed!'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
@@ -392,7 +392,7 @@ def check_mchp_dependencies(installer, verification_handler):
         # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 6 for {installer['installer_os']}',
-            f':firecracker: Step 6 for {installer['installer_os']} failed for the following MCUs (MCU-to-MCHP files are missing):\n - {'\n - '.join(failed_mcus)}'
+            f':firecracker: Step 6 (MCU-to-MCHP dependencies) for {installer['installer_os']} failed!'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
@@ -403,7 +403,7 @@ def check_mchp_dependencies(installer, verification_handler):
         # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 6 for {installer['installer_os']}',
-            f':white_check_mark: Step 6 for {installer['installer_os']} passsed: All MCUs have corresponding files in MCHP files!'
+            f':white_check_mark: Step 6 (MCU-to-MCHP dependencies) for {installer['installer_os']} passsed!'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
@@ -457,7 +457,7 @@ def check_board_dependencies(installer, verification_handler):
         # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 7 for {installer['installer_os']}',
-            f':firecracker: Step 7 for {installer['installer_os']} failed for the following Boards (BOARD-to-BSP regexes are incorrect):\n - {'\n - '.join(failed_boards)}'
+            f':firecracker: Step 7 (BOARD-to-BSP dependencies) for {installer['installer_os']} failed!'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
@@ -468,7 +468,7 @@ def check_board_dependencies(installer, verification_handler):
         # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 7 for {installer['installer_os']}',
-            f':white_check_mark: Step 7 for {installer['installer_os']} passsed: All Boards have corresponding regexes in CMake files!'
+            f':white_check_mark: Step 7 (BOARD-to-BSP dependencies) for {installer['installer_os']} passsed!'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
@@ -517,7 +517,7 @@ def check_card_dependencies(installer, verification_handler):
         # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 8 for {installer['installer_os']}',
-            f':firecracker: Step 8 for {installer['installer_os']} failed for the following Cards (CARD-to-BSP files are missing):\n - {'\n - '.join(failed_cards)}'
+            f':firecracker: Step 8 (CARD-to-BSP dependencies) for {installer['installer_os']} failed!'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
@@ -528,7 +528,7 @@ def check_card_dependencies(installer, verification_handler):
         # Update the message file.
         message_content = message_content.replace(
             f':firecracker: Script failed to execute Step 8 for {installer['installer_os']}',
-            f':white_check_mark: Step 8 for {installer['installer_os']} passsed: All Cards have corresponding folders!'
+            f':white_check_mark: Step 8 (CARD-to-BSP dependencies) for {installer['installer_os']} passsed!'
         )
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
