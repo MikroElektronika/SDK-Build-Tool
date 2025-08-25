@@ -188,6 +188,7 @@ def check_mcu_dependencies(installer, verification_handler):
     indexed_items = fetch_current_indexed_packages(es, index)
 
     failed_mcus = []
+    passed_mcus = []
 
     for package in verification_handler:
         # Find the install location for the package based on kibana data.
@@ -212,6 +213,9 @@ def check_mcu_dependencies(installer, verification_handler):
                                             if re.match(regex[0], mcu):
                                                 # If match found - remove the mcu from the package dependency.
                                                 failed_mcus.remove(mcu)
+                                                passed_mcus.append(mcu)
+
+    print(passed_mcus)
 
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
@@ -247,6 +251,7 @@ def check_codegrip_dependencies(installer, verification_handler):
     indexed_items = fetch_current_indexed_packages(es, index)
 
     failed_mcus = []
+    passed_mcus = []
 
     for package in verification_handler:
         # Find the install location for the package based on kibana data.
@@ -261,6 +266,7 @@ def check_codegrip_dependencies(installer, verification_handler):
                             if file.replace('.mcu', '').lower() == mcu.lower():
                                 if mcu in failed_mcus:
                                     failed_mcus.remove(mcu)
+                                    passed_mcus.append(mcu)
 
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
@@ -296,6 +302,7 @@ def check_mchp_dependencies(installer, verification_handler):
     indexed_items = fetch_current_indexed_packages(es, index)
 
     failed_mcus = []
+    passed_mcus = []
 
     for package in verification_handler:
         # Find the install location for the package based on kibana data.
@@ -310,6 +317,7 @@ def check_mchp_dependencies(installer, verification_handler):
                             if file.replace('.PIC', '').lower() == mcu.lower():
                                 if mcu in failed_mcus:
                                     failed_mcus.remove(mcu)
+                                    passed_mcus.append(mcu)
 
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
@@ -345,6 +353,7 @@ def check_board_dependencies(installer, verification_handler):
     indexed_items = fetch_current_indexed_packages(es, index)
 
     failed_boards = []
+    passed_boards = []
 
     for package in verification_handler:
         # Find the install location for the package based on kibana data.
@@ -361,6 +370,7 @@ def check_board_dependencies(installer, verification_handler):
                             for board in verification_handler[package]:
                                 if board in bsp_content and board in failed_boards:
                                     failed_boards.remove(board)
+                                    passed_boards.append(board)
 
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
@@ -396,6 +406,7 @@ def check_card_dependencies(installer, verification_handler):
     indexed_items = fetch_current_indexed_packages(es, index)
 
     failed_cards = []
+    passed_cards = []
 
     for package in verification_handler:
         # Find the install location for the package based on kibana data.
@@ -407,6 +418,7 @@ def check_card_dependencies(installer, verification_handler):
                 for card in verification_handler[package]:
                     if card.lower() in install_location:
                         failed_cards.remove(package)
+                        passed_cards.append(package)
 
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
