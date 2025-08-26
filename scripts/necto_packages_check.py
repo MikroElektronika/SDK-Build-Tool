@@ -41,8 +41,8 @@ def main():
 :underage: Step 7 for {installer['installer_os']} not executed
 :underage: Step 8 for {installer['installer_os']} not executed
 
-For detailed information refer to:
-[Results in HTML]({os.environ["HTML_LINK"]})
+Check out detailed marvelously-shaped information:
+[Results in HTML](HTML_LINK)
     ''')
 
         # Verify NECTO installation.
@@ -139,7 +139,7 @@ For detailed information refer to:
         with open('message.txt', 'w') as message_file:
             message_file.write(message_content)
         packages.check_card_dependencies(installer, verification_handler)
-        
+
         print(message_content)
 
 if __name__ == '__main__':

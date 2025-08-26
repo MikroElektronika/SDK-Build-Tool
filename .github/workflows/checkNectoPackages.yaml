@@ -13,7 +13,8 @@ env:
   ES_USER: ${{ secrets.ES_USER }}
   ES_PASSWORD: ${{ secrets.ES_PASSWORD }}
   ES_INDEX_LIVE: ${{ secrets.ES_INDEX_LIVE }}
-  HTML_LINK: "https://github.com/${{ github.repository }}/packages/generic/results-html/${{ github.run_number }}/results.html"
+  GITHUB_REPO: ${{ github.repository }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   necto_verification:
@@ -71,13 +72,6 @@ jobs:
         run: |
           python -u scripts/necto_packages_check.py "step3"
 
-      # - name: package_dependencies.json as artifact
-      #   if: always()
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: package_dependencies
-      #     path: package_dependencies.json
-
       - name: Step 4 - Check if all CORE-to-MCU dependencies are correct
         if: always()
         run: |
@@ -112,19 +106,6 @@ jobs:
             package_dependencies.json
             message.txt
             scripts/necto_utils/results.html
-
-      - name: Upload results.html as a GitHub Package
-        if: always()
-        run: |
-          PACKAGE_OWNER=${{ github.repository_owner }}
-          PACKAGE_NAME=results-html
-          PACKAGE_VERSION=${{ github.run_number }}
-
-          curl -X PUT \
-            -u "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" \
-            -H "Content-Type: text/html" \
-            --data-binary @scripts/necto_utils/results.html \
-            "https://uploads.github.com/repos/${{ github.repository }}/packages/generic/${PACKAGE_NAME}/${PACKAGE_VERSION}/results.html"
 
       # - name: Send notification to Mattermost
       #   if: always() && matrix.os != 'windows-latest'

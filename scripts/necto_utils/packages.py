@@ -1,4 +1,4 @@
-import re, os, json, subprocess
+import re, os, json, subprocess, requests
 
 from elasticsearch import Elasticsearch
 
@@ -13,6 +13,54 @@ category_filter = [
 # Counter for NECTO packages installation.
 previous_prog = 101
 installation_downloading = 'downloading'
+
+def upload_release_asset(asset_path, installer):
+    asset_name = f"results_{installer['installer_os']}.html"
+    repo = os.environ['GITHUB_REPO']
+    print(f"Preparing to upload asset: {asset_name}...")
+
+    headers = {
+        'Authorization': f"token {os.environ['GITHUB_TOKEN']}",
+        'Content-Type': 'application/octet-stream'
+    }
+
+    # Get latest release
+    release_url = f"https://api.github.com/repos/{repo}/releases/latest"
+    response = requests.get(release_url, headers=headers)
+    response.raise_for_status()
+    release_id = response.json()['id']
+
+    # Delete existing asset if present (handle pagination)
+    page = 1
+    while True:
+        url = f"https://api.github.com/repos/{repo}/releases/{release_id}/assets?page={page}&per_page=30"
+        resp = requests.get(url, headers=headers)
+        resp.raise_for_status()
+        assets = resp.json()
+
+        if not assets:
+            break
+
+        for asset in assets:
+            if asset['name'] == asset_name:
+                delete_url = asset['url']
+                print(f"Deleting existing asset: {asset_name}")
+                del_resp = requests.delete(delete_url, headers=headers)
+                del_resp.raise_for_status()
+                print(f"Asset deleted: {asset_name}")
+                break
+        page += 1
+
+    # Upload new asset
+    upload_url = f"https://uploads.github.com/repos/{repo}/releases/{release_id}/assets?name={asset_name}"
+    with open(asset_path, 'rb') as f:
+        data = f.read()
+    upload_resp = requests.post(upload_url, headers=headers, data=data)
+    upload_resp.raise_for_status()
+    result = upload_resp.json()
+
+    print(f"Upload completed for: {asset_name}.")
+    return result['url']
 
 def fetch_current_indexed_packages(es : Elasticsearch, index_name):
     # Search query to use
@@ -143,14 +191,14 @@ def install_packages(installer, verification_handler):
                 failed_packages.append(package)
 
             package_counter += 1
-            
+
     if len(passed_packages):
         passed_packages[0] = '"' + passed_packages[0]
         passed_packages[-1] = passed_packages[-1] + '"'
     if len(failed_packages):
         failed_packages[0] = '"' + failed_packages[0]
         failed_packages[-1] = failed_packages[-1] + '"'
-            
+
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
         results_contents = results_html.read()
 
@@ -201,7 +249,7 @@ def create_dependencies_file(installer, verification_handler):
     )
     with open('message.txt', 'w') as message_file:
         message_file.write(message_content)
-            
+
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
         results_contents = results_html.read()
 
@@ -236,13 +284,13 @@ def check_mcu_dependencies(installer, verification_handler):
                 for root, _, files in os.walk(install_location):
                     for file in files:
                         if '.cmake' in file and 'coreUtils' not in file and 'Config' not in file and 'step' not in file and 'Headers' not in file:
+                            # We have 2 .cmake files - 1 for core files, 1 for delays.
+                            # We should check both.
+                            failed_mcus.extend(verification_handler[package])
                             with open(os.path.join(root, file), 'r') as package_cmake:
                                 cmake_lines = package_cmake.readlines()
                             for line in cmake_lines:
                                 if '${MCU_NAME}' in line:
-                                    # We have 2 .cmake files - 1 for core files, 1 for delays.
-                                    # We should check both.
-                                    failed_mcus.extend(verification_handler[package])
                                     regex = re.findall(r'"([^"]*)"'.lower(), line.lower())
                                     if len(regex):
                                         # Check if mcu found the matching regex.
@@ -253,7 +301,7 @@ def check_mcu_dependencies(installer, verification_handler):
                                                     failed_mcus.remove(mcu)
                                                 if mcu not in passed_mcus:
                                                     passed_mcus.append(mcu)
-                                                    
+
     if len(passed_mcus):
         passed_mcus[0] = '"' + passed_mcus[0]
         passed_mcus[-1] = passed_mcus[-1] + '"'
@@ -323,14 +371,14 @@ def check_codegrip_dependencies(installer, verification_handler):
                                 if mcu in failed_mcus:
                                     failed_mcus.remove(mcu)
                                     passed_mcus.append(mcu)
-                                    
+
     if len(passed_mcus):
         passed_mcus[0] = '"' + passed_mcus[0]
         passed_mcus[-1] = passed_mcus[-1] + '"'
     if len(failed_mcus):
         failed_mcus[0] = '"' + failed_mcus[0]
         failed_mcus[-1] = failed_mcus[-1] + '"'
-                                    
+
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
         results_contents = results_html.read()
 
@@ -393,14 +441,14 @@ def check_mchp_dependencies(installer, verification_handler):
                                 if mcu in failed_mcus:
                                     failed_mcus.remove(mcu)
                                     passed_mcus.append(mcu)
-                                    
+
     if len(passed_mcus):
         passed_mcus[0] = '"' + passed_mcus[0]
         passed_mcus[-1] = passed_mcus[-1] + '"'
     if len(failed_mcus):
         failed_mcus[0] = '"' + failed_mcus[0]
         failed_mcus[-1] = failed_mcus[-1] + '"'
-                                    
+
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
         results_contents = results_html.read()
 
@@ -465,14 +513,14 @@ def check_board_dependencies(installer, verification_handler):
                                 if board in bsp_content and board in failed_boards:
                                     failed_boards.remove(board)
                                     passed_boards.append(board)
-                                    
+
     if len(passed_boards):
         passed_boards[0] = '"' + passed_boards[0]
         passed_boards[-1] = passed_boards[-1] + '"'
     if len(failed_boards):
         failed_boards[0] = '"' + failed_boards[0]
         failed_boards[-1] = failed_boards[-1] + '"'
-                                    
+
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
         results_contents = results_html.read()
 
@@ -532,14 +580,14 @@ def check_card_dependencies(installer, verification_handler):
                     if card.lower() in install_location:
                         failed_cards.remove(package)
                         passed_cards.append(package)
-                        
+
     if len(passed_cards):
         passed_cards[0] = '"' + passed_cards[0]
         passed_cards[-1] = passed_cards[-1] + '"'
     if len(failed_cards):
         failed_cards[0] = '"' + failed_cards[0]
         failed_cards[-1] = failed_cards[-1] + '"'
-                        
+
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
         results_contents = results_html.read()
 
@@ -552,8 +600,12 @@ def check_card_dependencies(installer, verification_handler):
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
         results_html.write(results_contents)
 
+    html_link = upload_release_asset(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), installer)
+
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
+
+    message_content = message_content.replace('HTML_LINK', html_link)
 
     if len(failed_cards):
         # Update the message file.
