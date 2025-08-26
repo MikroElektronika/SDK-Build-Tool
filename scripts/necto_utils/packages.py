@@ -60,7 +60,7 @@ def upload_release_asset(asset_path, installer):
     result = upload_resp.json()
 
     print(f"Upload completed for: {asset_name}.")
-    return result['url']
+    return result['browser_download_url']
 
 def fetch_current_indexed_packages(es : Elasticsearch, index_name):
     # Search query to use
@@ -295,12 +295,13 @@ def check_mcu_dependencies(installer, verification_handler):
                                     if len(regex):
                                         # Check if mcu found the matching regex.
                                         for mcu in verification_handler[package]:
-                                            if re.match(regex[0].lower(), mcu.lower()):
-                                                # If match found - remove the mcu from the package dependency.
-                                                if mcu in failed_mcus:
-                                                    failed_mcus.remove(mcu)
-                                                if mcu not in passed_mcus:
-                                                    passed_mcus.append(mcu)
+                                            for subregex in regex:
+                                                if re.match(subregex.lower(), mcu.lower()):
+                                                    # If match found - remove the mcu from the package dependency.
+                                                    if mcu in failed_mcus:
+                                                        failed_mcus.remove(mcu)
+                                                    if mcu not in passed_mcus:
+                                                        passed_mcus.append(mcu)
 
     if len(passed_mcus):
         passed_mcus[0] = '"' + passed_mcus[0]
