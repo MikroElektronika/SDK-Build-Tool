@@ -117,6 +117,7 @@ def parse_and_print_progress(line):
                     else:
                         installation_downloading = 'downloading'
     except json.JSONDecodeError:
+        print(line)
         # Not a JSON line, just print nothing.
         return
 
