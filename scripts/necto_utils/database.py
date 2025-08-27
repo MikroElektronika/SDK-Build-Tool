@@ -54,7 +54,7 @@ def query_packages(db_path, sdk_version, verification_handler):
 
     # Step 1 - query the MCU packages.
     cursor.execute(f"""
-        SELECT DISTINCT Devices.uid, Devices.installer_package FROM Devices
+        SELECT DISTINCT Devices.sdk_config, Devices.installer_package FROM Devices
         INNER JOIN CompilerToDevice ON Devices.uid = CompilerToDevice.device_uid
         INNER JOIN SDKToDevice ON Devices.uid = SDKToDevice.device_uid
         WHERE SDKToDevice.sdk_uid = '{sdk_version}'
@@ -66,6 +66,8 @@ def query_packages(db_path, sdk_version, verification_handler):
         # Skip MCUs without installer_package
         if not row[1]:
             continue
+        sdk_config = json.loads(row[0])
+        mcu_name = sdk_config['MCU_NAME']
         installer_package = json.loads(row[1])
         for compiler in installer_package:
             package = installer_package[compiler]
@@ -73,8 +75,8 @@ def query_packages(db_path, sdk_version, verification_handler):
                 # Create the MCU-to-CORE dependency.
                 if package not in verification_handler:
                     verification_handler.update({package: []})
-                if row[0] not in verification_handler[package]:
-                    verification_handler[package].append(row[0])
+                if mcu_name not in verification_handler[package]:
+                    verification_handler[package].append(mcu_name)
 
     # Step 2 - query the Card packages.
     cursor.execute(f"""
@@ -127,7 +129,10 @@ def query_packages(db_path, sdk_version, verification_handler):
         SELECT DISTINCT ProgrammerToDevice.device_uid, ProgrammerToDevice.device_support_package FROM ProgrammerToDevice
         INNER JOIN Devices ON ProgrammerToDevice.device_uid = Devices.uid
         INNER JOIN SDKToDevice ON Devices.uid = SDKToDevice.device_uid
+        INNER JOIN CompilerToProgrammer ON ProgrammerToDevice.programer_uid = CompilerToProgrammer.programmer_uid
+        INNER JOIN CompilerToDevice ON Devices.uid = CompilerToDevice.device_uid
         WHERE SDKToDevice.sdk_uid = '{sdk_version}'
+        AND CompilerToProgrammer.compiler_uid = CompilerToDevice.compiler_uid
         AND SDKToDevice.device_uid NOT LIKE "%\\_%" ESCAPE "\\";
     """)
     rows = cursor.fetchall()

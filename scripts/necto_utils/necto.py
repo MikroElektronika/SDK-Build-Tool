@@ -125,7 +125,7 @@ def install_necto(installer):
         raise FileNotFoundError(f'\033[31mDownload failed: {downloaded_location} does not exist\033[31m')
     print(f'\033[32mNECTO installer is downloaded successfully: {downloaded_location}\033[32m ({os.path.getsize(downloaded_location)} bytes)')
 
-    # Step 3 - extract runner for the installer.
+    # Step 3 - Extract runner for the installer.
     if sys.platform.startswith('darwin'):
         # MacOS Disk Image mounting.
         mount_point = '/Volumes/NECTOInstaller'
@@ -171,7 +171,7 @@ def install_necto(installer):
             failed_packages.append(package)
         else:
             passed_packages.append(package)
-            
+
     if len(passed_packages):
         passed_packages[0] = '"' + passed_packages[0]
         passed_packages[-1] = passed_packages[-1] + '"'

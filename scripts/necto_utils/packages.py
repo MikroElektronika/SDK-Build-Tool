@@ -372,7 +372,8 @@ def check_codegrip_dependencies(installer, verification_handler):
                             if file.replace('.mcu', '').lower() == mcu.lower():
                                 if mcu in failed_mcus:
                                     failed_mcus.remove(mcu)
-                                    passed_mcus.append(mcu)
+                                    if mcu not in passed_mcus:
+                                        passed_mcus.append(mcu)
 
     if len(passed_mcus):
         passed_mcus[0] = '"' + passed_mcus[0]
@@ -442,7 +443,8 @@ def check_mchp_dependencies(installer, verification_handler):
                             if file.replace('.PIC', '').lower() == mcu.lower():
                                 if mcu in failed_mcus:
                                     failed_mcus.remove(mcu)
-                                    passed_mcus.append(mcu)
+                                    if mcu not in passed_mcus:
+                                        passed_mcus.append(mcu)
 
     if len(passed_mcus):
         passed_mcus[0] = '"' + passed_mcus[0]
@@ -514,7 +516,8 @@ def check_board_dependencies(installer, verification_handler):
                             for board in verification_handler[package]:
                                 if board in bsp_content and board in failed_boards:
                                     failed_boards.remove(board)
-                                    passed_boards.append(board)
+                                    if board not in passed_boards:
+                                        passed_boards.append(board)
 
     if len(passed_boards):
         passed_boards[0] = '"' + passed_boards[0]
@@ -581,7 +584,8 @@ def check_card_dependencies(installer, verification_handler):
                 for card in verification_handler[package]:
                     if card.lower() in install_location:
                         failed_cards.remove(package)
-                        passed_cards.append(package)
+                        if package not in passed_cards:
+                            passed_cards.append(package)
 
     if len(passed_cards):
         passed_cards[0] = '"' + passed_cards[0]
