@@ -186,6 +186,13 @@
       for (const b of stepTabs.querySelectorAll('.tab-btn')){
         b.classList.toggle('active', Number(b.dataset.step)===step);
       }
+
+      const data = stepData[step] || {succeeded:[], failed:[]};
+      if (data.failed && data.failed.length > 0) {
+        setKind('failed');
+      } else {
+        setKind('succeeded');
+      }
       render();
     }
 
