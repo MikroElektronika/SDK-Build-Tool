@@ -298,7 +298,7 @@ def create_dependencies_file(installer, verification_handler):
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
         results_html.write(results_contents)
 
-    download_asset('package_dependencies.json')
+    download_asset(f'package_dependencies_{installer['installer_os']}.json')
     with open ('package_dependencies_previous.json', 'r') as previous_dependencies_file:
         previous_dependencies = json.load(previous_dependencies_file)
 
