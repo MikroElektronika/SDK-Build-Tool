@@ -9,7 +9,7 @@
       --bg:#0b1020; --panel:#12172a; --muted:#9aa4b8; --text:#eaf0ff; --accent:#67b8ff; --accent-2:#7ef0c1;
       --success:#11371c; --success-border:#1e6e31; --success-chip:#2bbf62;
       --fail:#3a1214; --fail-border:#7a262b; --fail-chip:#ff6b6b;
-      --ring: #2e3652; --card:#0f1427; --border:#222a44;
+      --ring:#2e3652; --card:#0f1427; --border:#222a44;
       --warning:#3b2a00; --warning-border:#b08900; --warning-text:#ffe9a6;
     }
     *{box-sizing:border-box}
@@ -32,7 +32,7 @@
     .sub-btn{appearance:none; border:1px solid var(--border); background:#0f152b; color:var(--muted); padding:8px 12px; border-radius:999px; cursor:pointer; transition:.2s}
     .sub-btn.active{color:#fff; background:#1a2140; outline:2px solid var(--ring)}
 
-    /* NEW: Explanation block */
+    /* Explanation block */
     .explain{margin:8px 0 12px; border:1px solid var(--border); border-radius:12px; background:#0f152b}
     .explain > summary{cursor:pointer; list-style:none; padding:10px 12px; font-weight:600; letter-spacing:.2px; display:flex; align-items:center; gap:10px}
     .explain > summary::before{content:"▸"; transition:transform .2s}
@@ -66,39 +66,43 @@
     .footer{margin:18px 0 0; color:var(--muted); font-size:.9rem}
     .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background:#0f162c; padding:2px 6px; border-radius:6px; border:1px solid var(--border)}
 
-    .tab-btn.tab-green {
-        background: linear-gradient(180deg, #0f2b1b, #12351f);
-        border-color: #1e6e31;
-        color: #bff5d5;
-    }
-    .tab-btn.tab-red {
-        background: linear-gradient(180deg, #3a1214, #1f0b0c);
-        border-color: #7a262b;
-        color: #ffd2d2;
-    }
-    .tab-btn.tab-yellow {
-        background: linear-gradient(180deg, #2b2b0f, #353512);
-        border-color: #7a7a26;
-        color: #fff6bf;
-    }
+    .tab-btn.tab-green { background: linear-gradient(180deg, #0f2b1b, #12351f); border-color: #1e6e31; color: #bff5d5; }
+    .tab-btn.tab-red { background: linear-gradient(180deg, #3a1214, #1f0b0c); border-color: #7a262b; color: #ffd2d2; }
+    .tab-btn.tab-yellow { background: linear-gradient(180deg, #2b2b0f, #353512); border-color: #7a7a26; color: #fff6bf; }
+
+    /* CHANGES tab styling */
+    .changes-header{display:flex; flex-wrap:wrap; gap:8px; margin:8px 0 12px}
+    .badge{display:inline-flex; gap:6px; align-items:center; border:1px solid var(--border); background:#0f162c; border-radius:999px; padding:6px 10px}
+    .badge strong{font-weight:700}
+    .chg-section{border:1px solid var(--border); border-radius:12px; background:#0f152b; margin:10px 0; overflow:hidden}
+    .chg-section > summary{cursor:pointer; list-style:none; padding:10px 12px; font-weight:600}
+    .chg-section > summary::before{content:"▸"; margin-right:8px}
+    .chg-section[open] > summary::before{content:"▾"}
+    .chg-list{padding:8px 12px 12px}
+    .chg-item{border:1px solid var(--border); background:#0e1428; border-radius:10px; padding:10px 12px; margin:8px 0}
+    .chg-item h4{margin:0 0 6px; font-size:1rem}
+    .cols{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    @media (max-width:760px){ .cols{grid-template-columns:1fr} }
+    .mini{color:var(--muted); font-size:.9rem}
+    .ul-plain{margin:.2rem 0 .2rem 1rem}
   </style>
 </head>
 <body>
   <div class="wrap">
     <h1>NECTOStudio Overall Results</h1>
-    <p class="sub">Eight-step report with Succeeded/Failed sub-tabs.</p>
+    <p class="sub">Eight-step report with Succeeded/Failed sub-tabs, plus a Packages “Changes” diff.</p>
 
     <!-- Top step tabs -->
     <div id="stepTabs" class="tabs" role="tablist" aria-label="Steps"></div>
 
     <div class="panel" id="panel">
       <!-- Sub-tabs -->
-      <div class="subtabs" role="tablist" aria-label="Result tabs">
+      <div class="subtabs" role="tablist" aria-label="Result tabs" id="subTabs">
         <button class="sub-btn active" data-kind="succeeded" id="subSucceeded" aria-selected="true">Succeeded</button>
         <button class="sub-btn" data-kind="failed" id="subFailed" aria-selected="false">Failed</button>
       </div>
 
-      <!-- NEW: Foldable explanation (per-step) -->
+      <!-- Explanation (per-step) -->
       <details class="explain" id="explain">
         <summary id="explainSummary">Step overview</summary>
         <div class="explain-content" id="explainContent"></div>
@@ -110,19 +114,50 @@
         <div class="pill">Count: <strong id="barCount" style="margin-left:6px">0</strong></div>
       </div>
 
-      <!-- Content grid -->
+      <!-- Content grid (steps 1–8) -->
       <div id="grid" class="grid" aria-live="polite"></div>
-
       <div id="empty" class="empty" style="display:none">No items to display for this filter.</div>
 
-      <div class="footer">Tip: Use <span class="kbd">[1–8]</span> to switch steps, <span class="kbd">S</span>/<span class="kbd">F</span> for sub-tabs, and <span class="kbd">E</span> to toggle the explanation.</div>
+      <!-- CHANGES content (step 9) -->
+      <div id="changesRoot" style="display:none">
+        <div class="changes-header">
+          <div class="badge">New packages: <strong id="chgNewCount">0</strong></div>
+          <div class="badge">Removed packages: <strong id="chgRemovedCount">0</strong></div>
+          <div class="badge">Modified packages: <strong id="chgModifiedCount">0</strong></div>
+        </div>
+
+        <details class="chg-section" id="secNew">
+          <summary>New packages</summary>
+          <div class="chg-list" id="chgNewList"></div>
+        </details>
+
+        <details class="chg-section" id="secRemoved">
+          <summary>Removed packages</summary>
+          <div class="chg-list" id="chgRemovedList"></div>
+        </details>
+
+        <details class="chg-section" id="secModified">
+          <summary>Modified packages (MCU list changes)</summary>
+          <div class="chg-list" id="chgModifiedList"></div>
+        </details>
+
+        <p class="mini">Tip: press <span class="kbd">E</span> to toggle the step explanation; <span class="kbd">[1–8]</span> to switch steps; <span class="kbd">9</span> for Changes.</p>
+      </div>
+
+      <div class="footer">Tip: Use <span class="kbd">[1–9]</span> to switch tabs, <span class="kbd">S</span>/<span class="kbd">F</span> for sub-tabs, and <span class="kbd">E</span> to toggle the explanation.</div>
     </div>
   </div>
 
   <script>
-    /* =====================
-       Data model (lists wired elsewhere)
-       ===================== */
+    /* =========================================
+       1) Put your parsed JSON here
+       ========================================= */
+    const packageDepsPrevious = PREVIOUS_PACKAGES_DATA;
+    const packageDepsCurrent = CURRENT_PACKAGES_DATA;
+
+    /* =========================================
+       2) Existing step data
+       ========================================= */
     const stepData = {
       1: { succeeded: [STEP1_PASSED], failed: [STEP1_FAILED] },
       2: { succeeded: [STEP2_PASSED], failed: [STEP2_FAILED] },
@@ -131,12 +166,14 @@
       5: { succeeded: [STEP5_PASSED], failed: [STEP5_FAILED] },
       6: { succeeded: [STEP6_PASSED], failed: [STEP6_FAILED] },
       7: { succeeded: [STEP7_PASSED], failed: [STEP7_FAILED] },
-      8: { succeeded: [STEP8_PASSED], failed: [STEP8_FAILED] }
+      8: { succeeded: [STEP8_PASSED], failed: [STEP8_FAILED] },
+      /* Step 9 is the special "Changes" tab */
+      9: { succeeded: [], failed: [] }
     };
 
-    /* =====================
-       Explanations per step (HTML strings)
-       ===================== */
+    /* =========================================
+       3) Explanations per step (unchanged from earlier)
+       ========================================= */
     const stepExplanations = {
       1: {
         title: "Step 1 – Check installation of mandatory NECTO packages",
@@ -317,10 +354,11 @@
       }
     };
 
-    /* =====================
-       UI wiring
-       ===================== */
+    /* =========================================
+       4) UI wiring
+       ========================================= */
     const stepTabs = document.getElementById('stepTabs');
+    const subTabs = document.getElementById('subTabs');
     const grid = document.getElementById('grid');
     const empty = document.getElementById('empty');
     const barStep = document.getElementById('barStep');
@@ -331,10 +369,22 @@
     const explainSummary = document.getElementById('explainSummary');
     const explainContent = document.getElementById('explainContent');
 
+    // CHANGES nodes
+    const changesRoot = document.getElementById('changesRoot');
+    const chgNewCount = document.getElementById('chgNewCount');
+    const chgRemovedCount = document.getElementById('chgRemovedCount');
+    const chgModifiedCount = document.getElementById('chgModifiedCount');
+    const chgNewList = document.getElementById('chgNewList');
+    const chgRemovedList = document.getElementById('chgRemovedList');
+    const chgModifiedList = document.getElementById('chgModifiedList');
+    const secNew = document.getElementById('secNew');
+    const secRemoved = document.getElementById('secRemoved');
+    const secModified = document.getElementById('secModified');
+
     let currentStep = 1;
     let currentKind = 'succeeded';
 
-    // Build step buttons
+    // Build step buttons 1..8
     for (let i=1; i<=8; i++){
       const btn = document.createElement('button');
       btn.className = 'tab-btn' + (i===1 ? ' active' : '');
@@ -359,6 +409,14 @@
       btn.addEventListener('click', () => setStep(i));
       stepTabs.appendChild(btn);
     }
+    // Add step 9: Changes
+    const changesBtn = document.createElement('button');
+    changesBtn.className = 'tab-btn';
+    changesBtn.textContent = 'Packages — Changes';
+    changesBtn.setAttribute('data-step', 9);
+    changesBtn.setAttribute('role', 'tab');
+    changesBtn.addEventListener('click', () => setStep(9));
+    stepTabs.appendChild(changesBtn);
 
     // Sub-tab buttons
     document.getElementById('subSucceeded').addEventListener('click', () => setKind('succeeded'));
@@ -369,12 +427,14 @@
       for (const b of stepTabs.querySelectorAll('.tab-btn')){
         b.classList.toggle('active', Number(b.dataset.step)===step);
       }
-
-      const data = stepData[step] || {succeeded:[], failed:[]};
-      if (data.failed && data.failed.length > 0) {
-        setKind('failed');
+      // Hide sub-tabs and explanation for step 9 (Changes)
+      if (step === 9){
+        subTabs.style.display = 'none';
+        explain.style.display = 'none';
+        barLabel.textContent = 'Changes summary';
       } else {
-        setKind('succeeded');
+        subTabs.style.display = '';
+        explain.style.display = '';
       }
       render();
     }
@@ -387,6 +447,7 @@
     }
 
     function renderExplanation(){
+      if (currentStep === 9){ return; } // no explanation for Changes
       const exp = stepExplanations[currentStep];
       if (!exp){
         explain.style.display = 'none';
@@ -395,15 +456,140 @@
       explain.style.display = '';
       explainSummary.textContent = exp.title;
       explainContent.innerHTML = exp.html;
-      // Auto-open when viewing "Failed" to surface the checklist
-      if (currentKind === 'failed') {
-        explain.setAttribute('open', '');
+      if (currentKind === 'failed') explain.setAttribute('open', '');
+      else explain.removeAttribute('open');
+    }
+
+    /* =========================================
+       5) Diff logic
+       ========================================= */
+    function asSet(arr){ return new Set((arr || []).map(String)); }
+    function setDiff(a, b){
+      const add = [], rem = [];
+      const A = asSet(a), B = asSet(b);
+      for (const x of B) if (!A.has(x)) add.push(x);
+      for (const x of A) if (!B.has(x)) rem.push(x);
+      add.sort(); rem.sort();
+      return {add, rem};
+    }
+    function diffPackages(prevObj, currObj){
+      if (!prevObj || !currObj) return { ok:false, newPkgs:[], removedPkgs:[], modifiedPkgs:[] };
+
+      const prevKeys = Object.keys(prevObj).sort();
+      const currKeys = Object.keys(currObj).sort();
+
+      const prevSet = new Set(prevKeys);
+      const currSet = new Set(currKeys);
+
+      const newPkgs = currKeys.filter(k => !prevSet.has(k));
+      const removedPkgs = prevKeys.filter(k => !currSet.has(k));
+
+      const common = currKeys.filter(k => prevSet.has(k));
+      const modifiedPkgs = [];
+
+      for (const k of common){
+        const {add, rem} = setDiff(prevObj[k], currObj[k]);
+        if (add.length || rem.length){
+          modifiedPkgs.push({ name:k, added:add, removed:rem });
+        }
+      }
+      return { ok:true, newPkgs, removedPkgs, modifiedPkgs };
+    }
+
+    let lastDiff = { ok:false, newPkgs:[], removedPkgs:[], modifiedPkgs:[] };
+
+    function renderChanges(){
+      // Show changes area; hide grid for step 9
+      grid.style.display = 'none';
+      empty.style.display = 'none';
+      changesRoot.style.display = '';
+
+      // Counts
+      chgNewCount.textContent = String(lastDiff.newPkgs.length);
+      chgRemovedCount.textContent = String(lastDiff.removedPkgs.length);
+      chgModifiedCount.textContent = String(lastDiff.modifiedPkgs.length);
+
+      // Lists
+      chgNewList.innerHTML = '';
+      if (lastDiff.newPkgs.length){
+        lastDiff.newPkgs.forEach(name => {
+          const div = document.createElement('div');
+          div.className = 'chg-item';
+          div.innerHTML = `<h4>${escapeHtml(name)}</h4>
+            <div class="mini">MCUs: ${Array.isArray(packageDepsCurrent[name]) ? packageDepsCurrent[name].length : 0}</div>`;
+          chgNewList.appendChild(div);
+        });
+        secNew.setAttribute('open', '');
       } else {
-        explain.removeAttribute('open');
+        chgNewList.innerHTML = '<div class="mini">None.</div>';
+        secNew.removeAttribute('open');
+      }
+
+      chgRemovedList.innerHTML = '';
+      if (lastDiff.removedPkgs.length){
+        lastDiff.removedPkgs.forEach(name => {
+          const div = document.createElement('div');
+          div.className = 'chg-item';
+          div.innerHTML = `<h4>${escapeHtml(name)}</h4>
+            <div class="mini">Previously had ${Array.isArray(packageDepsPrevious[name]) ? packageDepsPrevious[name].length : 0} MCUs.</div>`;
+          chgRemovedList.appendChild(div);
+        });
+        secRemoved.setAttribute('open', '');
+      } else {
+        chgRemovedList.innerHTML = '<div class="mini">None.</div>';
+        secRemoved.removeAttribute('open');
+      }
+
+      chgModifiedList.innerHTML = '';
+      if (lastDiff.modifiedPkgs.length){
+        lastDiff.modifiedPkgs.forEach(({name, added, removed}) => {
+          const div = document.createElement('div');
+          div.className = 'chg-item';
+          const addedList = added.length ? `<ul class="ul-plain">${added.map(x=>`<li>+ ${escapeHtml(x)}</li>`).join('')}</ul>` : '<div class="mini">No additions.</div>';
+          const removedList = removed.length ? `<ul class="ul-plain">${removed.map(x=>`<li>− ${escapeHtml(x)}</li>`).join('')}</ul>` : '<div class="mini">No removals.</div>';
+          div.innerHTML = `<h4>${escapeHtml(name)}</h4>
+            <div class="cols">
+              <div><strong>Added</strong>${addedList}</div>
+              <div><strong>Removed</strong>${removedList}</div>
+            </div>`;
+          chgModifiedList.appendChild(div);
+        });
+        secModified.setAttribute('open', '');
+      } else {
+        chgModifiedList.innerHTML = '<div class="mini">None.</div>';
+        secModified.removeAttribute('open');
+      }
+      // Bar
+      barStep.textContent = '9';
+      barCount.textContent = String(lastDiff.newPkgs.length + lastDiff.removedPkgs.length + lastDiff.modifiedPkgs.length);
+    }
+
+    function computeAndRenderDiff(){
+      lastDiff = diffPackages(packageDepsPrevious, packageDepsCurrent);
+      updateTabColors(); // reflect status on the 'Changes' tab
+      // If we are currently on step 9, re-render its content
+      if (currentStep === 9) renderChanges();
+      // Auto-open step 9 if there are differences
+      const hasDiff = lastDiff.ok && (lastDiff.newPkgs.length || lastDiff.removedPkgs.length || lastDiff.modifiedPkgs.length);
+      if (hasDiff && currentStep !== 9){
+        setStep(9);
       }
     }
 
+    /* =========================================
+       6) Render (steps + changes + coloring)
+       ========================================= */
     function render(){
+      if (currentStep === 9){
+        // CHANGES tab
+        renderChanges();
+        // Hide step grid controls
+        barLabel.textContent = 'Changes summary';
+        dot.style.background = 'var(--accent-2)';
+        return;
+      }
+
+      // Regular steps 1..8
       const data = stepData[currentStep] || {succeeded:[], failed:[]};
       const list = data[currentKind] || [];
       grid.innerHTML = '';
@@ -413,23 +599,14 @@
       barLabel.textContent = `Showing ${currentKind.charAt(0).toUpperCase()+currentKind.slice(1)}`;
       dot.style.background = currentKind==='succeeded' ? 'var(--success-chip)' : 'var(--fail-chip)';
 
-      // Update tab coloring for all steps
-      for (let i=1; i<=8; i++){
-        const btn = stepTabs.querySelector(`.tab-btn[data-step="${i}"]`);
-        btn.classList.remove('tab-green','tab-red','tab-yellow');
-        const step = stepData[i] || {succeeded:[], failed:[]};
-        if ((step.failed || []).length > 0) {
-          btn.classList.add('tab-red');
-        } else if ((step.succeeded || []).length > 0) {
-          btn.classList.add('tab-green');
-        } else {
-          btn.classList.add('tab-yellow');
-        }
-      }
+      // Update tab coloring for all steps (1..9)
+      updateTabColors();
 
       // Explanation
       renderExplanation();
 
+      // Show grid / empty, hide changes
+      changesRoot.style.display = 'none';
       if (!list.length){
         grid.style.display = 'none';
         empty.style.display = 'block';
@@ -449,6 +626,30 @@
       });
     }
 
+    function updateTabColors(){
+      for (let i=1; i<=8; i++){
+        const btn = stepTabs.querySelector(`.tab-btn[data-step="${i}"]`);
+        if (!btn) continue;
+        btn.classList.remove('tab-green','tab-red','tab-yellow');
+        const step = stepData[i] || {succeeded:[], failed:[]};
+        if ((step.failed || []).length > 0) btn.classList.add('tab-red');
+        else if ((step.succeeded || []).length > 0) btn.classList.add('tab-green');
+        else btn.classList.add('tab-yellow');
+      }
+      // Step 9 color based on diff state
+      const btn9 = stepTabs.querySelector(`.tab-btn[data-step="9"]`);
+      if (btn9){
+        btn9.classList.remove('tab-green','tab-red','tab-yellow');
+        if (!lastDiff.ok){
+          btn9.classList.add('tab-yellow'); // missing data
+        } else if (lastDiff.newPkgs.length || lastDiff.removedPkgs.length || lastDiff.modifiedPkgs.length){
+          btn9.classList.add('tab-red'); // differences found
+        } else {
+          btn9.classList.add('tab-green'); // no changes
+        }
+      }
+    }
+
     function escapeHtml(str){
       return String(str)
         .replaceAll('&','&amp;')
@@ -460,16 +661,21 @@
 
     // Keyboard shortcuts
     window.addEventListener('keydown', (e)=>{
-      if(e.key>='1' && e.key<='8'){ setStep(Number(e.key)); }
-      if(e.key==='s' || e.key==='S'){ setKind('succeeded'); }
-      if(e.key==='f' || e.key==='F'){ setKind('failed'); }
-      if(e.key==='e' || e.key==='E'){ // toggle explanation
-        if (explain.hasAttribute('open')) explain.removeAttribute('open');
-        else explain.setAttribute('open','');
-      }
+      if(e.key>='1' && e.key<='9'){ setStep(Number(e.key)); }
+      if(e.key==='s' || e.key==='S'){ if (currentStep !== 9) setKind('succeeded'); }
+      if(e.key==='f' || e.key==='F'){ if (currentStep !== 9) setKind('failed'); }
+      if(e.key==='e' || e.key==='E'){ if (currentStep !== 9) { if (explain.hasAttribute('open')) explain.removeAttribute('open'); else explain.setAttribute('open',''); } }
+      if(e.key==='r' || e.key==='R'){ computeAndRenderDiff(); } // quick recompute
     });
 
-    // Initial render
+    // Initial: set up buttons, compute diff, render
+    // Auto-open Failed when a step has failures; otherwise Succeeded (unchanged behavior)
+    function initialAutoKind(){
+      const s1 = stepData[1] || {succeeded:[], failed:[]};
+      currentKind = (s1.failed && s1.failed.length) ? 'failed' : 'succeeded';
+    }
+    initialAutoKind();
+    computeAndRenderDiff(); // colorizes step 9 and maybe auto-opens it if differences
     render();
   </script>
 </body>

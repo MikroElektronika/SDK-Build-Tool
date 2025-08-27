@@ -304,10 +304,17 @@ def create_dependencies_file(installer, verification_handler):
 
     upload_release_asset(f'package_dependencies.json', installer)
 
+    previous_dependencies_string = json.dumps(previous_dependencies, ensure_ascii=False, indent=None, separators=(',', ':')).replace('</', '<\\/')
+    current_dependencies_string = json.dumps(verification_handler, ensure_ascii=False, indent=None, separators=(',', ':')).replace('</', '<\\/')
+
     results_contents = results_contents.replace(
         'STEP3_PASSED', '"package_dependencies.json", "package_dependencies_previous.json"'
     ).replace(
         'STEP3_FAILED', ''
+    ).replace(
+        'PREVIOUS_PACKAGES_DATA', previous_dependencies_string
+    ).replace(
+        'CURRENT_PACKAGES_DATA', current_dependencies_string
     )
 
 # Function for checking MCU-to-CORE dependancies.
