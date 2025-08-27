@@ -1,5 +1,6 @@
 import os, sys, stat, json, subprocess
 import urllib.request
+from datetime import datetime
 
 # Dictionary for checking if all the packages were installed.
 package_installation_validation = {
@@ -179,6 +180,9 @@ def install_necto(installer):
         failed_packages[0] = '"' + failed_packages[0]
         failed_packages[-1] = failed_packages[-1] + '"'
 
+    now = datetime.now()
+    formatted_time = now.strftime("%d.%m.%Y at %H:%M")
+
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
         results_contents = results_html.read()
 
@@ -186,6 +190,8 @@ def install_necto(installer):
         'STEP1_PASSED', '", "'.join(passed_packages)
     ).replace(
         'STEP1_FAILED', '", "'.join(failed_packages)
+    ).replace(
+        'CURRENT_DATE', formatted_time
     )
 
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:

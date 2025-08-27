@@ -14,8 +14,47 @@ category_filter = [
 previous_prog = 101
 installation_downloading = 'downloading'
 
+def download_asset(asset_name):
+    repo = os.environ['GITHUB_REPO']
+    print(f"Preparing to upload asset: {asset_name}...")
+
+    headers = {
+        'Authorization': f"token {os.environ['GITHUB_TOKEN']}",
+        'Content-Type': 'application/octet-stream'
+    }
+
+    # Get latest release
+    release_url = f"https://api.github.com/repos/{repo}/releases/latest"
+    response = requests.get(release_url, headers=headers)
+    response.raise_for_status()
+    release_id = response.json()['id']
+
+    # Delete existing asset if present (handle pagination)
+    page = 1
+    while True:
+        url = f"https://api.github.com/repos/{repo}/releases/{release_id}/assets?page={page}&per_page=30"
+        resp = requests.get(url, headers=headers)
+        resp.raise_for_status()
+        assets = resp.json()
+
+        if not assets:
+            break
+
+        for asset in assets:
+            if asset['name'] == asset_name:
+                print(f"Downloading existing asset: {asset_name}")
+                resp = requests.get(asset['browser_download_url'], stream=True)
+                with open(f'{asset_name}_previous', 'wb') as f:
+                    for chunk in resp.iter_content(chunk_size=8192):
+                        f.write(chunk)
+                break
+
 def upload_release_asset(asset_path, installer):
-    asset_name = f"results_{installer['installer_os']}.html"
+    if 'results' in asset_path:
+        asset_name = f"results_{installer['installer_os']}.html"
+    else:
+        asset_name = f"dependencies_{installer['installer_os']}.json"
+
     repo = os.environ['GITHUB_REPO']
     print(f"Preparing to upload asset: {asset_name}...")
 
@@ -254,14 +293,22 @@ def create_dependencies_file(installer, verification_handler):
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
         results_contents = results_html.read()
 
-    results_contents = results_contents.replace(
-        'STEP3_PASSED', '"package_dependencies.json"'
-    ).replace(
-        'STEP3_FAILED', ''
-    )
+    changes_dictionary = {}
 
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
         results_html.write(results_contents)
+
+    download_asset('package_dependencies.json')
+    with open ('package_dependencies_previous.json', 'r') as previous_dependencies_file:
+        previous_dependencies = json.load(previous_dependencies_file)
+
+    upload_release_asset(f'package_dependencies.json', installer)
+
+    results_contents = results_contents.replace(
+        'STEP3_PASSED', '"package_dependencies.json", "package_dependencies_previous.json"'
+    ).replace(
+        'STEP3_FAILED', ''
+    )
 
 # Function for checking MCU-to-CORE dependancies.
 def check_mcu_dependencies(installer, verification_handler):

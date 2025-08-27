@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NECTOStudio Overall Results – 8 Steps</title>
+  <title>NECTOStudio Overall Results - CURRENT_DATE</title>
   <style>
     :root{
       --bg:#0b1020; --panel:#12172a; --muted:#9aa4b8; --text:#eaf0ff; --accent:#67b8ff; --accent-2:#7ef0c1;
@@ -132,6 +132,189 @@
       6: { succeeded: [STEP6_PASSED], failed: [STEP6_FAILED] },
       7: { succeeded: [STEP7_PASSED], failed: [STEP7_FAILED] },
       8: { succeeded: [STEP8_PASSED], failed: [STEP8_FAILED] }
+    };
+
+    /* =====================
+       Explanations per step (HTML strings)
+       ===================== */
+    const stepExplanations = {
+      1: {
+        title: "Step 1 – Check installation of mandatory NECTO packages",
+        html: `
+          <ul>
+            <li>Download NECTO installer.</li>
+            <li>Verify installer archive / disk image is present.</li>
+            <li>Extract runner for the installer.</li>
+            <li>Run the NECTO installer for mandatory packages.</li>
+            <li>Confirm all mandatory packages were installed.</li>
+          </ul>
+          <div class="note"><strong>Note:</strong> If any package fails, immediately do the following:
+            <ul>
+              <li>Check the presence in latest <a href="https://github.com/MikroElektronika/core_packages/releases" target="_blank" rel="noreferrer">core_packages</a> release.</li>
+              <li>Verify the download link in <a href="https://kibana.mikroe.com/s/sw-space/app/dev_tools#/console/shell" target="_blank" rel="noreferrer">Elasticsearch (Kibana)</a>.</li>
+              <li>Fix any issues found.</li>
+            </ul>
+          </div>
+        `
+      },
+      2: {
+        title: "Step 2 – Install all CORE, BSP, CODEGRIP, and MCHP NECTO packages",
+        html: `
+          <ul>
+            <li>Get latest SDK version from database.</li>
+            <li>Fetch all packages & dependencies:
+              <ul>
+                <li>Core package and all mapped MCUs.</li>
+                <li>Card package and SDK configuration.</li>
+                <li>Board package and SDK configuration.</li>
+                <li>CODEGRIP package and all mapped MCUs.</li>
+                <li>MCHP prog package and all mapped MCUs (XC compilers only).</li>
+              </ul>
+            </li>
+            <li>Fetch all indexed packages from Elasticsearch.</li>
+            <li>Run NECTO installer for all found packages:
+              <ul>
+                <li>Fetch install location info for each package via Kibana.</li>
+                <li>Verify installed package exists at that location.</li>
+              </ul>
+            </li>
+          </ul>
+          <div class="note"><strong>Note:</strong> If any package fails:
+            <ul>
+              <li>Check presence in latest <a href="https://github.com/MikroElektronika/core_packages/releases" target="_blank" rel="noreferrer">core_packages</a> or <a href="https://github.com/MikroElektronika/mikrosdk_v2/releases" target="_blank" rel="noreferrer">mikrosdk_v2</a> release.</li>
+              <li>Verify download link in <a href="https://kibana.mikroe.com/s/sw-space/app/dev_tools#/console/shell" target="_blank" rel="noreferrer">Elasticsearch</a>.</li>
+              <li>Fix any issues found.</li>
+            </ul>
+          </div>
+        `
+      },
+      3: {
+        title: "Step 3 – Create dependencies file for MCUs, Boards, Cards, and packages",
+        html: `
+          <ul>
+            <li>Get latest SDK version from database.</li>
+            <li>Collect all packages & dependencies (Core, Card, Board, CODEGRIP, MCHP as in Step 2).</li>
+            <li>Create the dependency file and upload it to the latest
+              <a href="https://github.com/MikroElektronika/core_packages/releases" target="_blank" rel="noreferrer">core_packages</a> release to track DB changes.</li>
+          </ul>
+        `
+      },
+      4: {
+        title: "Step 4 – Validate CORE-to-MCU dependencies",
+        html: `
+          <ul>
+            <li>Read dependencies from the file generated in Step 3.</li>
+            <li>Fetch indexed packages from Elasticsearch.</li>
+            <li>For each Core package, ensure all mapped MCUs are covered by its regex:
+              <ul>
+                <li>Get install location from index info.</li>
+                <li>Locate package and delays .cmake files in that path.</li>
+                <li>Extract regexes from those CMake files.</li>
+                <li>Verify each MCU's SDK configuration name matches the regex(es).</li>
+              </ul>
+            </li>
+          </ul>
+          <div class="note"><strong>Note:</strong> If any package fails:
+            <ul>
+              <li>Confirm presence in latest <a href="https://github.com/MikroElektronika/core_packages/releases" target="_blank" rel="noreferrer">core_packages</a> release.</li>
+              <li>Check download link & install location in <a href="https://kibana.mikroe.com/s/sw-space/app/dev_tools#/console/shell" target="_blank" rel="noreferrer">Elasticsearch</a>.</li>
+              <li>Manually verify that regex in both package delays .cmake matches the MCU SDK configuration name.</li>
+              <li>Fix any issues found.</li>
+            </ul>
+          </div>
+        `
+      },
+      5: {
+        title: "Step 5 – Validate CODEGRIP-to-MCU dependencies",
+        html: `
+          <ul>
+            <li>Read dependencies from the file generated in Step 3.</li>
+            <li>Fetch indexed packages from Elasticsearch.</li>
+            <li>For each CODEGRIP package, ensure all mapped MCUs are present in its files:
+              <ul>
+                <li>Get install location from index info.</li>
+                <li>Verify .mcu files exist for all MCU names.</li>
+              </ul>
+            </li>
+          </ul>
+          <div class="note"><strong>Note:</strong> If any package fails:
+            <ul>
+              <li>Check download link & install location in <a href="https://kibana.mikroe.com/s/sw-space/app/dev_tools#/console/shell" target="_blank" rel="noreferrer">Elasticsearch</a>.</li>
+              <li>Manually confirm a matching .mcu file exists in the CODEGRIP package.</li>
+              <li>Inform the CODEGRIP Team to fix the issue.</li>
+            </ul>
+          </div>
+        `
+      },
+      6: {
+        title: "Step 6 – Validate MCHP-to-MCU dependencies",
+        html: `
+          <ul>
+            <li>Read dependencies from the file generated in Step 3.</li>
+            <li>Fetch indexed packages from Elasticsearch.</li>
+            <li>For each Microchip prog package, ensure all mapped MCUs are present in its files:
+              <ul>
+                <li>Get install location from index info.</li>
+                <li>Verify .PIC files exist for all MCU names.</li>
+              </ul>
+            </li>
+          </ul>
+          <div class="note"><strong>Note:</strong> If any package fails:
+            <ul>
+              <li>Check download link & install location in <a href="https://kibana.mikroe.com/s/sw-space/app/dev_tools#/console/shell" target="_blank" rel="noreferrer">Elasticsearch</a>.</li>
+              <li>Manually confirm a matching .PIC file exists in the Microchip prog package.</li>
+              <li>Inform the IDE Team to fix the issue.</li>
+            </ul>
+          </div>
+        `
+      },
+      7: {
+        title: "Step 7 – Validate Board-to-BSP dependencies",
+        html: `
+          <ul>
+            <li>Read dependencies from the file generated in Step 3.</li>
+            <li>Fetch indexed packages from Elasticsearch.</li>
+            <li>For each Board package, ensure all mapped Boards are covered by its regex:
+              <ul>
+                <li>Get install location from index info.</li>
+                <li>Locate the package CMake in that path.</li>
+                <li>Verify the Board SDK configuration name matches the regex.</li>
+              </ul>
+            </li>
+          </ul>
+          <div class="note"><strong>Note:</strong> If any package fails:
+            <ul>
+              <li>Check presence in latest <a href="https://github.com/MikroElektronika/mikrosdk_v2/releases" target="_blank" rel="noreferrer">mikrosdk_v2</a> (or relevant) release.</li>
+              <li>Verify download link & install location in <a href="https://kibana.mikroe.com/s/sw-space/app/dev_tools#/console/shell" target="_blank" rel="noreferrer">Elasticsearch</a>.</li>
+              <li>Manually verify the Board CMake regex matches the Board SDK configuration name.</li>
+              <li>Fix any issues found.</li>
+            </ul>
+          </div>
+        `
+      },
+      8: {
+        title: "Step 8 – Validate Card-to-BSP dependencies",
+        html: `
+          <ul>
+            <li>Read dependencies from the file generated in Step 3.</li>
+            <li>Fetch indexed packages from Elasticsearch.</li>
+            <li>For each Card package, ensure all mapped Cards are covered:
+              <ul>
+                <li>Get install location from index info.</li>
+                <li>Verify the installation folder name matches the Card SDK configuration name.</li>
+              </ul>
+            </li>
+          </ul>
+          <div class="note"><strong>Note:</strong> If any package fails:
+            <ul>
+              <li>Check presence in latest <a href="https://github.com/MikroElektronika/mikrosdk_v2/releases" target="_blank" rel="noreferrer">mikrosdk_v2</a> release.</li>
+              <li>Verify download link & install location in <a href="https://kibana.mikroe.com/s/sw-space/app/dev_tools#/console/shell" target="_blank" rel="noreferrer">Elasticsearch</a>.</li>
+              <li>Manually confirm installation folder name matches the Card SDK configuration name.</li>
+              <li>Fix any issues found.</li>
+            </ul>
+          </div>
+        `
+      }
     };
 
     /* =====================
