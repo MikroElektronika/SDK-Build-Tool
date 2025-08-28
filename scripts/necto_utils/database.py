@@ -64,7 +64,7 @@ def query_packages(db_path, sdk_version, verification_handler):
 
     for row in rows:
         # Skip MCUs without installer_package
-        if not row[1]:
+        if not row[1] or not row[0]:
             continue
         sdk_config = json.loads(row[0])
         mcu_name = sdk_config['MCU_NAME']
