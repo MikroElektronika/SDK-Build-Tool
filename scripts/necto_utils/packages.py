@@ -16,7 +16,7 @@ installation_downloading = 'downloading'
 
 def download_asset(asset_name):
     repo = os.environ['GITHUB_REPO']
-    print(f"Preparing to upload asset: {asset_name}...")
+    print(f"Downloading asset: {asset_name}...")
 
     headers = {
         'Authorization': f"token {os.environ['GITHUB_TOKEN']}",
@@ -48,12 +48,13 @@ def download_asset(asset_name):
                     for chunk in resp.iter_content(chunk_size=8192):
                         f.write(chunk)
                 break
+        page += 1
 
 def upload_release_asset(asset_path, installer):
     if 'results' in asset_path:
         asset_name = f"results_{installer['installer_os']}.html"
     else:
-        asset_name = f"dependencies_{installer['installer_os']}.json"
+        asset_name = f"package_dependencies_{installer['installer_os']}.json"
 
     repo = os.environ['GITHUB_REPO']
     print(f"Preparing to upload asset: {asset_name}...")
