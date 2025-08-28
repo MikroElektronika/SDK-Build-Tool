@@ -32,7 +32,7 @@ compiler_list = {
     'RISCV': ['xpack-riscv-none-embed-gcc', 'clang-llvm-riscv'],
     'PIC': ['mchp_xc8'],
     'DSPIC': ['mchp_xc16'],
-    'PIC32': ['gcc_arm_none_eabi']
+    'PIC32': ['gcc_arm_none_eabi', 'clang-llvm']
 }
 
 # Define a REGEXP function for SQLite.
