@@ -44,7 +44,7 @@ def download_asset(asset_name):
             if asset['name'] == asset_name:
                 print(f"Downloading existing asset: {asset_name}")
                 resp = requests.get(asset['browser_download_url'], stream=True)
-                with open(f'{asset_name}_previous', 'wb') as f:
+                with open(f'{asset_name.replace('.json', '')}_previous.json', 'wb') as f:
                     for chunk in resp.iter_content(chunk_size=8192):
                         f.write(chunk)
                 break
@@ -280,17 +280,6 @@ def create_dependencies_file(installer, verification_handler):
     with open('package_dependencies.json', 'w') as dependency_file:
         json.dump(verification_handler, dependency_file, indent=4)
 
-    with open('message.txt', 'r') as message_file:
-        message_content = message_file.read()
-
-    # Update the message file.
-    message_content = message_content.replace(
-        f':firecracker: Script failed to execute Step 3 for {installer['installer_os']}',
-        f':white_check_mark: Step 3 (creating dependency file) for {installer['installer_os']} passsed!'
-    )
-    with open('message.txt', 'w') as message_file:
-        message_file.write(message_content)
-
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
         results_contents = results_html.read()
 
@@ -300,7 +289,7 @@ def create_dependencies_file(installer, verification_handler):
         results_html.write(results_contents)
 
     download_asset(f'package_dependencies_{installer['installer_os']}.json')
-    with open ('package_dependencies_previous.json', 'r') as previous_dependencies_file:
+    with open (f'package_dependencies_{installer['installer_os']}_previous.json', 'r') as previous_dependencies_file:
         previous_dependencies = json.load(previous_dependencies_file)
 
     upload_release_asset(f'package_dependencies.json', installer)
@@ -317,6 +306,17 @@ def create_dependencies_file(installer, verification_handler):
     ).replace(
         'CURRENT_PACKAGES_DATA', current_dependencies_string
     )
+
+    with open('message.txt', 'r') as message_file:
+        message_content = message_file.read()
+
+    # Update the message file.
+    message_content = message_content.replace(
+        f':firecracker: Script failed to execute Step 3 for {installer['installer_os']}',
+        f':white_check_mark: Step 3 (creating dependency file) for {installer['installer_os']} passsed!'
+    )
+    with open('message.txt', 'w') as message_file:
+        message_file.write(message_content)
 
 # Function for checking MCU-to-CORE dependancies.
 def check_mcu_dependencies(installer, verification_handler):
