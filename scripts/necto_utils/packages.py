@@ -283,11 +283,6 @@ def create_dependencies_file(installer, verification_handler):
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'r') as results_html:
         results_contents = results_html.read()
 
-    changes_dictionary = {}
-
-    with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
-        results_html.write(results_contents)
-
     download_asset(f'package_dependencies_{installer['installer_os']}.json')
     with open (f'package_dependencies_{installer['installer_os']}_previous.json', 'r') as previous_dependencies_file:
         previous_dependencies = json.load(previous_dependencies_file)
@@ -306,6 +301,9 @@ def create_dependencies_file(installer, verification_handler):
     ).replace(
         'CURRENT_PACKAGES_DATA', current_dependencies_string
     )
+
+    with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
+        results_html.write(results_contents)
 
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
