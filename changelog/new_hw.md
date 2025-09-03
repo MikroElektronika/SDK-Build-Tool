@@ -1,0 +1,32 @@
+<p align="center">
+  <img src="http://www.mikroe.com/img/designs/beta/logo_small.png?raw=true" alt="MikroElektronika"/>
+</p>
+
+---
+
+# `DATE`
+
+## Changes
+
+- [`DATE`](#date)
+  - [Changes](#changes)
+    - [NEW HARDWARE](#new-hardware)
+
+### NEW HARDWARE
+
+Support added for following hardware:
+
++ CY8C4147AZE_S5 MCU Support package for GCC & Clang
+  + CY8C4147AZE-S548
+  + CY8C4147AZE-S555
+  + CY8C4147AZE-S558
+  + CY8C4147AZE-S565
+  + CY8C4147AZE-S568
+  + CY8C4147AZE-S575
+  + CY8C4147AZE-S578
+  + CY8C4147AZE-S585
+  + CY8C4147AZE-S588
+  + CY8C4147AZE-S595
+  + CY8C4147AZE-S598
+
+---
