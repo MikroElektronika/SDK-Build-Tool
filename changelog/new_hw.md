@@ -1,0 +1,34 @@
+<p align="center">
+  <img src="http://www.mikroe.com/img/designs/beta/logo_small.png?raw=true" alt="MikroElektronika"/>
+</p>
+
+---
+
+# `DATE`
+
+## Changes
+
+- [`DATE`](#date)
+  - [Changes](#changes)
+    - [NEW HARDWARE](#new-hardware)
+
+### NEW HARDWARE
+
+Support added for following hardware:
+
++ CY8C4146AZI MCU Support package for GCC & Clang
+  + CY8C4146AZI-S423
+  + CY8C4146AZI-S433
+  + CY8C4146AZI-S443
+  + CY8C4146AZI-S445
+  + CY8C4146AZI-S453
+  + CY8C4146AZI-S455
+  + CY8C4146AZI-S463
+  + CY8C4146AZI-T403
+  + CY8C4146AZI-T405
+  + CY8C4146AZI-T413
+  + CY8C4146AZI-T415
+  + CY8C4146AZI-T453
+  + CY8C4146AZI-T455
+
+---
