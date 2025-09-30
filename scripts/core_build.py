@@ -325,7 +325,7 @@ def extract_mcu_names(file_name, source_dir, output_dir, regex):
                     if regex_pattern.match(mcu_name):
                         mcus[file_name]['mcu_names'].add(mcu_name)
                         if 'gcc_clang' in source_dir or 'XC32' in source_dir:
-                            isPresent, readData = read_data_from_db('necto_db.db', f'SELECT sdk_config, core_info FROM Devices WHERE name IS "{mcu_name}"')
+                            isPresent, readData = read_data_from_db(f"{local_app_data_path}/databases/necto_db.db", f'SELECT sdk_config, core_info FROM Devices WHERE name IS "{mcu_name}"')
                             if isPresent:
                                 if readData[0][1] == None:
                                     configJson = json.loads(readData[0][0])
@@ -682,6 +682,10 @@ def package_asset(source_dir, output_dir, arch, entry_name, changes_dict, es_ins
     file_paths = parse_files_for_paths(cmake_files, source_dir, True)
     for cmake_file, data in file_paths.items():
         base_output_dir = os.path.join(output_dir, f"{arch.lower()}_{entry_name.lower()}_{cmake_file}") # Subdirectory for this .cmake file
+        coreQueriesPath = os.path.join(os.getcwd(), 'resources/queries')
+        if os.path.exists(os.path.join(coreQueriesPath, 'mcus')):
+            updateDevicesFromCore([f"{local_app_data_path}/databases/necto_db.db"], os.path.join(coreQueriesPath, 'mcus'))
+
         # Copy the .cmake file into the package directory
         copy_cmake_files(data['cmake_file_path'], source_dir, base_output_dir, data['regex'])
 
@@ -700,9 +704,6 @@ def package_asset(source_dir, output_dir, arch, entry_name, changes_dict, es_ins
         copy_files_from_dir(mcuNames[cmake_file]['mcu_names'], source_dir, output_dir, base_output_dir, 'linker_scripts')
 
         get_core(mcuNames, f"{arch.lower()}_{entry_name.lower()}_{cmake_file}", cmake_file, source_dir, changes_dict)
-        coreQueriesPath = os.path.join(os.getcwd(), 'resources/queries')
-        if os.path.exists(os.path.join(coreQueriesPath, 'mcus')):
-            updateDevicesFromCore([f"{local_app_data_path}/databases/necto_db.db"], os.path.join(coreQueriesPath, 'mcus'))
 
         # Copy delay files
         copy_delays(mcuNames[cmake_file]['cores'], source_dir, output_dir, base_output_dir)
