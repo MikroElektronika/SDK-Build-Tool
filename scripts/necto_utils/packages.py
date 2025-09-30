@@ -1,7 +1,5 @@
 import re, os, json, subprocess, requests
 
-from datetime import datetime
-
 from elasticsearch import Elasticsearch
 
 category_filter = [
@@ -196,9 +194,6 @@ def install_packages(installer, verification_handler):
     failed_packages = []
     passed_packages = []
 
-    # Fetch current date and time to track the changes
-    verification_handler['triggered_time'] = datetime.now().strftime("%Y%m%d%H%M%S")
-
     # Fetch package info from kibana.
     for package in verification_handler:
         num_of_retries = 0
@@ -220,7 +215,7 @@ def install_packages(installer, verification_handler):
             failed_packages.append(package)
         else:
             # Try to install the package 3 times.
-            print(f'Installing package: {package} ({package_counter}/{len(verification_handler)})')
+            print(f'Installing package: {package} ({package_counter + 1}/{len(verification_handler)})')
             while (num_of_retries < 3):
                 run_command(f'"{installer['installer_path']}" installer --install-packages {package} {installer['necto_path']} {installer['necto_path_app_data']}')
                 # Verify if the package has been installed.

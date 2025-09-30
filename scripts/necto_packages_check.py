@@ -5,6 +5,8 @@ import necto_utils.necto as necto
 import necto_utils.packages as packages
 import necto_utils.database as database
 
+from datetime import datetime
+
 def main():
     parser = argparse.ArgumentParser(description="Run Recursive Build Tool.")
     parser.add_argument("step",
@@ -24,6 +26,9 @@ def main():
     args = parser.parse_args()
 
     verification_handler = {}
+    # Fetch current date and time to track the changes
+    verification_handler['triggered_time'] = datetime.now().strftime("%Y%m%d%H%M%S")
+
     installer = necto.define_paths()
     db_path = os.path.join(installer['necto_path_app_data'], 'databases/necto_db.db')
 
