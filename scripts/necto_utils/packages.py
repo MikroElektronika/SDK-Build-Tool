@@ -196,6 +196,8 @@ def install_packages(installer, verification_handler):
 
     # Fetch package info from kibana.
     for package in verification_handler:
+        if package == 'triggered_time':
+            continue
         num_of_retries = 0
         install_location = ''
         # Find the install location for the package based on kibana data.
@@ -215,7 +217,7 @@ def install_packages(installer, verification_handler):
             failed_packages.append(package)
         else:
             # Try to install the package 3 times.
-            print(f'Installing package: {package} ({package_counter + 1}/{len(verification_handler)})')
+            print(f'Installing package: {package} ({package_counter + 1}/{len(verification_handler) - 1})')
             while (num_of_retries < 3):
                 try:
                     run_command(f'"{installer['installer_path']}" installer --install-packages {package} {installer['necto_path']} {installer['necto_path_app_data']}')
