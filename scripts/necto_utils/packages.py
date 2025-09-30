@@ -1,5 +1,7 @@
 import re, os, json, subprocess, requests
 
+from datetime import datetime
+
 from elasticsearch import Elasticsearch
 
 category_filter = [
@@ -50,9 +52,9 @@ def download_asset(asset_name):
                 break
         page += 1
 
-def upload_release_asset(asset_path, installer):
+def upload_release_asset(asset_path, installer, verification_handler):
     if 'results' in asset_path:
-        asset_name = f"results_{installer['installer_os']}.html"
+        asset_name = f"results_{installer['installer_os']}_{verification_handler['triggered_time']}.html"
     else:
         asset_name = f"package_dependencies_{installer['installer_os']}.json"
 
@@ -194,6 +196,9 @@ def install_packages(installer, verification_handler):
     failed_packages = []
     passed_packages = []
 
+    # Fetch current date and time to track the changes
+    verification_handler['triggered_time'] = datetime.now().strftime("%Y%m%d%H%M%S")
+
     # Fetch package info from kibana.
     for package in verification_handler:
         num_of_retries = 0
@@ -287,7 +292,7 @@ def create_dependencies_file(installer, verification_handler):
     with open (f'package_dependencies_{installer['installer_os']}_previous.json', 'r') as previous_dependencies_file:
         previous_dependencies = json.load(previous_dependencies_file)
 
-    upload_release_asset(f'package_dependencies.json', installer)
+    upload_release_asset(f'package_dependencies.json', installer, verification_handler)
 
     previous_dependencies_string = json.dumps(previous_dependencies, ensure_ascii=False, indent=None, separators=(',', ':')).replace('</', '<\\/')
     current_dependencies_string = json.dumps(verification_handler, ensure_ascii=False, indent=None, separators=(',', ':')).replace('</', '<\\/')
@@ -659,7 +664,7 @@ def check_card_dependencies(installer, verification_handler):
     with open(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), 'w') as results_html:
         results_html.write(results_contents)
 
-    html_link = upload_release_asset(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), installer)
+    html_link = upload_release_asset(os.path.join(os.getcwd(), 'scripts', 'necto_utils', 'results.html'), installer, verification_handler)
 
     with open('message.txt', 'r') as message_file:
         message_content = message_file.read()
