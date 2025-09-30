@@ -217,7 +217,10 @@ def install_packages(installer, verification_handler):
             # Try to install the package 3 times.
             print(f'Installing package: {package} ({package_counter + 1}/{len(verification_handler)})')
             while (num_of_retries < 3):
-                run_command(f'"{installer['installer_path']}" installer --install-packages {package} {installer['necto_path']} {installer['necto_path_app_data']}')
+                try:
+                    run_command(f'"{installer['installer_path']}" installer --install-packages {package} {installer['necto_path']} {installer['necto_path_app_data']}')
+                except Exception as e:
+                    print(f'\033[91mWOW! Failed to trigger installer to install {package}\033[0m')
                 # Verify if the package has been installed.
                 if os.path.exists(install_location):
                     print(f"\033[94mThe {package} package was downloaded successfully.\033[0m")
