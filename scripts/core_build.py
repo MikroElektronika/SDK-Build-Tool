@@ -161,7 +161,7 @@ def run_builds(changes_dict):
 # Returns the list of compilers based on the given name and type.
 def get_compilers(name, is_mcu=True):
     if is_mcu:
-        if any(substring in name for substring in ["SAM", "STM", "TM4C", "MK", "MC", "R7FA", "K32L", "KW45", "M0", "M2", "M4", "NUC", "NANO", "MINI", "M23", "XMC"]):
+        if any(substring in name for substring in ["SAM", "STM", "TM4C", "MK", "MC", "R7", "K32L", "KW45", "M0", "M2", "M4", "NUC", "NANO", "MINI", "M23", "XMC", "CY8C", "MSP"]):
             return compiler_list["ARM"]
         elif any(substring in name for substring in ["GD32", "RISC"]):
             return compiler_list["RISCV"]
@@ -242,7 +242,7 @@ def parse_files_for_paths(cmake_files, source_dir, isGCC=None):
                 if isGCC and 'list(APPEND local_list_include' in line:
 
                     systemPath = line.split()[-1][:-1].replace("${vendor}", vendor)
-                    if 'doc_ds' in systemPath or ('sam' in systemPath and re.search('^(at)?sam.+$', file_name)) or 'nuvoton' in systemPath or 'pic32' in systemPath:
+                    if 'doc_ds' in systemPath or ('sam' in systemPath and re.search('^(at)?sam.+$', file_name)) or 'renesas' in systemPath or 'nuvoton' in systemPath or 'pic32' in systemPath or ('infineon' in systemPath and 'cy8c' in file_name) or ('ti' in systemPath and 'msp' in file_name):
                         systemPath = os.path.dirname(systemPath)
                     systemPath = os.path.join(source_dir, systemPath)
                     paths[file_name]['files'].add(systemPath)
@@ -324,6 +324,17 @@ def extract_mcu_names(file_name, source_dir, output_dir, regex):
                     mcu_name = os.path.splitext(file)[0]
                     if regex_pattern.match(mcu_name):
                         mcus[file_name]['mcu_names'].add(mcu_name)
+                        if 'gcc_clang' in source_dir or 'XC32' in source_dir:
+                            isPresent, readData = read_data_from_db(f"{local_app_data_path}/databases/necto_db.db", f'SELECT sdk_config, core_info FROM Devices WHERE name IS "{mcu_name}"')
+                            if isPresent:
+                                if readData[0][1] == None:
+                                    configJson = json.loads(readData[0][0])
+                                    mcus[file_name]['cores'].add(configJson['CORE_NAME'])
+                                else:
+                                    configJson = json.loads(readData[0][0])
+                                    core_info = json.loads(readData[0][1])
+                                    for core in core_info:
+                                        mcus[file_name]['cores'].add(core['core_name_define'])
 
     return mcus
 
@@ -671,6 +682,10 @@ def package_asset(source_dir, output_dir, arch, entry_name, changes_dict, es_ins
     file_paths = parse_files_for_paths(cmake_files, source_dir, True)
     for cmake_file, data in file_paths.items():
         base_output_dir = os.path.join(output_dir, f"{arch.lower()}_{entry_name.lower()}_{cmake_file}") # Subdirectory for this .cmake file
+        coreQueriesPath = os.path.join(os.getcwd(), 'resources/queries')
+        if os.path.exists(os.path.join(coreQueriesPath, 'mcus')):
+            updateDevicesFromCore([f"{local_app_data_path}/databases/necto_db.db"], os.path.join(coreQueriesPath, 'mcus'))
+
         # Copy the .cmake file into the package directory
         copy_cmake_files(data['cmake_file_path'], source_dir, base_output_dir, data['regex'])
 
@@ -689,9 +704,6 @@ def package_asset(source_dir, output_dir, arch, entry_name, changes_dict, es_ins
         copy_files_from_dir(mcuNames[cmake_file]['mcu_names'], source_dir, output_dir, base_output_dir, 'linker_scripts')
 
         get_core(mcuNames, f"{arch.lower()}_{entry_name.lower()}_{cmake_file}", cmake_file, source_dir, changes_dict)
-        coreQueriesPath = os.path.join(os.getcwd(), 'resources/queries')
-        if os.path.exists(os.path.join(coreQueriesPath, 'mcus')):
-            updateDevicesFromCore([f"{local_app_data_path}/databases/necto_db.db"], os.path.join(coreQueriesPath, 'mcus'))
 
         # Copy delay files
         copy_delays(mcuNames[cmake_file]['cores'], source_dir, output_dir, base_output_dir)
