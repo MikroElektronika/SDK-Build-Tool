@@ -242,7 +242,7 @@ def parse_files_for_paths(cmake_files, source_dir, isGCC=None):
                 if isGCC and 'list(APPEND local_list_include' in line:
 
                     systemPath = line.split()[-1][:-1].replace("${vendor}", vendor)
-                    if 'doc_ds' in systemPath or ('sam' in systemPath and re.search('^(at)?sam.+$', file_name)) or 'nuvoton' in systemPath or 'pic32' in systemPath or 'infineon' in systemPath or ('ti' in systemPath and 'mspm' in file_name) or 'renesas' in systemPath:
+                    if 'doc_ds' in systemPath or ('sam' in systemPath and re.search('^(at)?sam.+$', file_name)) or 'renesas' in systemPath or 'nuvoton' in systemPath or 'pic32' in systemPath or ('infineon' in systemPath and 'cy8c' in file_name) or ('ti' in systemPath and 'msp' in file_name):
                         systemPath = os.path.dirname(systemPath)
                     systemPath = os.path.join(source_dir, systemPath)
                     paths[file_name]['files'].add(systemPath)
@@ -306,7 +306,7 @@ def copy_interrupt_files(source_dir, output_dir):
     os.makedirs(dest_dir_c, exist_ok=True)
     shutil.copy(source_file_c, dest_dir_c)
 
-def extract_mcu_names(file_name, source_dir, output_dir, regex):
+def extract_mcu_names(file_name, source_dir, regex):
     """
     Copy files from a specific subdirectory in source_dir that match a regex to a corresponding subdirectory in output_dir,
     maintaining the folder structure.
@@ -324,6 +324,17 @@ def extract_mcu_names(file_name, source_dir, output_dir, regex):
                     mcu_name = os.path.splitext(file)[0]
                     if regex_pattern.match(mcu_name):
                         mcus[file_name]['mcu_names'].add(mcu_name)
+                        if 'gcc_clang' in source_dir or 'XC32' in source_dir:
+                            isPresent, readData = read_data_from_db('necto_db.db', f'SELECT sdk_config, core_info FROM Devices WHERE name IS "{mcu_name}"')
+                            if isPresent:
+                                if readData[0][1] == None:
+                                    configJson = json.loads(readData[0][0])
+                                    mcus[file_name]['cores'].add(configJson['CORE_NAME'])
+                                else:
+                                    configJson = json.loads(readData[0][0])
+                                    core_info = json.loads(readData[0][1])
+                                    for core in core_info:
+                                        mcus[file_name]['cores'].add(core['core_name_define'])
 
     return mcus
 
