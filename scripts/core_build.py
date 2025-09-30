@@ -306,7 +306,7 @@ def copy_interrupt_files(source_dir, output_dir):
     os.makedirs(dest_dir_c, exist_ok=True)
     shutil.copy(source_file_c, dest_dir_c)
 
-def extract_mcu_names(file_name, source_dir, regex):
+def extract_mcu_names(file_name, source_dir, output_dir, regex):
     """
     Copy files from a specific subdirectory in source_dir that match a regex to a corresponding subdirectory in output_dir,
     maintaining the folder structure.
