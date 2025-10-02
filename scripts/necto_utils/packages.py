@@ -172,14 +172,18 @@ def run_command(cmd):
         text=True
     )
 
-    # Parse the line to display the installation progress.
-    for line in proc.stdout:
-        parse_and_print_progress(line)
-    proc.wait()
+    # Read and parse line-by-line safely
+    with proc.stdout:
+        for line in proc.stdout:
+            parse_and_print_progress(line)
 
-    # Display the error if something fails.
+    # Make sure all buffers are flushed and FDs closed
+    stdout_data, _ = proc.communicate()
+
     if proc.returncode != 0:
-        raise RuntimeError(f'\033[31mCommand failed with exit code {proc.returncode}: {cmd}.\033[31m')
+        raise RuntimeError(
+            f'\033[31mCommand failed with exit code {proc.returncode}: {cmd}.\033[31m'
+        )
 
 # Function for installing NECTO packages.
 def install_packages(installer, verification_handler):
@@ -223,12 +227,6 @@ def install_packages(installer, verification_handler):
                     run_command(f'"{installer['installer_path']}" installer --install-packages {package} {installer['necto_path']} {installer['necto_path_app_data']}')
                 except Exception as e:
                     print(f'\033[91mWOW! Failed to trigger installer to install {package}\033[0m')
-                    # Print current ulimit values for debugging
-                    try:
-                        limits = subprocess.check_output("ulimit -a", shell=True, executable="/bin/bash").decode()
-                        print(f"\033[93m[DEBUG] Current ulimit values:\n{limits}\033[0m")
-                    except Exception as ue:
-                        print(f"\033[91m[DEBUG] Failed to read ulimit: {ue}\033[0m")
 
                 # Verify if the package has been installed.
                 if os.path.exists(install_location):
