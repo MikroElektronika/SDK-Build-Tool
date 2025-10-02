@@ -223,11 +223,19 @@ def install_packages(installer, verification_handler):
                     run_command(f'"{installer['installer_path']}" installer --install-packages {package} {installer['necto_path']} {installer['necto_path_app_data']}')
                 except Exception as e:
                     print(f'\033[91mWOW! Failed to trigger installer to install {package}\033[0m')
+                    # Print current ulimit values for debugging
+                    try:
+                        limits = subprocess.check_output("ulimit -a", shell=True, executable="/bin/bash").decode()
+                        print(f"\033[93m[DEBUG] Current ulimit values:\n{limits}\033[0m")
+                    except Exception as ue:
+                        print(f"\033[91m[DEBUG] Failed to read ulimit: {ue}\033[0m")
+
                 # Verify if the package has been installed.
                 if os.path.exists(install_location):
                     print(f"\033[94mThe {package} package was downloaded successfully.\033[0m")
                     passed_packages.append(package)
                     break
+
                 num_of_retries += 1
 
             # After the third try remember the package as it failed to be installed.
