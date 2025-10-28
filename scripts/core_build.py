@@ -142,7 +142,7 @@ def run_builds(changes_dict):
     print(f"\033[93mRunning build for {len(changes_dict['mcu_list'])} MCUs\033[0m")
     mcu_number = 0
     for mcu in changes_dict['mcu_list']:
-        print(f'Building mcu number {mcu_number} out of {len(changes_dict['mcu_list'])}.')
+        print(f'Building mcu number {mcu_number + 1} out of {len(changes_dict['mcu_list'])}.')
         mcu_number += 1
         # Get the necessary compiler for the current MCU build.
         compilers = get_compilers(mcu, is_mcu=True)
