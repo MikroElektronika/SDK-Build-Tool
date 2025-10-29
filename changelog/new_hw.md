@@ -1,0 +1,35 @@
+<p align="center">
+  <img src="http://www.mikroe.com/img/designs/beta/logo_small.png?raw=true" alt="MikroElektronika"/>
+</p>
+
+---
+
+# `DATE`
+
+## Changes
+
+- [`DATE`](#date)
+  - [Changes](#changes)
+    - [NEW HARDWARE](#new-hardware)
+
+### NEW HARDWARE
+
+Support added for following hardware:
+
++ CY9BF366 MCU Support package for GCC & Clang
+  + CY9BF366KPMC-G-JNE2
+  + CY9BF366KPMC-G-JNK1E2
+  + CY9BF366KQN-G-AVE2
+  + CY9BF366LPMC-G-JNE2
+  + CY9BF366LQN-G-AVE2
+  + CY9BF366MPMC1-G-JNE2
+  + CY9BF366NPMC-G-MNE2
+  + CY9BF366NPMC-GNE2
+  + CY9BF366NPQC-G-JNE2
+  + CY9BF366RBGL-GE1
+  + CY9BF366RBGL-GK7E1
+  + CY9BF366RPMC-G-JNE2
+  + CY9BF366RPMC-G-MNE2
+  + CY9BF366RPMC-GNE2
+
+---
