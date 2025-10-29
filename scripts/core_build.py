@@ -142,7 +142,7 @@ def run_builds(changes_dict):
     print(f"\033[93mRunning build for {len(changes_dict['mcu_list'])} MCUs\033[0m")
     mcu_number = 0
     for mcu in changes_dict['mcu_list']:
-        print(f'Building mcu number {mcu_number} out of {len(changes_dict['mcu_list'])}.')
+        print(f'Building mcu number {mcu_number + 1} out of {len(changes_dict['mcu_list'])}.')
         mcu_number += 1
         # Get the necessary compiler for the current MCU build.
         compilers = get_compilers(mcu, is_mcu=True)
@@ -161,7 +161,7 @@ def run_builds(changes_dict):
 # Returns the list of compilers based on the given name and type.
 def get_compilers(name, is_mcu=True):
     if is_mcu:
-        if any(substring in name for substring in ["SAM", "STM", "TM4C", "MK", "MC", "R7", "K32L", "KW45", "M0", "M2", "M4", "NUC", "NANO", "MINI", "M23", "XMC", "CY8C", "MSP"]):
+        if any(substring in name for substring in ["SAM", "STM", "TM4C", "MK", "MC", "R7", "K32L", "KW45", "M0", "M2", "M4", "NUC", "NANO", "MINI", "M23", "XMC", "CY", "MSP", "S6"]):
             return compiler_list["ARM"]
         elif any(substring in name for substring in ["GD32", "RISC"]):
             return compiler_list["RISCV"]
