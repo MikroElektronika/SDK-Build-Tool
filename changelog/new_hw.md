@@ -1,0 +1,32 @@
+<p align="center">
+  <img src="http://www.mikroe.com/img/designs/beta/logo_small.png?raw=true" alt="MikroElektronika"/>
+</p>
+
+---
+
+# `DATE`
+
+## Changes
+
+- [`DATE`](#date)
+  - [Changes](#changes)
+    - [NEW HARDWARE](#new-hardware)
+
+### NEW HARDWARE
+
+Support added for following hardware:
+
++ CY9AF312 MCU Support package for GCC & Clang
+  + CY9AF312KPMC-G-JNCGE2
+  + CY9AF312KPMC-G-JNE1
+  + CY9AF312KPMC-G-JNERE2
+  + CY9AF312KPMC1-G-JNE2
+  + CY9AF312KQN-G-AVE2
+  + CY9AF312LAPMC1-G-MNE2
+  + CY9AF312LAPMC1-GNE2
+  + CY9AF312LAQN-G-AVE2
+  + CY9AF312MAPMC-GNE2
+  + CY9AF312NABGL-GK9E1
+  + CY9AF312NAPMC-GNE2
+
+---
