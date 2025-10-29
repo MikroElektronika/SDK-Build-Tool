@@ -1,0 +1,34 @@
+<p align="center">
+  <img src="http://www.mikroe.com/img/designs/beta/logo_small.png?raw=true" alt="MikroElektronika"/>
+</p>
+
+---
+
+# `DATE`
+
+## Changes
+
+- [`DATE`](#date)
+  - [Changes](#changes)
+    - [NEW HARDWARE](#new-hardware)
+
+### NEW HARDWARE
+
+Support added for following hardware:
+
++ CY9BF121 MCU Support package for GCC & Clang
+  + CY9BF121JPMC-G-JNE2
+  + CY9BF121JWQN-G-JNE2
+  + CY9BF121KPMC-G-MNE2
+  + CY9BF121KPMC-GNE2
+  + CY9BF121KQN-G-AVE2
+  + CY9BF121LPMC-GNE2
+  + CY9BF121LPMC1-G-MNE2
+  + CY9BF121LPMC1-GNE2
+  + CY9BF121LQN-G-AVE2
+  + CY9BF121MBGL-GK9E1
+  + CY9BF121MPMC-G-MNE2
+  + CY9BF121MPMC-GNE2
+  + CY9BF121MPMC1-G-JNE2
+
+---
