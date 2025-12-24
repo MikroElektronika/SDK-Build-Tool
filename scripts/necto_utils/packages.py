@@ -233,7 +233,7 @@ def install_packages(installer, verification_handler):
 
                 # Verify if the package has been installed.
                 if os.path.exists(install_location):
-                    print(f"\033[94mThe {package} package was downloaded successfully.\033[0m")
+                    print(f"\033[94m[{package_counter + 1}/{len(verification_handler) - 1}] The {package} package was downloaded successfully.\033[0m")
                     passed_packages.append(package)
                     break
 
