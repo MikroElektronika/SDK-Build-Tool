@@ -32,8 +32,6 @@ jobs:
       # Remove Haskell (GHC)
       # Remove Julia
       # Remove Android SDKs
-      # Remove Chromium (optional if not using for browser tests)
-      # Remove Microsoft/Edge and Google Chrome builds
       # Remove Azure CLI
       # Remove PowerShell
       # Remove CodeQL and other toolcaches
@@ -46,8 +44,6 @@ jobs:
           sudo rm -rf /usr/local/.ghcup
           sudo rm -rf /usr/local/julia*
           sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /usr/local/share/chromium
-          sudo rm -rf /opt/microsoft /opt/google
           sudo rm -rf /opt/az
           sudo rm -rf /usr/local/share/powershell
           sudo rm -rf /opt/hostedtoolcache
