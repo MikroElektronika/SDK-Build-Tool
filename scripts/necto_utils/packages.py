@@ -163,7 +163,8 @@ def parse_and_print_progress(line):
 
 # Function for executing the commands.
 def run_command(cmd):
-    print(f'\033[36mRunning: {cmd}\033[36m')
+    # TODO: uncomment for debug purposes
+    # print(f'\033[36mRunning: {cmd}\033[36m')
     proc = subprocess.Popen(
         cmd,
         shell=True,
@@ -221,12 +222,14 @@ def install_packages(installer, verification_handler):
             failed_packages.append(package)
         else:
             # Try to install the package 3 times.
-            print(f'Installing package: {package} ({package_counter + 1}/{len(verification_handler) - 1})')
+            # TODO - uncomment for testing purposes
+            # print(f'Installing package: {package} ({package_counter + 1}/{len(verification_handler) - 1})')
             while (num_of_retries < 3):
-                try:
-                    run_command(f'"{installer['installer_path']}" installer --install-packages {package} {installer['necto_path']} {installer['necto_path_app_data']}')
-                except Exception as e:
-                    print(f'\033[91mWOW! Failed to trigger installer to install {package}\033[0m')
+                # try:
+                run_command(f'"{installer['installer_path']}" installer --install-packages {package} {installer['necto_path']} {installer['necto_path_app_data']}')
+                # except Exception as e:
+                    # TODO - uncomment for testing purposes
+                    # print(f'\033[91mWOW! Failed to trigger installer to install {package}\033[0m')
 
                 # Verify if the package has been installed.
                 if os.path.exists(install_location):

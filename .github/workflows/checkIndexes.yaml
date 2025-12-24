@@ -1,0 +1,128 @@
+name: Check Indexed File Links
+
+on:
+  workflow_dispatch:
+    inputs:
+      select_index:
+        type: choice
+        description: Check Test and/or Live ES indexed items
+        options:
+          - Test
+          - Live
+          - Both
+      regex:
+        type: string
+        description: Regex to use when searching for indexed items
+        default: "arm_gcc_clang|arm_mikroc|clocks|database|dspic|^images$|mikroe_utils|avr|pic|preinit|riscv|schemas|unit_test_lib|.+[device|tool]_support$|^codegrip_pack"
+      fix:
+        type: boolean
+        description: Fix the broken links with new ones?
+        default: false
+      index_legacy:
+        type: boolean
+        description: Re-index legacy compiler packages as well (MikroC libraries/only applicable to manual runs)?
+        default: false
+
+  # push:
+    # branches:
+      # - main  # This will trigger on every push (merge) to the 'main' branch
+
+  # schedule:
+    # - cron: "0 5 * * 1-5"      # At 07:00, Monday–Friday
+    # - cron: "0 10-16/2 * * 1-5"  # Every 2 hours from 11:00 to 17:00, Monday–Friday
+
+env:
+  GLOBAL_REGEX: "arm_gcc_clang|arm_mikroc|clocks|database|dspic|^images$|mikroe_utils|avr|pic|preinit|riscv|schemas|unit_test_lib|.+[device|tool]_support$|^codegrip_pack"
+  ES_HOST_LEGACY: ${{ secrets.ES_HOST_LEGACY }}
+  ES_USER_LEGACY: ${{ secrets.ES_USER_LEGACY }}
+  ES_PASSWORD_LEGACY: ${{ secrets.ES_PASSWORD_LEGACY }}
+
+jobs:
+  manual_run:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scripts/requirements/check_index.txt
+
+      - name: Check Indexed Links - Live
+        if: ${{ github.event.inputs.select_index == 'Live' || github.event.inputs.select_index == 'Both' }}
+        run: |
+          FIX_ACTION=${{ github.event.inputs.fix }}  # Capture the fix input
+          LOG_ONLY=$([[ "$FIX_ACTION" == "false" ]] && echo true || echo false)  # Negate the fix input
+          echo "LOG_ONLY is set to $LOG_ONLY"
+          python -u scripts/check_indexes.py ${{ github.repository }} ${{ secrets.GITHUB_TOKEN }} ${{ secrets.ES_HOST }} ${{ secrets.ES_USER }} ${{ secrets.ES_PASSWORD }} ${{ secrets.ES_INDEX_LIVE }} "--es_regex" "${{ github.event.inputs.regex }}" "--log_only" "$LOG_ONLY" "--index_legacy_packages" "${{ github.event.inputs.index_legacy }}"
+        continue-on-error: true # Ensure the workflow continues
+
+      - name: Check Indexed Links - Test
+        if: ${{ github.event.inputs.select_index == 'Test' || github.event.inputs.select_index == 'Both' }}
+        run: |
+          FIX_ACTION=${{ github.event.inputs.fix }}  # Capture the fix input
+          LOG_ONLY=$([[ "$FIX_ACTION" == "false" ]] && echo true || echo false)  # Negate the fix input
+          echo "LOG_ONLY is set to $LOG_ONLY"
+          python -u scripts/check_indexes.py ${{ github.repository }} ${{ secrets.GITHUB_TOKEN }} ${{ secrets.ES_HOST }} ${{ secrets.ES_USER }} ${{ secrets.ES_PASSWORD }} ${{ secrets.ES_INDEX_TEST }} "--es_regex" "${{ github.event.inputs.regex }}" "--log_only" "$LOG_ONLY" "--index_legacy_packages" "${{ github.event.inputs.index_legacy }}"
+        continue-on-error: true # Ensure the workflow continues
+
+  push_to_main_run:
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scripts/requirements/check_index.txt
+
+      - name: Check Indexed Links - Live
+        run: |
+          python -u scripts/check_indexes.py ${{ github.repository }} ${{ secrets.GITHUB_TOKEN }} ${{ secrets.ES_HOST }} ${{ secrets.ES_USER }} ${{ secrets.ES_PASSWORD }} ${{ secrets.ES_INDEX_LIVE }} "--es_regex" "$GLOBAL_REGEX"
+        continue-on-error: true # Ensure the workflow continues
+
+      - name: Check Indexed Links - Test
+        run: |
+          python -u scripts/check_indexes.py ${{ github.repository }} ${{ secrets.GITHUB_TOKEN }} ${{ secrets.ES_HOST }} ${{ secrets.ES_USER }} ${{ secrets.ES_PASSWORD }} ${{ secrets.ES_INDEX_TEST }} "--es_regex" "$GLOBAL_REGEX"
+        continue-on-error: true # Ensure the workflow continues
+
+  scheduled_run:
+    if: ${{ github.event_name == 'schedule' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scripts/requirements/check_index.txt
+
+      - name: Check Indexed Links - Live
+        run: |
+          python -u scripts/check_indexes.py ${{ github.repository }} ${{ secrets.GITHUB_TOKEN }} ${{ secrets.ES_HOST }} ${{ secrets.ES_USER }} ${{ secrets.ES_PASSWORD }} ${{ secrets.ES_INDEX_LIVE }} "--es_regex" "$GLOBAL_REGEX"
+        continue-on-error: true # Ensure the workflow continues
+
+      - name: Check Indexed Links - Test
+        run: |
+          python -u scripts/check_indexes.py ${{ github.repository }} ${{ secrets.GITHUB_TOKEN }} ${{ secrets.ES_HOST }} ${{ secrets.ES_USER }} ${{ secrets.ES_PASSWORD }} ${{ secrets.ES_INDEX_TEST }} "--es_regex" "$GLOBAL_REGEX"
+        continue-on-error: true # Ensure the workflow continues

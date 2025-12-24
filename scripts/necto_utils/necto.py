@@ -20,17 +20,7 @@ package_installation_validation = {
     'preinit': False,
     'srecord': False,
     'tabnine': False,
-    'templates_live_0_mikrosdk2': False,
-    'templates_live_1_dual_core': False,
-    'templates_live_2_lvgl_designer': False,
-    'templates_live_3_designer': False,
-    'templates_live_4_application_with_library': False,
-    'templates_live_5_library_sdk': False,
-    'templates_live_designer_generated_code': False,
-    'templates_live_file_templates': False,
-    'templates_live_interrupt_assistant_templates': False,
-    'templates_live_lvgl_designer_generated_code': False,
-    'templates_live_toolchain_templates': False,
+    'templates': False,
     'unit_test_lib': False,
     'clocks': False,
     'schemas': False
@@ -92,7 +82,8 @@ def parse_and_print_progress(line):
             if pkg is not None and prog is not None and previous_prog != prog:
                 previous_prog = prog
                 if prog == 100:
-                    print(f'\033[32m[{pkg}] {installation_downloading} progress: {prog}%\033[32m')
+                    # TODO uncomment for testing purposes
+                    # print(f'\033[32m[{pkg}] {installation_downloading} progress: {prog}%\033[32m')
                     if installation_downloading == 'downloading':
                         installation_downloading = 'installation'
                     else:

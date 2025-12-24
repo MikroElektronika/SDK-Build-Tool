@@ -3,15 +3,18 @@ name: Notify Codegrip Release Mattermost
 on:
   workflow_dispatch:
 
+  schedule:
+    - cron: "0 10 * * 1-5"  # 11:00 AM, Monday through Friday
+
 jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.x'
 
@@ -56,7 +59,7 @@ jobs:
       - name: Send notification to Mattermost - Test Channel
         if: ${{ github.event_name == 'workflow_dispatch' }}
         env:
-          MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
+          MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL_TEST }}
         run: |
           MESSAGE=$(cat message.txt)
           curl -X POST -H 'Content-Type: application/json' \
