@@ -179,7 +179,7 @@ def run_command(cmd):
             parse_and_print_progress(line)
 
     # Make sure all buffers are flushed and FDs closed
-    stdout_data, _ = proc.communicate()
+    # stdout_data, _ = proc.communicate()
 
     if proc.returncode != 0:
         raise RuntimeError(
