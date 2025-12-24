@@ -71,11 +71,11 @@ jobs:
             message.txt
             scripts/necto_utils/results.html
 
-      # - name: Notify Mattermost
-      #   if: always()
-      #   env:
-      #     MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL_TEST }}
-      #   run: |
-      #     curl -X POST -H 'Content-Type: application/json' \
-      #     --data "{\"text\": \"$(cat message.txt)\"}" \
-      #     $MATTERMOST_WEBHOOK_URL
+      - name: Notify Mattermost
+        if: always()
+        env:
+          MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL_TEST }}
+        run: |
+          curl -X POST -H 'Content-Type: application/json' \
+          --data "{\"text\": \"$(cat message.txt)\"}" \
+          $MATTERMOST_WEBHOOK_URL

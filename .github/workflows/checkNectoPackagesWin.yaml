@@ -74,11 +74,11 @@ jobs:
             message.txt
             scripts/necto_utils/results.html
 
-      # - name: Notify Mattermost (Windows)
-      #   if: always()
-      #   env:
-      #     MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL_TEST }}
-      #   run: |
-      #     $MESSAGE = Get-Content -Raw message.txt
-      #     $payload = @{ text = $MESSAGE } | ConvertTo-Json -Compress
-      #     curl.exe -X POST -H "Content-Type: application/json" -d $payload $env:MATTERMOST_WEBHOOK_URL
+      - name: Notify Mattermost (Windows)
+        if: always()
+        env:
+          MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL_TEST }}
+        run: |
+          $MESSAGE = Get-Content -Raw message.txt
+          $payload = @{ text = $MESSAGE } | ConvertTo-Json -Compress
+          curl.exe -X POST -H "Content-Type: application/json" -d $payload $env:MATTERMOST_WEBHOOK_URL
