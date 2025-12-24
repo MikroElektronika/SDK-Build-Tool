@@ -32,21 +32,35 @@ jobs:
           pip install -r scripts/requirements/shared.txt
           pip install -r scripts/requirements/databases.txt
 
-      - run: python -u scripts/necto_packages_check.py step1
-      - run: python -u scripts/necto_packages_check.py step2
+      - name: Step 1 - Install NECTO Studio
+        run: python -u scripts/necto_packages_check.py step1
 
-      - run: python -u scripts/necto_packages_check.py step3
+      - name: Step 2 - Install all packages with NECTO installer
+        run: python -u scripts/necto_packages_check.py step2
+
+      - name: Step 3 - Create dependencies
         if: always()
-      - run: python -u scripts/necto_packages_check.py step4
+        run: python -u scripts/necto_packages_check.py step3
+
+      - name: Step 4 - CORE-to-MCU dependencies
         if: always()
-      - run: python -u scripts/necto_packages_check.py step5
+        run: python -u scripts/necto_packages_check.py step4
+
+      - name: Step 5 - CODEGRIP-to-MCU dependencies
         if: always()
-      - run: python -u scripts/necto_packages_check.py step6
+        run: python -u scripts/necto_packages_check.py step5
+
+      - name: Step 6 - MCHP-to-MCU dependencies
         if: always()
-      - run: python -u scripts/necto_packages_check.py step7
+        run: python -u scripts/necto_packages_check.py step6
+
+      - name: Step 7 - Board-to-BSP dependencies
         if: always()
-      - run: python -u scripts/necto_packages_check.py step8
+        run: python -u scripts/necto_packages_check.py step7
+
+      - name: Step 8 - Card-to-BSP dependencies
         if: always()
+        run: python -u scripts/necto_packages_check.py step8
 
       - uses: actions/upload-artifact@v6
         if: always()
