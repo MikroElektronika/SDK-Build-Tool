@@ -151,7 +151,7 @@ def parse_and_print_progress(line):
             if pkg is not None and prog is not None and previous_prog != prog:
                 previous_prog = prog
                 if prog == 100:
-                    print(f'\033[32m[{pkg}] {installation_downloading} progress: {prog}%\033[32m')
+                    # print(f'\033[32m[{pkg}] {installation_downloading} progress: {prog}%\033[32m')
                     if installation_downloading == 'downloading':
                         installation_downloading = 'installation'
                     else:
@@ -181,7 +181,7 @@ def run_command(cmd):
     # Make sure all buffers are flushed and FDs closed
     # stdout_data, _ = proc.communicate()
 
-    if proc.returncode != 0:
+    if proc.returncode and proc.returncode != 0:
         raise RuntimeError(
             f'\033[31mCommand failed with exit code {proc.returncode}: {cmd}.\033[31m'
         )
