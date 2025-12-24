@@ -155,7 +155,7 @@ def parse_and_print_progress(line):
             if pkg is not None and prog is not None and previous_prog != prog:
                 previous_prog = prog
                 if prog == 100:
-                    # print(f'\033[32m[{pkg}] {installation_downloading} progress: {prog}%\033[32m')
+                    print(f'\033[32m[{pkg}] {installation_downloading} progress: {prog}%\033[32m')
                     if installation_downloading == 'downloading':
                         installation_downloading = 'installation'
                     else:
@@ -168,7 +168,7 @@ def parse_and_print_progress(line):
 # Function for executing the commands.
 def run_command(cmd):
     # TODO: uncomment for debug purposes
-    # print(f'\033[36mRunning: {cmd}\033[36m')
+    print(f'\033[36mRunning: {cmd}\033[36m')
     proc = subprocess.Popen(
         cmd,
         shell=True,
@@ -227,7 +227,7 @@ def install_packages(installer, verification_handler):
         else:
             # Try to install the package 3 times.
             # TODO - uncomment for testing purposes
-            # print(f'Installing package: {package} ({package_counter + 1}/{len(verification_handler) - 1})')
+            print(f'Installing package: {package} ({package_counter + 1}/{len(verification_handler) - 1})')
             while (num_of_retries < 3):
                 # try:
                 run_command(f'"{installer['installer_path']}" installer --install-packages {package} {installer['necto_path']} {installer['necto_path_app_data']}')

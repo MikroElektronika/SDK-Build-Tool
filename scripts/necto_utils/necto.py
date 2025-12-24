@@ -93,7 +93,7 @@ def parse_and_print_progress(line):
                 previous_prog = prog
                 if prog == 100:
                     # TODO uncomment for testing purposes
-                    # print(f'\033[32m[{pkg}] {installation_downloading} progress: {prog}%\033[32m')
+                    print(f'\033[32m[{pkg}] {installation_downloading} progress: {prog}%\033[32m')
                     if installation_downloading == 'downloading':
                         installation_downloading = 'installation'
                     else:

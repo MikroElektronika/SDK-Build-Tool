@@ -39,6 +39,7 @@ jobs:
       # Remove CodeQL and other toolcaches
       - name: Aggressive cleanup
         run: |
+          df -h
           sudo rm -rf /usr/lib/jvm
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf /usr/share/swift
