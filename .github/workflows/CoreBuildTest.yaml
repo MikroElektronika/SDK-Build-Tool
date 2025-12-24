@@ -48,7 +48,7 @@ jobs:
           python -u scripts/core_build.py ${{ secrets.TOKEN }} ${{ secrets.ES_INDEX_TEST }} ${{ secrets.ES_HOST }} ${{ secrets.ES_USER }} ${{ secrets.ES_PASSWORD }}
 
       - name: Archive test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: test-results
