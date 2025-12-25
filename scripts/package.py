@@ -417,7 +417,7 @@ def compress_directory_7z(base_output_dir, entry_name, arch=None):
 
     # Execute the command
     try:
-        subprocess.run(command, check=True)
+        subprocess.run(command, check=True, capture_output=True)
         print(f"Archive created successfully: {archive_name}")
         return archive_name
     except subprocess.CalledProcessError as e:
@@ -561,8 +561,9 @@ async def upload_release_asset(session, token, repo, release_id, asset_path, ass
     if delete_existing:
         with open(asset_path, 'rb') as file:
             print(f'Uploading new asset: {asset_name}')
-            response = requests.post(url, headers=headers, data=file)
-            response.raise_for_status()
+            async with session.post(url, headers=headers, data=file) as response:
+                response.raise_for_status()
+                result = await response.json()
             print(f'\033[92mUploaded asset: {os.path.basename(asset_path)} to release ID: {release_id}\033[0m')
     else:
         asset_exists = False
@@ -579,7 +580,7 @@ async def upload_release_asset(session, token, repo, release_id, asset_path, ass
                 print(f'\033[92mUploaded asset: {os.path.basename(asset_path)} to release ID: {release_id}\033[0m')
 
     # Remove the asset from local drive to avoid reaching the memory limit
-    if os.path.exists(asset_path):
+    if os.path.exists(asset_path) and '.7z' in asset_path and 'database' not in asset_path:
         print(f'\033[93mRemoved asset {os.path.basename(asset_path)} locally on running machine\033[0m')
         os.remove(asset_path)
     return result
@@ -593,7 +594,10 @@ async def package_asset(source_dir, output_dir, arch, entry_name, token, repo, t
     package_to_mcu_xlsx = []
     package_to_mcu_json_full = []
     package_to_mcu_xlsx_full = []
+    current_package_num = 1
     for cmake_file, data in file_paths.items():
+        print(f'\033[96m[{current_package_num}/{len(file_paths)}] Processing {cmake_file}\033[0m')
+        current_package_num += 1
         base_output_dir = os.path.join(output_dir, f"{arch.lower()}_{entry_name.lower()}_{cmake_file}") # Subdirectory for this .cmake file
         # Copy the .cmake file into the package directory
         copy_cmake_files(data['cmake_file_path'], source_dir, base_output_dir, data['regex'])
@@ -648,12 +652,13 @@ async def package_asset(source_dir, output_dir, arch, entry_name, token, repo, t
         shutil.rmtree(base_output_dir)
         # Upload archive
         upload_result= ""
-        async with aiohttp.ClientSession() as session:
-            upload_tasks = [upload_release_asset(session, token, repo, release_id, archive_path, assets)]
-            results = await asyncio.gather(*upload_tasks, return_exceptions=True)
-            for result in results:
-                upload_result = result
-            print("All uploads completed.")
+        # async with aiohttp.ClientSession() as session:
+            # upload_tasks = [upload_release_asset(session, token, repo, release_id, archive_path, assets)]
+            # results = await asyncio.gather(*upload_tasks, return_exceptions=True)
+            # for result in results:
+                # upload_result = result
+            # TODO Uncomment for debugging purposes
+            # print("All uploads completed.")
 
         # Determine the version based on the hash
         version = get_version_based_on_hash(archiveName, tag_name.replace("v", ""), archiveHash, current_metadata)
