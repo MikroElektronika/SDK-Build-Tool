@@ -84,15 +84,13 @@ def upload_release_asset(asset_path, installer, verification_handler):
         latest_created_at = '2024-12-22T13:13:45Z'
 
         for asset in assets:
-            if installer['installer_os'] in asset['name'] and '.html' in asset['name']:
-                if latest_created_at > asset['created_at']:
-                    delete_url = asset['url']
-                    print(f"Deleting existing asset: {asset['name']}")
-                    del_resp = requests.delete(delete_url, headers=headers)
-                    del_resp.raise_for_status()
-                    print(f"Asset deleted: {asset['name']}")
-                else:
-                    latest_created_at = asset['created_at']
+            if installer['installer_os'] in asset['name'] and ('.html' in asset['name'] or ('.json' in asset_name and '.json' in asset['name'])):
+                delete_url = asset['url']
+                print(f"Deleting existing asset: {asset['name']}")
+                del_resp = requests.delete(delete_url, headers=headers)
+                del_resp.raise_for_status()
+                print(f"Asset deleted: {asset['name']}")
+
         page += 1
 
     # Upload new asset
