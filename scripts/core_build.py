@@ -158,22 +158,6 @@ def run_builds(changes_dict):
                     cmd = f'{toolPath} --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_DSPIC_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
             run_cmd(cmd, changes_dict, mcu + ' ' + compiler)
 
-# Returns the list of compilers based on the given name and type.
-def get_compilers(name, is_mcu=True):
-    if is_mcu:
-        if any(substring in name for substring in ["SAM", "STM", "TM4C", "MK", "MC", "R7", "K32L", "KW45", "M0", "M2", "M4", "NUC", "NANO", "MINI", "M23", "XMC", "CY", "MSP", "S6"]):
-            return compiler_list["ARM"]
-        elif any(substring in name for substring in ["GD32", "RISC"]):
-            return compiler_list["RISCV"]
-        elif "PIC32" in name:
-            return compiler_list["PIC32"]
-        elif any(substring in name for substring in ["DSPIC", "PIC24", "dsPIC"]):
-            return compiler_list["DSPIC"]
-        elif any(substring in name for substring in ["PIC18", "PIC16", "PIC12", "PIC10"]):
-            return compiler_list["PIC"]
-        elif "AT" in name and "ATSAM" not in name:
-            return compiler_list["AVR"]
-
 def functionRegex(value, pattern):
     c_pattern = re.compile(r"\b" + pattern.lower() + r"\b")
     return c_pattern.search(value) is not None
@@ -195,6 +179,14 @@ def read_data_from_db(db, sql_query):
 
     ## Return query results
     return len(results), results
+
+# Returns the list of compilers based on the given name and type.
+def get_compilers(name, is_mcu=True):
+    if is_mcu:
+        query = f'SELECT compiler_uid from CompilerToDevice WHERE device_uid IS "{name}"'
+        _, results = read_data_from_db(f"{local_app_data_path}/databases/necto_db.db", query)
+        print(results)
+        return results
 
 def get_changed_files(branch='main'):
     try:
