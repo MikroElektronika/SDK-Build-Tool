@@ -26,15 +26,6 @@ else:
 # Global variable to trace failed tests.
 build_failed = False
 
-# Supported compilers list for each architecture.
-compiler_list = {
-    'ARM': ['gcc_arm_none_eabi', 'clang-llvm'],
-    'RISCV': ['xpack-riscv-none-embed-gcc', 'clang-llvm-riscv'],
-    'PIC': ['mchp_xc8'],
-    'DSPIC': ['mchp_xc16'],
-    'PIC32': ['gcc_arm_none_eabi', 'clang-llvm']
-}
-
 # Define a REGEXP function for SQLite.
 def regexp(expr, item):
     # Handle the case where item is None
@@ -185,8 +176,8 @@ def get_compilers(name, is_mcu=True):
     if is_mcu:
         query = f'SELECT compiler_uid from CompilerToDevice WHERE device_uid IS "{name}"'
         _, results = read_data_from_db(f"{local_app_data_path}/databases/necto_db.db", query)
-        print(results)
-        return results
+        compilers = [row[0] for row in results]
+        return compilers
 
 def get_changed_files(branch='main'):
     try:
