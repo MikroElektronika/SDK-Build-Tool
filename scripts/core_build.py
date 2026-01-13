@@ -580,7 +580,7 @@ def updateDevicesFromCore(dbs, queries):
                                     sdkVersions = read_data_from_db(eachDb, 'SELECT DISTINCT version FROM SDKs WHERE name IS "mikroSDK"')
                                     versions = filter_versions(list(v[0] for v in sdkVersions[1]))
                                     threshold_version = version.parse(eachKey[eachTableKey][collumns[1]][:-1])
-                                    filtered_versions = [f'mikrosdk_v{v.replace('.','')}' for v in versions if version.parse(v) >= threshold_version]
+                                    filtered_versions = [f"mikrosdk_v{v.replace('.','')}" for v in versions if version.parse(v) >= threshold_version]
                                     values.append(filtered_versions)
                                 # Add Packages if they are not present in the database
                                 elif 'DeviceToPackage' == eachTableKey:
