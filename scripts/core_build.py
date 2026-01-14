@@ -138,15 +138,17 @@ def run_builds(changes_dict):
         # Get the necessary compiler for the current MCU build.
         compilers = get_compilers(mcu, is_mcu=True)
         for compiler in compilers:
-            if 'xc' not in compiler:
-                cmd = f'{toolPath} --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_ARM_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
-            else:
+            if 'riscv' in compiler:
+                cmd = f'{toolPath} --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_RISCV_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
+            elif 'xc' in compiler:
                 if 'xc8' in compiler:
                     cmd = f'{toolPath} --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_PIC_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
                 elif 'xc32' in compiler:
                     cmd = f'{toolPath} --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_PIC32_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
                 else:
                     cmd = f'{toolPath} --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_DSPIC_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
+            else:
+                cmd = f'{toolPath} --isBareMetal "1" --compiler "{compiler}" --sdk "{sdk_version}" --board "GENERIC_ARM_BOARD" --mcu "{mcu}" --installPrefix "{testPath}/mcu_build/{compiler}"'
             run_cmd(cmd, changes_dict, mcu + ' ' + compiler)
 
 def functionRegex(value, pattern):
