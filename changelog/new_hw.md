@@ -1,0 +1,37 @@
+<p align="center">
+  <img src="http://www.mikroe.com/img/designs/beta/logo_small.png?raw=true" alt="MikroElektronika"/>
+</p>
+
+---
+
+# `DATE`
+
+## Changes
+
+- [`DATE`](#date)
+  - [Changes](#changes)
+    - [NEW HARDWARE](#new-hardware)
+
+### NEW HARDWARE
+
+Support added for following hardware:
+
++ EFM32TG11B1 MCU Support package for GCC & Clang
+  + EFM32TG11B120F128GM32
+  + EFM32TG11B120F128GM64
+  + EFM32TG11B120F128GQ48
+  + EFM32TG11B120F128GQ64
+  + EFM32TG11B120F128IM32
+  + EFM32TG11B120F128IM64
+  + EFM32TG11B120F128IQ48
+  + EFM32TG11B120F128IQ64
+  + EFM32TG11B140F64GM32
+  + EFM32TG11B140F64GM64
+  + EFM32TG11B140F64GQ48
+  + EFM32TG11B140F64GQ64
+  + EFM32TG11B140F64IM32
+  + EFM32TG11B140F64IM64
+  + EFM32TG11B140F64IQ48
+  + EFM32TG11B140F64IQ64
+
+---
