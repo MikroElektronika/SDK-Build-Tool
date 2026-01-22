@@ -1,0 +1,37 @@
+<p align="center">
+  <img src="http://www.mikroe.com/img/designs/beta/logo_small.png?raw=true" alt="MikroElektronika"/>
+</p>
+
+---
+
+# `DATE`
+
+## Changes
+
+- [`DATE`](#date)
+  - [Changes](#changes)
+    - [NEW HARDWARE](#new-hardware)
+
+### NEW HARDWARE
+
+Support added for following hardware:
+
++ EFR32MG24A0 MCU Support package for GCC & Clang
+  + EFR32MG24A010F1024IM40
+  + EFR32MG24A010F1024IM48
+  + EFR32MG24A010F1536GM40
+  + EFR32MG24A010F1536GM48
+  + EFR32MG24A010F1536IM40
+  + EFR32MG24A010F1536IM48
+  + EFR32MG24A010F768IM40
+  + EFR32MG24A010F768IM48
+  + EFR32MG24A020F1024IM40
+  + EFR32MG24A020F1024IM48
+  + EFR32MG24A020F1536GM40
+  + EFR32MG24A020F1536GM48
+  + EFR32MG24A020F1536IM40
+  + EFR32MG24A020F1536IM48
+  + EFR32MG24A020F768IM40
+  + EFR32MG24A021F1024IM40
+
+---
