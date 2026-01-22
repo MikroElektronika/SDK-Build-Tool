@@ -1,0 +1,37 @@
+<p align="center">
+  <img src="http://www.mikroe.com/img/designs/beta/logo_small.png?raw=true" alt="MikroElektronika"/>
+</p>
+
+---
+
+# `DATE`
+
+## Changes
+
+- [`DATE`](#date)
+  - [Changes](#changes)
+    - [NEW HARDWARE](#new-hardware)
+
+### NEW HARDWARE
+
+Support added for following hardware:
+
++ EFR32ZG28 MCU Support package for GCC & Clang
+  + EFR32ZG28A110F1024GM48
+  + EFR32ZG28A110F1024GM68
+  + EFR32ZG28A112F1024GM48
+  + EFR32ZG28A112F1024GM68
+  + EFR32ZG28A120F1024GM48
+  + EFR32ZG28A120F1024GM68
+  + EFR32ZG28A122F1024GM48
+  + EFR32ZG28A122F1024GM68
+  + EFR32ZG28B310F1024IM48
+  + EFR32ZG28B310F1024IM68
+  + EFR32ZG28B312F1024IM48
+  + EFR32ZG28B312F1024IM68
+  + EFR32ZG28B320F1024IM48
+  + EFR32ZG28B320F1024IM68
+  + EFR32ZG28B322F1024IM48
+  + EFR32ZG28B322F1024IM68
+
+---
