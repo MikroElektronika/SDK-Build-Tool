@@ -1,0 +1,39 @@
+<p align="center">
+  <img src="http://www.mikroe.com/img/designs/beta/logo_small.png?raw=true" alt="MikroElektronika"/>
+</p>
+
+---
+
+# `DATE`
+
+## Changes
+
+- [`DATE`](#date)
+  - [Changes](#changes)
+    - [NEW HARDWARE](#new-hardware)
+
+### NEW HARDWARE
+
+Support added for following hardware:
+
++ EFM32WG3 MCU Support package for GCC & Clang
+  + EFM32WG330F128
+  + EFM32WG330F256
+  + EFM32WG330F64
+  + EFM32WG332F128
+  + EFM32WG332F256
+  + EFM32WG332F64
+  + EFM32WG360F128
+  + EFM32WG360F256
+  + EFM32WG360F64
+  + EFM32WG380F128
+  + EFM32WG380F256
+  + EFM32WG380F64
+  + EFM32WG390F128
+  + EFM32WG390F256
+  + EFM32WG390F64
+  + EFM32WG395F128
+  + EFM32WG395F256
+  + EFM32WG395F64
+
+---
