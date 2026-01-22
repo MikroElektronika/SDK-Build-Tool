@@ -1,0 +1,37 @@
+<p align="center">
+  <img src="http://www.mikroe.com/img/designs/beta/logo_small.png?raw=true" alt="MikroElektronika"/>
+</p>
+
+---
+
+# `DATE`
+
+## Changes
+
+- [`DATE`](#date)
+  - [Changes](#changes)
+    - [NEW HARDWARE](#new-hardware)
+
+### NEW HARDWARE
+
+Support added for following hardware:
+
++ EFR32FG12 MCU Support package for GCC & Clang
+  + EFR32FG12P231F1024GL125
+  + EFR32FG12P231F1024GM48
+  + EFR32FG12P231F1024GM68
+  + EFR32FG12P231F512GM68
+  + EFR32FG12P232F1024GL125
+  + EFR32FG12P232F1024GM48
+  + EFR32FG12P431F1024GL125
+  + EFR32FG12P431F1024GM48
+  + EFR32FG12P431F1024GM68
+  + EFR32FG12P431F1024IM48
+  + EFR32FG12P431F512GM68
+  + EFR32FG12P432F1024GL125
+  + EFR32FG12P432F1024GM48
+  + EFR32FG12P433F1024GL125
+  + EFR32FG12P433F1024GM48
+  + EFR32FG12P433F1024GM68
+
+---
