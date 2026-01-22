@@ -1,0 +1,40 @@
+<p align="center">
+  <img src="http://www.mikroe.com/img/designs/beta/logo_small.png?raw=true" alt="MikroElektronika"/>
+</p>
+
+---
+
+# `DATE`
+
+## Changes
+
+- [`DATE`](#date)
+  - [Changes](#changes)
+    - [NEW HARDWARE](#new-hardware)
+
+### NEW HARDWARE
+
+Support added for following hardware:
+
++ EFM32G2 MCU Support package for GCC & Clang
+  + EFM32G200F16
+  + EFM32G200F32
+  + EFM32G200F64
+  + EFM32G210F128
+  + EFM32G222F128
+  + EFM32G222F32
+  + EFM32G222F64
+  + EFM32G230F128
+  + EFM32G230F32
+  + EFM32G230F64
+  + EFM32G232F128
+  + EFM32G232F32
+  + EFM32G232F64
+  + EFM32G280F128
+  + EFM32G280F32
+  + EFM32G280F64
+  + EFM32G290F128
+  + EFM32G290F32
+  + EFM32G290F64
+
+---
