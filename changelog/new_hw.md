@@ -1,0 +1,39 @@
+<p align="center">
+  <img src="http://www.mikroe.com/img/designs/beta/logo_small.png?raw=true" alt="MikroElektronika"/>
+</p>
+
+---
+
+# `DATE`
+
+## Changes
+
+- [`DATE`](#date)
+  - [Changes](#changes)
+    - [NEW HARDWARE](#new-hardware)
+
+### NEW HARDWARE
+
+Support added for following hardware:
+
++ EFR32FG1P MCU Support package for GCC & Clang
+  + EFR32FG1P131F128GM32
+  + EFR32FG1P131F128GM48
+  + EFR32FG1P131F256GM32
+  + EFR32FG1P131F256GM48
+  + EFR32FG1P131F256IM32
+  + EFR32FG1P131F256IM48
+  + EFR32FG1P131F64GM32
+  + EFR32FG1P131F64GM48
+  + EFR32FG1P132F128GM32
+  + EFR32FG1P132F128GM48
+  + EFR32FG1P132F256GM32
+  + EFR32FG1P132F256GM48
+  + EFR32FG1P132F64GM32
+  + EFR32FG1P132F64GM48
+  + EFR32FG1P133F128GM48
+  + EFR32FG1P133F256GM32
+  + EFR32FG1P133F256GM48
+  + EFR32FG1P133F64GM48
+
+---
