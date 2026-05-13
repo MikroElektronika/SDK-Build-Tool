@@ -85,10 +85,10 @@ def run_cmd(cmd, changes_dict, status_key):
     # print(output)
     if 'Building:' in result.stdout:
         output = result.stdout
-        # print(output)
+        print(output)
     else:
         output = result.stderr
-        # print(output)
+        print(output)
     while num_of_retries <= 5:
         current_build_failed = False
         total_ouput = ''
