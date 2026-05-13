@@ -77,6 +77,7 @@ def run_cmd(cmd, changes_dict, status_key):
     # Store all the output lines to print only important ones.
     # output = subprocess.check_output(cmd, shell=True, text=True)
     # Store all the output lines to print only important ones.
+    result = subprocess.run(cmd, shell=True, text=True, capture_output=False)
     result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
     changes_dict['build_status'][status_key] = 'UNDEFINED'
     changes_dict['build_status'][status_key] += result.stdout
