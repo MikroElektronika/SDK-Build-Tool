@@ -75,20 +75,20 @@ def run_cmd(cmd, changes_dict, status_key):
     # shutil.copy(os.path.join(testPath, 'clocks.json'), os.path.join(local_app_data_path, 'clocks.json'))
 
     # Store all the output lines to print only important ones.
-    # output = subprocess.check_output(cmd, shell=True, text=True)
+    output = subprocess.check_output(cmd, shell=True, text=True)
     # Store all the output lines to print only important ones.
     result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
     changes_dict['build_status'][status_key] = 'UNDEFINED'
     changes_dict['build_status'][status_key] += result.stdout
-    # print(output)
+    print(output)
     changes_dict['build_status'][status_key] += result.stderr
     # print(output)
     if 'Building:' in result.stdout:
         output = result.stdout
-        print(output)
+        # print(output)
     else:
         output = result.stderr
-        print(output)
+        # print(output)
     while num_of_retries <= 5:
         current_build_failed = False
         total_ouput = ''
