@@ -713,6 +713,7 @@ def package_asset(source_dir, output_dir, arch, entry_name, changes_dict, es_ins
 
         # Finally copy everthing to AppData location
         shutil.copytree(base_output_dir, os.path.join(local_app_data_path, "packages", "core", arch, entry_name))
+        shutil.copytree(base_output_dir, os.path.join(local_app_data_path, "packages", "core", arch, entry_name, f"{arch.lower()}_{entry_name.lower()}_{cmake_file}"))
 
         # Copy packages to artifacts as well
         shutil.copytree(base_output_dir, os.path.join(testPath, "packages", f"{arch.lower()}_{entry_name.lower()}_{cmake_file}"))
