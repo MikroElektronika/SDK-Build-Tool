@@ -39,29 +39,52 @@ def regexp(expr, item):
 # Extracts the SDK version from the manifest.json file.
 def get_sdk_version():
     sdk_list = []
+
     conn = sqlite3.connect(os.path.join(local_app_data_path, 'databases', 'necto_db.db'))
 
-    # Create REGEXP function for python script.
-    conn.create_function("REGEXP", 2, regexp)
-    cursor = conn.cursor()
+    try:
+        conn.create_function("REGEXP", 2, regexp)
+        cursor = conn.cursor()
 
-    cursor.execute(f"""
-        SELECT uid
-        FROM SDKs
-        WHERE uid REGEXP "mikrosdk_v";
-    """)
-    rows = cursor.fetchall()
-    if rows:
-        sdk_list.extend([row[0] for row in rows])
+        cursor.execute("""
+            SELECT uid
+            FROM SDKs
+            WHERE uid REGEXP "^mikrosdk_v[0-9]+$";
+        """)
 
-    # Function to extract the numeric version from a string
+        rows = cursor.fetchall()
+
+        if rows:
+            sdk_list.extend([row[0] for row in rows])
+
+    finally:
+        conn.close()
+
     def extract_version(version_string):
-        match = re.search(r'mikrosdk_v(\d+)', version_string)
-        if match:
-            return int(match.group(1))  # Return the version as an integer
-        return -1  # Return a default value if no match is found
+        """
+        mikrosdk_v2181  -> (2, 18, 1)
+        mikrosdk_v21714 -> (2, 17, 14)
 
-    return sorted(sdk_list, key=extract_version)[-1]
+        Format assumed:
+        - first digit  = major
+        - next 2 digits = minor
+        - remaining digits = patch
+        """
+        match = re.search(r'mikrosdk_v(\d)(\d{2})(\d+)$', version_string)
+
+        if not match:
+            return (-1, -1, -1)
+
+        major = int(match.group(1))
+        minor = int(match.group(2))
+        patch = int(match.group(3))
+
+        return (major, minor, patch)
+
+    if not sdk_list:
+        return None
+
+    return max(sdk_list, key=extract_version)
 
 # Runs the bash command.
 def run_cmd(cmd, changes_dict, status_key):
