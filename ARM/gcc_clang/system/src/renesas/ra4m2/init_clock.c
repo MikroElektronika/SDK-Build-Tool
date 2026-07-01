@@ -39,8 +39,10 @@
  * @brief Mikroe clock initialization API.
  */
 
-#include "core_header.h"
+#include <string.h>
 #include "mcu.h"
+#include "delays.h"
+#include "core_header.h"
 
 extern void * __Vectors[];
 
@@ -520,6 +522,14 @@ void SystemInit(void)
     SCB->CPACR |= ((3UL << (10*2)) | (3UL << (11*2)));
     SCB->VTOR = (uint32_t) &__Vectors;
 
+    // Unlock VBTCR1 register
+    R_SYSTEM->PRCR = (uint16_t) BSP_PRV_PRCR_UNLOCK;
+
+    // Disable VBATT input
+    R_SYSTEM->VBTICTLR_b.VCH0INEN = 0;
+    R_SYSTEM->VBTICTLR_b.VCH1INEN = 0;
+    R_SYSTEM->VBTICTLR_b.VCH2INEN = 0;
+
     // Lock VBTCR1 register
     R_SYSTEM->PRCR = (uint16_t) BSP_PRV_PRCR_LOCK;
 
@@ -653,6 +663,19 @@ static void system_clock_configuration() {
         }
     } else {
         R_SYSTEM->PLLCR_b.PLLSTP = 1; // PLL is stopped
+    }
+
+    if ( !( VALUE_SYSTEM_PLL2CR & R_SYSTEM_PLL2CR_PLL2STP_Msk ) ) {
+        R_SYSTEM->PLL2CR_b.PLL2STP = 1; // PLL2 is stopped
+        R_SYSTEM->PLL2CCR = (uint16_t) VALUE_SYSTEM_PLL2CCR;
+        R_SYSTEM->PLL2CCR2 = (uint16_t) VALUE_SYSTEM_PLL2CCR2;
+        R_SYSTEM->PLL2CR_b.PLL2STP = 0; // PLL2 is operating
+
+        while ( !( R_SYSTEM->OSCSF_b.PLL2SF ) ) {
+            // Wait for PLL2 to stabilize
+        }
+    } else {
+        R_SYSTEM->PLL2CR_b.PLL2STP = 1; // PLL2 is stopped
     }
 
     R_SYSTEM->LOCOCR = VALUE_SYSTEM_LOCOCR;

@@ -39,8 +39,10 @@
  * @brief Mikroe clock initialization API.
  */
 
-#include "core_header.h"
+#include <string.h>
 #include "mcu.h"
+#include "delays.h"
+#include "core_header.h"
 
 extern void * __Vectors[];
 
@@ -68,6 +70,12 @@ static uint8_t ClockPrescTable[ 7 ] = { 1, 2, 4, 8, 16, 32, 64 };
 
 #define BSP_STACK_POINTER_MONITOR_NMI_ON_DETECTION    (0xA500U)
 #define BSP_CFG_STACK_MAIN_BYTES (0x400)
+
+extern uint32_t __ram_from_flash$$Load;
+extern uint32_t __ram_from_flash$$Base;
+extern uint32_t __ram_from_flash$$Limit;
+extern uint32_t __ram_zero$$Base;
+extern uint32_t __ram_zero$$Limit;
 
 extern void (* __init_array_start[])(void);
 extern void (* __init_array_end[])(void);
@@ -664,6 +672,18 @@ void SystemInit(void)
     // Enable MSP monitoring
     R_MPU_SPMON->SP[0].CTL = 1U;
 
+    memset(
+        &__ram_zero$$Base,
+        0,
+        (uint32_t)&__ram_zero$$Limit - (uint32_t)&__ram_zero$$Base
+    );
+
+    memcpy(
+        &__ram_from_flash$$Base,
+        &__ram_from_flash$$Load,
+        (uint32_t)&__ram_from_flash$$Limit - (uint32_t)&__ram_from_flash$$Base
+    );
+
     int32_t count = __init_array_end - __init_array_start;
     for (int32_t i = 0; i < count; i++)
     {
@@ -728,7 +748,6 @@ static void system_clock_configuration() {
         R_SYSTEM->FLLCR1_b.FLLEN = 0x1;
 
         R_SYSTEM->HOCOCR2 = VALUE_SYSTEM_HOCOCR2;
-        R_SYSTEM->HOCOWTCR = VALUE_SYSTEM_HOCOWTCR;
         R_SYSTEM->HOCOCR_b.HCSTP = 0; // Start HOCO
 
         while ( !( R_SYSTEM->OSCSF_b.HOCOSF ) ) {
@@ -746,6 +765,19 @@ static void system_clock_configuration() {
         }
     } else {
         R_SYSTEM->PLLCR_b.PLLSTP = 1; // PLL is stopped
+    }
+
+    if ( !( VALUE_SYSTEM_PLL2CR & R_SYSTEM_PLL2CR_PLL2STP_Msk ) ) {
+        R_SYSTEM->PLL2CR_b.PLL2STP = 1; // PLL2 is stopped
+        R_SYSTEM->PLL2CCR = (uint16_t) VALUE_SYSTEM_PLL2CCR;
+        R_SYSTEM->PLL2CCR2 = (uint16_t) VALUE_SYSTEM_PLL2CCR2;
+        R_SYSTEM->PLL2CR_b.PLL2STP = 0; // PLL2 is operating
+
+        while ( !( R_SYSTEM->OSCSF_b.PLL2SF ) ) {
+            // Wait for PLL2 to stabilize
+        }
+    } else {
+        R_SYSTEM->PLL2CR_b.PLL2STP = 1; // PLL2 is stopped
     }
 
     R_SYSTEM->LOCOCR = VALUE_SYSTEM_LOCOCR;

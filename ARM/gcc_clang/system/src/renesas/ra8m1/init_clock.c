@@ -39,8 +39,10 @@
  * @brief Mikroe clock initialization API.
  */
 
-#include "core_header.h"
+#include <string.h>
 #include "mcu.h"
+#include "delays.h"
+#include "core_header.h"
 
 extern void * __Vectors[];
 
@@ -56,9 +58,12 @@ typedef struct
     uint32_t FCLK_Frequency;    // Flash interface clock frequency in Hz
     uint32_t SPICLK_Frequency;  // SPI clock frequency in Hz
     uint32_t SCICLK_Frequency;  // SCI clock frequency in Hz
+    uint32_t I3CCLK_Frequency;  // I3C clock frequency in Hz
 } SYSTEM_ClocksTypeDef;
 
 static uint8_t ClockPrescTable[] = { 1, 2, 4, 8, 16, 32, 64, 0, 3, 6, 12 };
+static uint8_t SCI_SPI_CLK_PrescTable[] = { 1, 2, 4, 6, 8, 3, 5 };
+static uint8_t I3CDividersTable[] = { 1, 2, 4, 6, 8, 3, 5, 10, 16, 32 };
 
 /* Helper macros for getting SPI and SCI clock sources. */
 #define SCI_SPI_SOURCE_HOCO     (0)
@@ -87,6 +92,15 @@ static uint8_t ClockPrescTable[] = { 1, 2, 4, 8, 16, 32, 64, 0, 3, 6, 12 };
 #define PLLMULNF_HALF           (0xC0)
 #define PLLMULNF_TWO_THIRDS     (0x80)
 #define PLLMULNF_ONE_THIRD      (0x40)
+
+/* Helper macros for getting I3C source clock. */
+#define I3C_SOURCE_MOCO         (1)
+#define I3C_SOURCE_PLL1P        (5)
+#define I3C_SOURCE_PLL2P        (6)
+#define I3C_SOURCE_PLL1Q        (7)
+#define I3C_SOURCE_PLL1R        (8)
+#define I3C_SOURCE_PLL2Q        (9)
+#define I3C_SOURCE_PLL2R        (10)
 
 /* Key code for writing PRCR register. */
 #define BSP_PRV_PRCR_KEY                              (0xA500U)
@@ -625,21 +639,9 @@ uint32_t SYSTEM_GetPLLClocksFrequency( uint32_t pll_config_value, \
  *
  * @return SPI or SCI peripheral clock value.
  */
-uint32_t SYSTEM_GetSPISCIClocksFrequency ( uint8_t config_value ) {
-    uint32_t hoco_frequency, peripheral_clock;
+uint32_t SYSTEM_GetSPISCIClocksFrequency ( uint8_t config_value, uint32_t hoco_frequency ) {
+    uint32_t peripheral_clock;
     uint8_t prescaler;
-
-    // Get HOCO frequency.
-    if( HOCO_FREQUENCY_MHZ_16 == ( VALUE_SYSTEM_HOCOCR2 & 0x7 ))
-        hoco_frequency = FREQUENCY_16MHZ;
-    else if ( HOCO_FREQUENCY_MHZ_18 == ( VALUE_SYSTEM_HOCOCR2 & 0x7 ))
-        hoco_frequency = FREQUENCY_18MHZ;
-    else if ( HOCO_FREQUENCY_MHZ_20 == ( VALUE_SYSTEM_HOCOCR2 & 0x7 ))
-        hoco_frequency = FREQUENCY_20MHZ;
-    else if ( HOCO_FREQUENCY_MHZ_32 == ( VALUE_SYSTEM_HOCOCR2 & 0x7 ))
-        hoco_frequency = FREQUENCY_32MHZ;
-    else if ( HOCO_FREQUENCY_MHZ_48 == ( VALUE_SYSTEM_HOCOCR2 & 0x7 ))
-        hoco_frequency = FREQUENCY_48MHZ;
 
     switch ( config_value ) {
         case SCI_SPI_SOURCE_HOCO:
@@ -703,6 +705,65 @@ uint32_t SYSTEM_GetSPISCIClocksFrequency ( uint8_t config_value ) {
 }
 
 /**
+ * @brief Gets the peripheral clock value for I3C module.
+ *
+ * Calculates configured clock frequency for I3C clock.
+ *
+ * @return I3C peripheral clock value.
+ */
+uint32_t SYSTEM_GetI3CClockFrequency ( uint32_t hoco_frequency ) {
+    uint32_t peripheral_clock;
+    uint8_t prescaler;
+
+    switch ( VALUE_SYSTEM_I3CCKCR & R_SYSTEM_I3CCKCR_I3CCKSEL_Msk ) {
+        case I3C_SOURCE_MOCO:
+            peripheral_clock = FREQUENCY_8MHZ;
+            break;
+        case I3C_SOURCE_PLL1P:
+            prescaler = (( VALUE_SYSTEM_PLLCCR2 & R_SYSTEM_PLLCCR2_PLODIVP_Msk ) \
+                >> R_SYSTEM_PLLCCR2_PLODIVP_Pos ) + 1;
+            peripheral_clock = \
+                SYSTEM_GetPLLClocksFrequency( VALUE_SYSTEM_PLLCCR, hoco_frequency, prescaler );
+            break;
+        case I3C_SOURCE_PLL2P:
+            prescaler = (( VALUE_SYSTEM_PLL2CCR2 & R_SYSTEM_PLL2CCR2_PL2ODIVP_Msk ) \
+                >> R_SYSTEM_PLL2CCR2_PL2ODIVP_Pos ) + 1;
+            peripheral_clock = \
+                SYSTEM_GetPLLClocksFrequency( VALUE_SYSTEM_PLL2CCR, hoco_frequency, prescaler );
+            break;
+        case I3C_SOURCE_PLL1Q:
+            prescaler = (( VALUE_SYSTEM_PLLCCR2 & R_SYSTEM_PLLCCR2_PLODIVQ_Msk ) \
+                >> R_SYSTEM_PLLCCR2_PLODIVQ_Pos ) + 1;
+            peripheral_clock = \
+                SYSTEM_GetPLLClocksFrequency( VALUE_SYSTEM_PLLCCR, hoco_frequency, prescaler );
+            break;
+        case I3C_SOURCE_PLL1R:
+            prescaler = (( VALUE_SYSTEM_PLLCCR2 & R_SYSTEM_PLLCCR2_PLODIVR_Msk ) \
+                >> R_SYSTEM_PLLCCR2_PLODIVR_Pos ) + 1;
+            peripheral_clock = \
+                SYSTEM_GetPLLClocksFrequency( VALUE_SYSTEM_PLLCCR, hoco_frequency, prescaler );
+            break;
+        case I3C_SOURCE_PLL2Q:
+            prescaler = (( VALUE_SYSTEM_PLL2CCR2 & R_SYSTEM_PLL2CCR2_PL2ODIVQ_Msk ) \
+                >> R_SYSTEM_PLL2CCR2_PL2ODIVQ_Pos ) + 1;
+            peripheral_clock = \
+                SYSTEM_GetPLLClocksFrequency( VALUE_SYSTEM_PLL2CCR, hoco_frequency, prescaler );
+            break;
+        case I3C_SOURCE_PLL2R:
+            prescaler = (( VALUE_SYSTEM_PLL2CCR2 & R_SYSTEM_PLL2CCR2_PL2ODIVR_Msk ) \
+                >> R_SYSTEM_PLL2CCR2_PL2ODIVR_Pos ) + 1;
+            peripheral_clock = \
+                SYSTEM_GetPLLClocksFrequency( VALUE_SYSTEM_PLL2CCR, hoco_frequency, prescaler );
+            break;
+
+        default:
+            break;
+    }
+
+    return peripheral_clock;
+}
+
+/**
  * @brief Gets the system clock values.
  *
  * Calculates configured clock frequency for system clocks which are used by different
@@ -711,7 +772,7 @@ uint32_t SYSTEM_GetSPISCIClocksFrequency ( uint8_t config_value ) {
  * @return None
  */
 void SYSTEM_GetClocksFrequency( SYSTEM_ClocksTypeDef * SYSTEM_Clocks ) {
-    uint32_t source_clock;
+    uint32_t source_clock, hoco_frequency;
     uint8_t prescaler;
 
     // Get the frequency of CPU clock.
@@ -749,13 +810,35 @@ void SYSTEM_GetClocksFrequency( SYSTEM_ClocksTypeDef * SYSTEM_Clocks ) {
     prescaler = ClockPrescTable[ ( VALUE_SYSTEM_SCKDIVCR & 0xF ) ];
     SYSTEM_Clocks->PCLKD_Frequency = source_clock / prescaler;
 
+    // Get HOCO frequency.
+    if( HOCO_FREQUENCY_MHZ_16 == ( VALUE_SYSTEM_HOCOCR2 & 0x7 ))
+        hoco_frequency = FREQUENCY_16MHZ;
+    else if ( HOCO_FREQUENCY_MHZ_18 == ( VALUE_SYSTEM_HOCOCR2 & 0x7 ))
+        hoco_frequency = FREQUENCY_18MHZ;
+    else if ( HOCO_FREQUENCY_MHZ_20 == ( VALUE_SYSTEM_HOCOCR2 & 0x7 ))
+        hoco_frequency = FREQUENCY_20MHZ;
+    else if ( HOCO_FREQUENCY_MHZ_32 == ( VALUE_SYSTEM_HOCOCR2 & 0x7 ))
+        hoco_frequency = FREQUENCY_32MHZ;
+    else if ( HOCO_FREQUENCY_MHZ_48 == ( VALUE_SYSTEM_HOCOCR2 & 0x7 ))
+        hoco_frequency = FREQUENCY_48MHZ;
+
     // Get the source clock of SPI module.
     SYSTEM_Clocks->SPICLK_Frequency = \
-        SYSTEM_GetSPISCIClocksFrequency( VALUE_SYSTEM_SPICKCR & R_SYSTEM_SPICKCR_CKSEL_Msk );
+        SYSTEM_GetSPISCIClocksFrequency( VALUE_SYSTEM_SPICKCR & R_SYSTEM_SPICKCR_CKSEL_Msk, hoco_frequency );
+    // Adjust SPICLK based on the SPICKDIVCR value.
+    SYSTEM_Clocks->SPICLK_Frequency /= SCI_SPI_CLK_PrescTable[ VALUE_SYSTEM_SPICKDIVCR & R_SYSTEM_SPICKDIVCR_CKDIV_Msk ];
 
     // Get the source clock of SCI module.
     SYSTEM_Clocks->SCICLK_Frequency = \
-        SYSTEM_GetSPISCIClocksFrequency( VALUE_SYSTEM_SCICKCR & R_SYSTEM_SCICKCR_SCICKSEL_Msk );
+        SYSTEM_GetSPISCIClocksFrequency( VALUE_SYSTEM_SCICKCR & R_SYSTEM_SCICKCR_SCICKSEL_Msk, hoco_frequency );
+    // Adjust SCICLK based on the SPICKDIVCR value.
+    SYSTEM_Clocks->SCICLK_Frequency /= SCI_SPI_CLK_PrescTable[ VALUE_SYSTEM_SCICKDIVCR & R_SYSTEM_SCICKDIVCR_CKDIV_Msk ];
+
+    // Get I3C clock frequency.
+    SYSTEM_Clocks->I3CCLK_Frequency = SYSTEM_GetI3CClockFrequency( hoco_frequency );
+
+    // Get I3C clock with requested divider.
+    SYSTEM_Clocks->I3CCLK_Frequency /= I3CDividersTable[ VALUE_SYSTEM_I3CCKDIVCR & R_SYSTEM_I3CCKDIVCR_I3CCKDIV_Msk ];
 }
 
 /**
@@ -958,8 +1041,29 @@ static void system_clock_configuration() {
         R_SYSTEM->CKOCR_b.CKOEN = 1; // Enable clock out
     }
 
-    R_SYSTEM->SCICKCR = VALUE_SYSTEM_SCICKCR;
+    // Set SPICLK parameters
+    R_SYSTEM->SPICKCR_b.CKSREQ = 1;
+    while ( !( R_SYSTEM->SPICKCR_b.CKSRDY ));
+    R_SYSTEM->SPICKDIVCR = VALUE_SYSTEM_SPICKDIVCR;
     R_SYSTEM->SPICKCR = VALUE_SYSTEM_SPICKCR;
+    R_SYSTEM->SPICKCR_b.CKSREQ = 0;
+    while ( R_SYSTEM->SPICKCR_b.CKSRDY );
+
+    // Set SCICLK parameters
+    R_SYSTEM->SCICKCR_b.CKSREQ = 1;
+    while ( !( R_SYSTEM->SCICKCR_b.CKSRDY ));
+    R_SYSTEM->SCICKDIVCR = VALUE_SYSTEM_SCICKDIVCR;
+    R_SYSTEM->SCICKCR = VALUE_SYSTEM_SCICKCR;
+    R_SYSTEM->SCICKCR_b.CKSREQ = 0;
+    while ( R_SYSTEM->SCICKCR_b.CKSRDY );
+
+    // Set I3CCLK parameters
+    R_SYSTEM->I3CCKCR_b.I3CCKREQ = 1;
+    while ( !( R_SYSTEM->I3CCKCR_b.I3CCKSRDY ));
+    R_SYSTEM->I3CCKDIVCR = VALUE_SYSTEM_I3CCKDIVCR;
+    R_SYSTEM->I3CCKCR = VALUE_SYSTEM_I3CCKCR;
+    R_SYSTEM->I3CCKCR_b.I3CCKREQ = 0;
+    while ( !( R_SYSTEM->I3CCKCR_b.I3CCKSRDY ));
 
     /* If PLL2 is enabled and PLL1 is not chosen as source clock
      * or PLL2 is disabled and PLL1 is chosen as clock source.

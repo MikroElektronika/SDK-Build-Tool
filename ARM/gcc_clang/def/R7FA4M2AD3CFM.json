@@ -228,7 +228,8 @@
                 }
             ],
             "key": "SYSTEM_SCKDIVCR",
-            "unused": "88ff8888"
+            "unused": "88ff8888",
+            "label": "System clock division control register"
         },
         {
             "address": "4001e026",
@@ -269,7 +270,8 @@
                 }
             ],
             "key": "SYSTEM_SCKSCR",
-            "unused": "000000f8"
+            "unused": "000000f8",
+            "label": "System clock source control register"
         },
         {
             "address": "4001e028",
@@ -488,7 +490,8 @@
                 }
             ],
             "key": "SYSTEM_PLLCCR",
-            "unused": "0000c0ec"
+            "unused": "0000c0ec",
+            "label": "Pll clock control register"
         },
         {
             "address": "4001e02a",
@@ -513,7 +516,8 @@
                 }
             ],
             "key": "SYSTEM_PLLCR",
-            "unused": "000000fe"
+            "unused": "000000fe",
+            "label": "Pll control register"
         },
         {
             "address": "4001e032",
@@ -538,7 +542,8 @@
                 }
             ],
             "key": "SYSTEM_MOSCCR",
-            "unused": "000000fe"
+            "unused": "000000fe",
+            "label": "Main clock oscillator control register"
         },
         {
             "address": "4001e036",
@@ -563,7 +568,8 @@
                 }
             ],
             "key": "SYSTEM_HOCOCR",
-            "unused": "000000fe"
+            "unused": "000000fe",
+            "label": "High-speed on-chip oscillator control register"
         },
         {
             "address": "4001e037",
@@ -592,7 +598,8 @@
                 }
             ],
             "key": "SYSTEM_HOCOCR2",
-            "unused": "000000fc"
+            "unused": "000000fc",
+            "label": "High-speed on-chip oscillator control register 2"
         },
         {
             "address": "4001e038",
@@ -617,7 +624,8 @@
                 }
             ],
             "key": "SYSTEM_MOCOCR",
-            "unused": "000000fe"
+            "unused": "000000fe",
+            "label": "Middle-speed on-chip oscillator control register"
         },
         {
             "address": "4001e03e",
@@ -712,7 +720,254 @@
                 }
             ],
             "key": "SYSTEM_CKOCR",
-            "unused": "00000008"
+            "unused": "00000008",
+            "label": "Clock out control register"
+        },
+        {
+            "address": "4001e048",
+            "default": "1300",
+            "fields": [
+                {
+                    "hidden": false,
+                    "init": "0",
+                    "key": "PL2IDIV",
+                    "label": "PLL2 Input Frequency Division Ratio Select",
+                    "mask": "3",
+                    "settings": [
+                        {
+                            "label": "\u2215 1 (value after reset)",
+                            "value": "0"
+                        },
+                        {
+                            "label": "\u2215 2",
+                            "value": "1"
+                        },
+                        {
+                            "label": "\u2215 3",
+                            "value": "2"
+                        }
+                    ]
+                },
+                {
+                    "hidden": false,
+                    "init": "0",
+                    "key": "PL2SRCSEL",
+                    "label": "PLL2 Clock Source Select",
+                    "mask": "10",
+                    "settings": [
+                        {
+                            "label": "Main clock oscillator",
+                            "value": "0"
+                        },
+                        {
+                            "label": "HOCO",
+                            "value": "10"
+                        }
+                    ]
+                },
+                {
+                    "hidden": false,
+                    "init": "1300",
+                    "key": "PLL2MUL",
+                    "label": "PLL2 Frequency Multiplication Factor Select",
+                    "mask": "3f00",
+                    "settings": [
+                        {
+                            "label": "x10.0",
+                            "value": "1300"
+                        },
+                        {
+                            "label": "x10.5",
+                            "value": "1400"
+                        },
+                        {
+                            "label": "x11.0",
+                            "value": "1500"
+                        },
+                        {
+                            "label": "x11.5",
+                            "value": "1600"
+                        },
+                        {
+                            "label": "x12.0",
+                            "value": "1700"
+                        },
+                        {
+                            "label": "x12.5",
+                            "value": "1800"
+                        },
+                        {
+                            "label": "x13.0",
+                            "value": "1900"
+                        },
+                        {
+                            "label": "x13.5",
+                            "value": "1a00"
+                        },
+                        {
+                            "label": "x14.0",
+                            "value": "1b00"
+                        },
+                        {
+                            "label": "x14.5",
+                            "value": "1c00"
+                        },
+                        {
+                            "label": "x15.0",
+                            "value": "1d00"
+                        },
+                        {
+                            "label": "x15.5",
+                            "value": "1e00"
+                        },
+                        {
+                            "label": "x16.0",
+                            "value": "1f00"
+                        },
+                        {
+                            "label": "x16.5",
+                            "value": "2000"
+                        },
+                        {
+                            "label": "x17.0",
+                            "value": "2100"
+                        },
+                        {
+                            "label": "x17.5",
+                            "value": "2200"
+                        },
+                        {
+                            "label": "x18.0",
+                            "value": "2300"
+                        },
+                        {
+                            "label": "x18.5",
+                            "value": "2400"
+                        },
+                        {
+                            "label": "x19.0",
+                            "value": "2500"
+                        },
+                        {
+                            "label": "x19.5",
+                            "value": "2600"
+                        },
+                        {
+                            "label": "x20.0",
+                            "value": "2700"
+                        },
+                        {
+                            "label": "x20.5",
+                            "value": "2800"
+                        },
+                        {
+                            "label": "x21.0",
+                            "value": "2900"
+                        },
+                        {
+                            "label": "x21.5",
+                            "value": "2a00"
+                        },
+                        {
+                            "label": "x22.0",
+                            "value": "2b00"
+                        },
+                        {
+                            "label": "x22.5",
+                            "value": "2c00"
+                        },
+                        {
+                            "label": "x23.0",
+                            "value": "2d00"
+                        },
+                        {
+                            "label": "x23.5",
+                            "value": "2e00"
+                        },
+                        {
+                            "label": "x24.0",
+                            "value": "2f00"
+                        },
+                        {
+                            "label": "x24.5",
+                            "value": "3000"
+                        },
+                        {
+                            "label": "x25.0",
+                            "value": "3100"
+                        },
+                        {
+                            "label": "x25.5",
+                            "value": "3200"
+                        },
+                        {
+                            "label": "x26.0",
+                            "value": "3300"
+                        },
+                        {
+                            "label": "x26.5",
+                            "value": "3400"
+                        },
+                        {
+                            "label": "x27.0",
+                            "value": "3500"
+                        },
+                        {
+                            "label": "x27.5",
+                            "value": "3600"
+                        },
+                        {
+                            "label": "x28.0",
+                            "value": "3700"
+                        },
+                        {
+                            "label": "x28.5",
+                            "value": "3800"
+                        },
+                        {
+                            "label": "x29.0",
+                            "value": "3900"
+                        },
+                        {
+                            "label": "x29.5",
+                            "value": "3a00"
+                        },
+                        {
+                            "label": "x30.0",
+                            "value": "3b00"
+                        }
+                    ]
+                }
+            ],
+            "key": "SYSTEM_PLL2CCR",
+            "unused": "0000c0ec",
+            "label": "PLL2 Clock Control Register"
+        },
+        {
+            "address": "4001e04a",
+            "default": "1",
+            "fields": [
+                {
+                    "hidden": false,
+                    "init": "1",
+                    "key": "PLL2STP",
+                    "label": "PLL2 Stop Control",
+                    "mask": "1",
+                    "settings": [
+                        {
+                            "label": "PLL2 is operating",
+                            "value": "0"
+                        },
+                        {
+                            "label": "PLL2 is stopped.",
+                            "value": "1"
+                        }
+                    ]
+                }
+            ],
+            "key": "SYSTEM_PLL2CR",
+            "unused": "000000fe",
+            "label": "PLL2 Control Register"
         },
         {
             "address": "4001e0a0",
@@ -737,7 +992,8 @@
                 }
             ],
             "key": "SYSTEM_OPCCR",
-            "unused": "000000ec"
+            "unused": "000000ec",
+            "label": "Operating power control register"
         },
         {
             "address": "4001e0a2",
@@ -794,7 +1050,8 @@
                 }
             ],
             "key": "SYSTEM_MOSCWTCR",
-            "unused": "000000f0"
+            "unused": "000000f0",
+            "label": "Main clock oscillator wait control register"
         },
         {
             "address": "4001e0aa",
@@ -819,7 +1076,8 @@
                 }
             ],
             "key": "SYSTEM_SOPCCR",
-            "unused": "000000ee"
+            "unused": "000000ee",
+            "label": "Sub operating power control register"
         },
         {
             "address": "4001e413",
@@ -869,7 +1127,8 @@
                 }
             ],
             "key": "SYSTEM_MOMCR",
-            "unused": "0000008f"
+            "unused": "0000008f",
+            "label": "Main clock oscillator mode oscillation control register"
         },
         {
             "address": "4001e480",
@@ -894,7 +1153,8 @@
                 }
             ],
             "key": "SYSTEM_SOSCCR",
-            "unused": "000000fe"
+            "unused": "000000fe",
+            "label": "Sub-clock oscillator control register"
         },
         {
             "address": "4001e481",
@@ -919,7 +1179,8 @@
                 }
             ],
             "key": "SYSTEM_SOMCR",
-            "unused": "000000fd"
+            "unused": "000000fd",
+            "label": "Sub-clock oscillator mode control register"
         },
         {
             "address": "4001e490",
@@ -944,7 +1205,8 @@
                 }
             ],
             "key": "SYSTEM_LOCOCR",
-            "unused": "000000fe"
+            "unused": "000000fe",
+            "label": "Low-speed on-chip oscillator control register"
         }
     ],
     "core": "M33EF",
