@@ -27,6 +27,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
+          pkg-config --modversion zlib
           python -m pip install --upgrade pip
           pip install -r scripts/requirements/shared.txt
           pip install -r scripts/requirements/release.txt
