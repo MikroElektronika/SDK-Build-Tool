@@ -1,8 +1,9 @@
 import os, time, argparse
-import json
+import json, sys
 from elasticsearch import Elasticsearch
 from datetime import datetime
 import classes.class_generate_events_json as calendar_events
+from zoneinfo import ZoneInfo
 
 import support as support
 
@@ -30,9 +31,10 @@ def fetch_current_indexed_sdk_files(es : Elasticsearch, index_name):
     for eachHit in response['hits']['hits']:
         if not 'name' in eachHit['_source']:
             continue
-        if 'necto_package' == eachHit['_type']:
-            if False == eachHit['_source']['hidden']:
-                all_packages.append(eachHit['_source'])
+        if '_type' in eachHit:
+            if '_doc' == eachHit['_type']:
+                if False == eachHit['_source']['hidden']:
+                    all_packages.append(eachHit['_source'])
 
     # Sort all_packages alphabetically by the 'name' field
     all_packages.sort(key=lambda x: x['name'])
@@ -63,9 +65,7 @@ def fetch_current_indexed_click_boards(es : Elasticsearch, index_name):
     for eachHit in response['hits']['hits']:
         if not 'name' in eachHit['_source']:
             continue
-        if index_name == eachHit['_type']:
-            if 'mikroe.click' in eachHit['_source']['name']:
-                all_packages.append(eachHit['_source'])
+        all_packages.append(eachHit['_source'])
 
     return all_packages
 
@@ -75,26 +75,45 @@ if __name__ == '__main__':
     parser.add_argument("doc_link", help="Spreadsheet table with release details - link.")
     parser.add_argument("sdk_index", help="SDK packages index.")
     parser.add_argument("clicks_index", help="Click packages index.")
+    parser.add_argument(
+        "--date",
+        dest="release_date",
+        default=None,
+        help="Release date in YYYY-MM-DD format. Defaults to today."
+    )
 
     ## Parse the arguments
     args = parser.parse_args()
 
     # Elasticsearch instance used for getting indexing info
     num_of_retries = 1
+    print("Trying to connect to ES.")
     while True:
-        print(f"Trying to connect to ES. Connection retry:  {num_of_retries}")
         es = Elasticsearch([os.environ['ES_HOST']], http_auth=(os.environ['ES_USER'], os.environ['ES_PASSWORD']))
         if es.ping():
             break
-        # Wait for 30 seconds and try again if connection fails
+        # Wait 1 second and try again if connection fails
         if 10 == num_of_retries:
             # Exit if it fails 10 times, something is wrong with the server
             raise ValueError("Connection to ES failed!")
+        print(f"Connection retry: {num_of_retries}")
         num_of_retries += 1
 
-        time.sleep(30)
+        time.sleep(1)
 
-    current_date = datetime.now().strftime("%Y-%m-%d")
+    if args.release_date:
+        try:
+            datetime.strptime(args.release_date, "%Y-%m-%d")
+        except ValueError as exc:
+            raise ValueError(
+                f"Invalid release date '{args.release_date}'. Expected YYYY-MM-DD."
+            ) from exc
+
+        current_date = args.release_date
+    else:
+        current_date = datetime.now(ZoneInfo("Europe/Belgrade")).strftime("%Y-%m-%d")
+
+    print(f"Generating Web News for: {current_date}")
 
     # Get all indexed click boards
     all_click_boards = fetch_current_indexed_click_boards(es, args.clicks_index)
@@ -129,7 +148,17 @@ if __name__ == '__main__':
         # Find newly published clicks
         if 'published' in each_click:
             if each_click['published'].startswith(current_date):
-                todays_release = todays_release.replace('</ul>', f'\t<li>Driver for {each_click['display_name'].replace('click', 'Click')}</li>\n</ul>')
+                if 'click' in each_click['name']:
+                    # If it is a Click Package release
+                    todays_release = todays_release.replace('</ul>', f'\t<li>Driver for {each_click['display_name'].replace('click', 'Click')}</li>\n</ul>')
+                else:
+                    # If it is a Demo Package release
+                    if each_click['version'] == '3.0.0':
+                        # If it as an initial release
+                        todays_release = todays_release.replace('</ul>', f'\t<li>{each_click['display_name']}</li>\n</ul>')
+                    else:
+                        # If it as a Demo update
+                        todays_update = todays_update.replace('</ul>', f'\t<li>{each_click['display_name']}</li>\n</ul>')
             # TODO - when info regarding update tracing is provided - update accordingly
             # if each_click['last_updated'].startswith(current_date):
                 # todays_update = todays_update.replace('</ul>', f'\t<li>{each_click['display_name']}</li>\n</ul>')
@@ -143,7 +172,7 @@ if __name__ == '__main__':
             # Find newly published SDK packages
             if sdk_file['published_at'].startswith(current_date):
                 # Check if it is a newly released package that is listed in release spreadsheet
-                if sdk_file['display_name'] in release_spreadsheet_data:
+                if sdk_file['display_name'] in release_spreadsheet_data and f'Clock for {sdk_file['display_name']}' not in release_spreadsheet_data:
                     if sdk_file['type'] == 'mcu':
                         # Separate MCU packages to display them before boards and cards
                         mcu_lines += f'\t<li>{sdk_file['display_name']}</li>\n'
@@ -161,12 +190,20 @@ if __name__ == '__main__':
                         todays_release = todays_release.replace('</ul>', f'\t<li>{sdk_file['display_name']}</li>\n</ul>')
                 # If it is not newly released package - add it to UPDATED section
                 else:
-                    if sdk_file['type'] == 'card':
-                        todays_update = todays_update.replace('</ul>', f'\t<li>Card Package for {sdk_file['display_name']}</li>\n</ul>')
-                    elif sdk_file['type'] == 'board':
-                        todays_update = todays_update.replace('</ul>', f'\t<li>Board Package for {sdk_file['display_name']}</li>\n</ul>')
+                    if 'Clock' not in release_spreadsheet_data:
+                        if sdk_file['type'] == 'card':
+                            todays_update = todays_update.replace('</ul>', f'\t<li>Card Package for {sdk_file['display_name']}</li>\n</ul>')
+                        elif sdk_file['type'] == 'board':
+                            todays_update = todays_update.replace('</ul>', f'\t<li>Board Package for {sdk_file['display_name']}</li>\n</ul>')
+                        else:
+                            todays_update = todays_update.replace('</ul>', f'\t<li>{sdk_file['display_name']}</li>\n</ul>')
                     else:
-                        todays_update = todays_update.replace('</ul>', f'\t<li>{sdk_file['display_name']}</li>\n</ul>')
+                        if sdk_file['type'] == 'card':
+                            todays_update = todays_update.replace('</ul>', f'\t<li>Clock preset for {sdk_file['display_name']}</li>\n</ul>')
+                        elif sdk_file['type'] == 'board':
+                            todays_update = todays_update.replace('</ul>', f'\t<li>Clock preset for {sdk_file['display_name']}</li>\n</ul>')
+                        else:
+                            todays_update = todays_update.replace('</ul>', f'\t<li>{sdk_file['display_name']}</li>\n</ul>')
                     update_present = 1
 
     # Workaround to display mikroSDK as updated package although it is in the spreadsheet
@@ -188,7 +225,7 @@ if __name__ == '__main__':
     if update_present:
         todays_release += todays_update
 
-    # MCU Packages/SDK Packages should have "Released" keyword in Status column
+    # MCU Packages/SDK Packages for today should have "Released" keyword in Status column
     # In addition to this, they should be added to the Release Calendar
     if '' == mcu_lines and '' == board_lines and '' == card_lines and '' == codegrip_lines:
         print('Check Release Spreadsheet or update the Calendar')
