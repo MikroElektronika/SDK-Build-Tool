@@ -103,35 +103,29 @@ jobs:
           ES_PASSWORD: ${{ secrets.ES_PASSWORD }}
           MIKROE_NECTO_AWS: ${{ secrets.MIKROE_NECTO_AWS }}
           RELEASES_SPREADSHEET: ${{ secrets.RELEASES_SPREADSHEET }}
-          ES_INDEX_LIVE: ${{ secrets.ES_INDEX_LIVE }}
-          ES_CLICKS_INDEX_LIVE: ${{ secrets.ES_CLICKS_INDEX_LIVE }}
         run: |
           python -u scripts/build_message_web.py \
             "NECTO DAILY UPDATE" \
             "$RELEASES_SPREADSHEET" \
-            "$ES_INDEX_LIVE" \
-            "$ES_CLICKS_INDEX_LIVE" \
+            ${{ secrets.ES_INDEX_LIVE }} \
+            ${{ secrets.ES_CLICKS_INDEX_LIVE }} \
             --date "$NEWS_DATE"
 
       - name: Notify Post Message Failure
         if: failure()
         env:
           MATTERMOST_WEBHOOK_URL_SDK: ${{ secrets.MATTERMOST_WEBHOOK_URL_SDK }}
-          INPUT_DATE: ${{ github.event.inputs.release_date }}
         run: |
-          FAILED_DATE="${NEWS_DATE:-$INPUT_DATE}"
+          FAILED_DATE="${NEWS_DATE:-${{ github.event.inputs.release_date }}}"
 
           if [ -z "$FAILED_DATE" ]; then
             FAILED_DATE="today"
           fi
 
           MESSAGE="**Check Release Spreadsheet or update the Calendar - there are no SDK Packages for the NECTO Daily Update on $FAILED_DATE.**"
-
-          curl --fail-with-body --show-error \
-            -X POST \
-            -H 'Content-Type: application/json' \
-            --data "{\"text\": \"$MESSAGE\"}" \
-            "$MATTERMOST_WEBHOOK_URL_SDK"
+          curl -X POST -H 'Content-Type: application/json' \
+          --data "{\"text\": \"$MESSAGE\"}" \
+          $MATTERMOST_WEBHOOK_URL_SDK
 
       - name: Upload News File
         uses: actions/upload-artifact@v4
@@ -150,73 +144,33 @@ jobs:
         with:
           name: news-file
 
-      - name: Validate Beta Website Credentials
-        env:
-          MIKROE_BETA_URL: ${{ secrets.MIKROE_BETA_URL }}
-          WEB_BETA_USER: ${{ secrets.WEB_BETA_USER }}
-          WEB_BETA_PASSWORD: ${{ secrets.WEB_BETA_PASSWORD }}
-        run: |
-          missing=0
-
-          if [ -z "$MIKROE_BETA_URL" ]; then
-            echo "::error::MIKROE_BETA_URL secret is empty or unavailable."
-            missing=1
-          fi
-
-          if [ -z "$WEB_BETA_USER" ]; then
-            echo "::error::WEB_BETA_USER secret is empty or unavailable."
-            missing=1
-          fi
-
-          if [ -z "$WEB_BETA_PASSWORD" ]; then
-            echo "::error::WEB_BETA_PASSWORD secret is empty or unavailable."
-            missing=1
-          fi
-
-          if [ "$missing" -ne 0 ]; then
-            exit 1
-          fi
-
       - name: Post message on Beta Website
         env:
           MIKROE_BETA_URL: ${{ secrets.MIKROE_BETA_URL }}
-          WEB_BETA_USER: ${{ secrets.WEB_BETA_USER }}
-          WEB_BETA_PASSWORD: ${{ secrets.WEB_BETA_PASSWORD }}
           NEWS_DATE: ${{ needs.prepare_news.outputs.news_date }}
           NEWS_DATETIME: ${{ needs.prepare_news.outputs.news_datetime }}
         run: |
           MESSAGE=$(cat message.txt)
           FORMATTED_DATE=$(date -d "$NEWS_DATE" +"%a %b %d")
 
-          echo "Posting Beta Web News for $NEWS_DATE"
-
-          curl \
-            --fail-with-body \
-            --show-error \
-            --silent \
-            --user "$WEB_BETA_USER:$WEB_BETA_PASSWORD" \
-            "$MIKROE_BETA_URL" \
-            --header 'Content-Type: application/x-www-form-urlencoded' \
-            --header 'Cookie: PHPSESSID=bdu5qnabbu4bpucutoqa4dea95; PrestaShop-c70d81b27989da2e05775a7416c2a451=7LlCRwFwicyVSo9CGkRIGxvgnGHSZknmUUGAf4FagfDu1ZAio%2B%2Fm0fGU6AWzPnSalLDnm99ipnraikuHQ6qumZwMervfogxNSuEvoN%2BXqM8o6osXcG%2FwXztgwd1U4C4LVMKjv9sDymWMFO%2FOKCvzsu5tK28MUdAF%2FP77lxnnZDNOLTj8MniASlaesF%2FyxiE6RqmLq%2FVc9H4oCwQWccZH2XvbTHOeBYynAx6x%2B%2BJJDf7ODMWvOuyjrkmLvbNPZ5sO000185' \
-            --data-urlencode "title=Release for $FORMATTED_DATE" \
-            --data-urlencode 'description=Beta release' \
-            --data-urlencode 'category=SW daily release' \
-            --data-urlencode "date=$NEWS_DATETIME" \
-            --data-urlencode "body=$MESSAGE"
+          curl --user ${{ secrets.WEB_BETA_USER }}:${{ secrets.WEB_BETA_PASSWORD }} "$MIKROE_BETA_URL" \
+              --header 'Content-Type: application/x-www-form-urlencoded' \
+              --header 'Cookie: PHPSESSID=bdu5qnabbu4bpucutoqa4dea95; PrestaShop-c70d81b27989da2e05775a7416c2a451=7LlCRwFwicyVSo9CGkRIGxvgnGHSZknmUUGAf4FagfDu1ZAio%2B%2Fm0fGU6AWzPnSalLDnm99ipnraikuHQ6qumZwMervfogxNSuEvoN%2BXqM8o6osXcG%2FwXztgwd1U4C4LVMKjv9sDymWMFO%2FOKCvzsu5tK28MUdAF%2FP77lxnnZDNOLTj8MniASlaesF%2FyxiE6RqmLq%2FVc9H4oCwQWccZH2XvbTHOeBYynAx6x%2B%2BJJDf7ODMWvOuyjrkmLvbNPZ5sO000185' \
+              --data-urlencode "title=Release for $FORMATTED_DATE" \
+              --data-urlencode 'description=Beta release' \
+              --data-urlencode 'category=SW daily release' \
+              --data-urlencode "date=$NEWS_DATETIME" \
+              --data-urlencode "body=$MESSAGE"
 
       - name: Notify Mattermost - Web News Ready
-        if: success()
         env:
           MATTERMOST_WEBHOOK_URL_SDK: ${{ secrets.MATTERMOST_WEBHOOK_URL_SDK }}
           NEWS_DATE: ${{ needs.prepare_news.outputs.news_date }}
         run: |
           MESSAGE="**Beta Web News posted for $NEWS_DATE.**\n> Take a look at [Beta Blog](https://beta.mikroe.com/blog#necto_studio_daily_updates&page=1)\n"
-
-          curl --fail-with-body --show-error \
-            -X POST \
-            -H 'Content-Type: application/json' \
-            --data "{\"text\": \"$MESSAGE\"}" \
-            "$MATTERMOST_WEBHOOK_URL_SDK"
+          curl -X POST -H 'Content-Type: application/json' \
+          --data "{\"text\": \"$MESSAGE\"}" \
+          $MATTERMOST_WEBHOOK_URL_SDK
 
   post_official:
     needs: prepare_news
@@ -229,15 +183,6 @@ jobs:
         with:
           name: news-file
 
-      - name: Validate Official Website URL
-        env:
-          MIKROE_OFFICIAL_URL: ${{ secrets.MIKROE_OFFICIAL_URL }}
-        run: |
-          if [ -z "$MIKROE_OFFICIAL_URL" ]; then
-            echo "::error::MIKROE_OFFICIAL_URL secret is empty or unavailable."
-            exit 1
-          fi
-
       - name: Post message on Official Website
         env:
           MIKROE_OFFICIAL_URL: ${{ secrets.MIKROE_OFFICIAL_URL }}
@@ -247,32 +192,21 @@ jobs:
           MESSAGE=$(cat message.txt)
           FORMATTED_DATE=$(date -d "$NEWS_DATE" +"%a %b %d")
 
-          echo "Posting Official Web News for $NEWS_DATE"
-
-          curl \
-            --fail-with-body \
-            --show-error \
-            --silent \
-            --location \
-            "$MIKROE_OFFICIAL_URL" \
-            --header 'Content-Type: application/x-www-form-urlencoded' \
-            --header 'Cookie: PHPSESSID=bdu5qnabbu4bpucutoqa4dea95; PrestaShop-c70d81b27989da2e05775a7416c2a451=7LlCRwFwicyVSo9CGkRIGxvgnGHSZknmUUGAf4FagfDu1ZAio%2B%2Fm0fGU6AWzPnSalLDnm99ipnraikuHQ6qumZwMervfogxNSuEvoN%2BXqM8o6osXcG%2FwXztgwd1U4C4LVMKjv9sDymWMFO%2FOKCvzsu5tK28MUdAF%2FP77lxnnZDNOLTj8MniASlaesF%2FyxiE6RqmLq%2FVc9H4oCwQWccZH2XvbTHOeBYynAx6x%2B%2BJJDf7ODMWvOuyjrkmLvbNPZ5sO000185' \
-            --data-urlencode "title=Release for $FORMATTED_DATE" \
-            --data-urlencode 'description=Official release' \
-            --data-urlencode 'category=SW daily release' \
-            --data-urlencode "date=$NEWS_DATETIME" \
-            --data-urlencode "body=$MESSAGE"
+          curl --location $MIKROE_OFFICIAL_URL \
+              --header 'Content-Type: application/x-www-form-urlencoded' \
+              --header 'Cookie: PHPSESSID=bdu5qnabbu4bpucutoqa4dea95; PrestaShop-c70d81b27989da2e05775a7416c2a451=7LlCRwFwicyVSo9CGkRIGxvgnGHSZknmUUGAf4FagfDu1ZAio%2B%2Fm0fGU6AWzPnSalLDnm99ipnraikuHQ6qumZwMervfogxNSuEvoN%2BXqM8o6osXcG%2FwXztgwd1U4C4LVMKjv9sDymWMFO%2FOKCvzsu5tK28MUdAF%2FP77lxnnZDNOLTj8MniASlaesF%2FyxiE6RqmLq%2FVc9H4oCwQWccZH2XvbTHOeBYynAx6x%2B%2BJJDf7ODMWvOuyjrkmLvbNPZ5sO000185' \
+              --data-urlencode "title=Release for $FORMATTED_DATE" \
+              --data-urlencode 'description=Official release' \
+              --data-urlencode 'category=SW daily release' \
+              --data-urlencode "date=$NEWS_DATETIME" \
+              --data-urlencode "body=$MESSAGE"
 
       - name: Notify Mattermost - Web News Ready
-        if: success()
         env:
           MATTERMOST_WEBHOOK_URL_SDK: ${{ secrets.MATTERMOST_WEBHOOK_URL_SDK }}
           NEWS_DATE: ${{ needs.prepare_news.outputs.news_date }}
         run: |
           MESSAGE="**Official Web News posted for $NEWS_DATE.**\n> Take a look at [MIKROE Blog](https://www.mikroe.com/blog#necto_studio_daily_updates&page=1)\n"
-
-          curl --fail-with-body --show-error \
-            -X POST \
-            -H 'Content-Type: application/json' \
-            --data "{\"text\": \"$MESSAGE\"}" \
-            "$MATTERMOST_WEBHOOK_URL_SDK"
+          curl -X POST -H 'Content-Type: application/json' \
+          --data "{\"text\": \"$MESSAGE\"}" \
+          $MATTERMOST_WEBHOOK_URL_SDK
