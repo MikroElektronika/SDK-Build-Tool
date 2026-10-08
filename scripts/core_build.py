@@ -691,6 +691,7 @@ def index_package(package_name, mcus_to_index, es_instance, indexed_packages):
 def package_asset(source_dir, output_dir, arch, entry_name, changes_dict, es_instance, indexed_packages):
     cmake_files = find_cmake_files(source_dir)
     file_paths = parse_files_for_paths(cmake_files, source_dir, True)
+    print(file_paths)
     for cmake_file, data in file_paths.items():
         base_output_dir = os.path.join(output_dir, f"{arch.lower()}_{entry_name.lower()}_{cmake_file}") # Subdirectory for this .cmake file
         coreQueriesPath = os.path.join(os.getcwd(), 'resources/queries')
