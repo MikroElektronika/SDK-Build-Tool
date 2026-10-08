@@ -807,8 +807,8 @@ def main():
 
     files = get_changed_files('main')
     archs = []
-    architectures = ["ARM", "RISCV", "PIC32", "PIC", "dsPIC", "AVR"]
-    valid_entries = ["gcc_clang", "XC32", "XC16", "XC8"]
+    architectures = ["ARM", "RISCV", "PIC32", "PIC", "dsPIC", "AVR", "RX", "RL78"]
+    valid_entries = ["gcc_clang", "XC32", "XC16", "XC8", "gcc", "llvm"]
     for file in files:
         for architecture in architectures:
             if architecture == file.split('/')[0] and architecture not in archs:
