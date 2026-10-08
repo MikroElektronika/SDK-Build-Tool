@@ -544,6 +544,7 @@ def get_core(mcuNames, package_name, cmake_file, source_dir, changes_dict):
             core = get_core_from_queries(os.path.join(os.getcwd(), "resources/queries/mcus", mcu_name, 'Devices.json'))
         mcuNames[cmake_file]['cores'].add(core)
         changes_dict['mcu_list'].append(mcu_name)
+        print(f'Added {mcu_name} to build')
 
 def filter_versions(versions):
     # Filter out versions that contain non-numeric characters (e.g., words or suffixes)
@@ -808,11 +809,12 @@ def main():
     files = get_changed_files('main')
     archs = []
     architectures = ["ARM", "RISCV", "PIC32", "PIC", "dsPIC", "AVR", "RX", "RL78"]
-    valid_entries = ["gcc_clang", "XC32", "XC16", "XC8", "gcc", "llvm"]
+    valid_entries = ["gcc_clang", "XC32", "XC16", "XC8", "gcc", "LLVM"]
     for file in files:
         for architecture in architectures:
             if architecture == file.split('/')[0] and architecture not in archs:
                 archs.append(architecture)
+                print(f'Changes detected for {architecture}!')
     changes_dict = {
         'mcu_list': [],
         'build_status': {}
