@@ -231,6 +231,7 @@ def find_cmake_files(path):
     for file in files:
         if 'cmake/' in file and 'delays/' not in file and file not in cmake_files:
             cmake_files.append(file)
+            print(f'Detected new cmake: {file}')
     return cmake_files
 
 def parse_files_for_paths(cmake_files, source_dir, isGCC=None):
