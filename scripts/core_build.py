@@ -436,7 +436,7 @@ def copy_cmake_files(cmake_file, source_dir, output_dir, regex):
         shutil.copy(fallback_config_path, os.path.join(output_dir, "cmake"))
     if os.path.exists(install_headers_path):
         shutil.copy(install_headers_path, os.path.join(output_dir, "cmake"))
-    if 'gcc_clang' in source_dir:
+    if 'gcc' in source_dir or 'LLVM' in source_dir:
         mcuFileName = find_first_matching_mcu_name(source_dir, regex)
         delays_cmake_dir = os.path.join(os.path.dirname(cmake_file), 'delays')
         delay_relative_path = os.path.relpath(delays_cmake_dir, start=source_dir)
